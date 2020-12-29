@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ApplicationServices
+namespace ApplicationServices.Interfaces
 {
-    class Class1
+    public interface IEntityServiceBLL<T>
     {
+
     }
 }

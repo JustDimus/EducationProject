@@ -7,7 +7,7 @@ namespace DomainServices.Interfaces
 {
     public interface IRepository<T> where T : BaseEntity
     {
-        IEnumerable<T> Get(Predicate<int> Condition);
+        IEnumerable<T> Get(Predicate<T> Condition);
 
         T Get(int Id);
 

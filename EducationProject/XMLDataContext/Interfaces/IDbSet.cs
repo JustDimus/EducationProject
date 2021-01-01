@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DomainCore.BLL;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

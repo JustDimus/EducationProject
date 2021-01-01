@@ -18,7 +18,7 @@ namespace XMLDataContext.DataContext
 
         public XMLContext()
         {
-            _document = new FileCheckers.FileChecker(ConfigurationManager.ConnectionStrings["XMLFile"].ConnectionString).Get();
+            _document = new FileCheckers.FileChecker(ConfigurationManager.AppSettings.Get("XMLFile")).Get();
         }
 
         public IDbSet<User> Users

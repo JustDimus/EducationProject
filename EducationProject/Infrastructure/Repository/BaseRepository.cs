@@ -15,7 +15,7 @@ namespace Infrastructure.Repository
 
         public BaseRepository(IDbSet<T> elements)
         {
-
+            Elements = elements;
         }
 
         private void CheckElements()

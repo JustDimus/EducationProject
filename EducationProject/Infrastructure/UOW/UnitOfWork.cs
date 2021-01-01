@@ -14,6 +14,12 @@ namespace Infrastructure.UOW
 
         private IRepository<User> _usersRepos;
 
+        public UnitOfWork(XMLContext DataContext)
+        {
+            _dataContext = DataContext;
+        }
+
+
         public IRepository<User> Users
         {
             get

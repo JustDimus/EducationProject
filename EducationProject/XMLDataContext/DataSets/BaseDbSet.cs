@@ -18,18 +18,18 @@ namespace XMLDataContext.DataSets
         public BaseDbSet(IXMLParser<T> Parser, XDocument Document)
         {
             _parser = Parser;
-            _elements = new Dictionary<T, ElementState>();
+            _elements = new Dictionary<int, (T, ElementState)>();
 
             _document = Document;
         }
 
-        private Dictionary<T, ElementState> _elements;
+        private Dictionary<int, (T, ElementState)> _elements;
 
-        public Dictionary<T, ElementState> Elements => _elements;
+        public Dictionary<int, (T, ElementState)> Elements => _elements;
 
         public void Delete(T Entity)
         {
-            _elements.Add(Entity, ElementState.Deleted);
+            _elements[Entity.Id] = (Entity, ElementState.Deleted);
         }
 
         public T Get(int Id)
@@ -67,20 +67,64 @@ namespace XMLDataContext.DataSets
 
         public void Insert(T Entity)
         {
-            _elements[Entity] = ElementState.Created;
-//            _elements.Add(Entity, ElementState.Created);
+            if (Get(Entity) != null)
+                throw new Exception("Current entity already exist!");
+
+            _elements[Entity.Id] = (Entity, ElementState.Created);
         }
 
         public void Save()
         {
-            throw new NotImplementedException();
+            foreach(var i in (from element in _document.Root.Elements(_parser.ElementName) select element))
+            {
+                int currentId = Int32.Parse(i.Attribute("Id").Value);
+                if (_elements.ContainsKey(currentId))
+                {
+                    switch(_elements[currentId].Item2)
+                    {
+                        case ElementState.Updated:
+                            i.ReplaceAll(_parser.ParseToXElement(_elements[currentId].Item1));
+                            break;
+                        case ElementState.Deleted:
+                            i.Remove();
+                            break;
+                    }
+                }
+            }
+
+            foreach (var i in (from t in _elements where t.Value.Item2 == ElementState.Created select t))
+            {
+                _document.Root.Add(_parser.ParseToXElement(i.Value.Item1));
+            }
+
+            foreach(var i in _elements.Keys.ToList())
+            {
+                _elements[i] = (_elements[i].Item1, ElementState.NoAction);
+            }
         }
 
         public void Update(T Entity)
         {
-            _elements[Entity] = ElementState.Updated;
- //           if(_elements.ContainsKey(Entity))
-//                _elements.Add(Entity, ElementState.Updated);
+            if(_elements.ContainsKey(Entity.Id))
+            {
+                if (_elements[Entity.Id].Item2 == ElementState.Created)
+                {
+                    _elements[Entity.Id] = (Entity, ElementState.Created);
+                }
+                else
+                {
+                    _elements[Entity.Id] = (Entity, ElementState.Updated);
+                }
+                return;
+            }
+            if (Get(t => t.Id == Entity.Id) != null)
+            {
+                _elements[Entity.Id] = (Entity, ElementState.Updated);
+            }
+            else
+            {
+                _elements[Entity.Id] = (Entity, ElementState.Created);
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -94,7 +138,7 @@ namespace XMLDataContext.DataSets
 
         private T TryFindInLocalCollection(int Id)
         {
-            return (from pair in _elements where pair.Key.Id == Id select pair.Key).FirstOrDefault();
+            return (from pair in _elements.Values where pair.Item1.Id == Id select pair.Item1).FirstOrDefault();
         } 
     }
 }

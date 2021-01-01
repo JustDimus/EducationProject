@@ -12,13 +12,16 @@ namespace XMLDataContext.DataContext
     {
         private IDbSet<User> _users;
 
+        private string _fileName;
+
         private XDocument _document;
 
         private string filePath { get; set; }
 
         public XMLContext()
         {
-            _document = new FileCheckers.FileChecker(ConfigurationManager.AppSettings.Get("XMLFile")).Get();
+            _fileName = ConfigurationManager.AppSettings.Get("XMLFile");
+            _document = new FileCheckers.FileChecker(_fileName).Get();
         }
 
         public IDbSet<User> Users
@@ -35,7 +38,9 @@ namespace XMLDataContext.DataContext
 
         public void Save()
         {
-            //TODO
+            _users?.Save();
+
+            _document.Save(_fileName);
         }
     }
 }

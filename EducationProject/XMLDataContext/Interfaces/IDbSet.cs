@@ -7,7 +7,7 @@ namespace XMLDataContext.Interfaces
 {
     public interface IDbSet<T>: IEnumerable<T>
     {
-        Dictionary<T, ElementState> Elements { get; }
+        Dictionary<int, (T, ElementState)> Elements { get; }
         
         T Get(int Id);
 

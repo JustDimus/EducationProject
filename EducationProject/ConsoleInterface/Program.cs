@@ -1,5 +1,8 @@
 ﻿using Infrastructure.UOW;
 using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 
 namespace ConsoleInterface
 {
@@ -12,27 +15,33 @@ namespace ConsoleInterface
             var t = new DomainCore.BLL.User()
             {
                 Id = 15,
-                City = "Counter",
-                Country = "Cww",
+                City = "New-York",
+                Country = "USA",
                 FirstName = "John",
                 SecondName = "Cena",
                 Mail = "JohnCena@gmail.com",
-                PhoneNumber = "+380777123456"
+                PhoneNumber = "+10777123456"
             };
 
             var z = new DomainCore.BLL.User()
             {
                 Id = 15,
-                City = "Counter",
-                Country = "Cww",
+                City = "Las-Vegas",
+                Country = "USA",
                 FirstName = "John",
                 SecondName = "Cena",
                 Mail = "JohnCena@gmail.com",
-                PhoneNumber = "+380777123456"
+                PhoneNumber = "+10777123456"
             };
 
-            uow.Users.Insert(t);
-            uow.Users.Update(z);
+            uow.Users.Insert(z);
+
+            uow.Users.Update(t);
+
+            uow.Save();
+
+            var u = uow.Users.Get(t => true).ToList();
+
         }
     }
 }

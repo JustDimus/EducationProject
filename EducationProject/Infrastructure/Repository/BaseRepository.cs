@@ -9,11 +9,11 @@ using XMLDataContext.Interfaces;
 
 namespace Infrastructure.Repository
 {
-    public abstract class BaseRepository<T> : IRepository<T> where T : BaseEntity
+    public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         protected IDbSet<T> Elements;
 
-        public BaseRepository(XMLContext elements)
+        public BaseRepository(IDbSet<T> elements)
         {
 
         }

@@ -6,8 +6,20 @@ using XMLDataContext.Interfaces;
 
 namespace XMLDataContext.DataSets
 {
-    public abstract class BaseDbSet<T> : IDbSet<T>
+    public class BaseDbSet<T> : IDbSet<T>
     {
+        IXMLParser<T> _parser;
+
+        public BaseDbSet(IXMLParser<T> Parser)
+        {
+            _parser = Parser;
+        }
+
+        private Dictionary<T, ElementState> _elements;
+
+
+        public Dictionary<T, ElementState> Elements => _elements;
+
         public void Delete(T Entity)
         {
             throw new NotImplementedException();

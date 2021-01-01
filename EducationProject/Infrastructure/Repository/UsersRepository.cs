@@ -5,15 +5,16 @@ using System.Text;
 using XMLDataContext.DataContext;
 using XMLDataContext.Interfaces;
 
+//NONEED
+
 namespace Infrastructure.Repository
 {
     public class UsersRepository : BaseRepository<User>
     {
-
-        public UsersRepository(XMLContext elements)
+        public UsersRepository(IDbSet<User> elements)
             : base(elements)
         {
-            Elements = elements.Users;
+
         }
     }
 }

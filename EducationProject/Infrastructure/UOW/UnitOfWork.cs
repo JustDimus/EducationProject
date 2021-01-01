@@ -20,7 +20,7 @@ namespace Infrastructure.UOW
             {
                 if(_usersRepos == null)
                 {
-                    _usersRepos = new UsersRepository(_dataContext);
+                    _usersRepos = new BaseRepository<User>(_dataContext.Users);
                 }
                 return _usersRepos;
             }

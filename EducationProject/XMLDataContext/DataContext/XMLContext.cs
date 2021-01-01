@@ -1,5 +1,4 @@
 ﻿using DomainCore.BLL;
-using System;
 using XMLDataContext.DataSets;
 using XMLDataContext.Interfaces;
 using System.Configuration;
@@ -38,7 +37,7 @@ namespace XMLDataContext.DataContext
 
         public void Save()
         {
-            _users?.Save();
+            Users.Save();
 
             _document.Save(_fileName);
         }

@@ -15,7 +15,7 @@ namespace ConsoleInterface
             var t = new DomainCore.BLL.User()
             {
                 Id = 15,
-                City = "New-York",
+                City = "Mahogon",
                 Country = "USA",
                 FirstName = "John",
                 SecondName = "Cena",
@@ -23,25 +23,13 @@ namespace ConsoleInterface
                 PhoneNumber = "+10777123456"
             };
 
-            var z = new DomainCore.BLL.User()
-            {
-                Id = 15,
-                City = "Las-Vegas",
-                Country = "USA",
-                FirstName = "John",
-                SecondName = "Cena",
-                Mail = "JohnCena@gmail.com",
-                PhoneNumber = "+10777123456"
-            };
+            //uow.Users.Insert(z);
 
-            uow.Users.Insert(z);
-
-            uow.Users.Update(t);
+            //uow.Users.Update(t);
 
             uow.Save();
 
             var u = uow.Users.Get(t => true).ToList();
-
         }
     }
 }

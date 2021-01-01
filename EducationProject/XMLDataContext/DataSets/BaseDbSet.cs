@@ -83,7 +83,7 @@ namespace XMLDataContext.DataSets
                     switch(_elements[currentId].Item2)
                     {
                         case ElementState.Updated:
-                            i.ReplaceAll(_parser.ParseToXElement(_elements[currentId].Item1));
+                            i.ReplaceWith(_parser.ParseToXElement(_elements[currentId].Item1));
                             break;
                         case ElementState.Deleted:
                             i.Remove();
@@ -117,7 +117,8 @@ namespace XMLDataContext.DataSets
                 }
                 return;
             }
-            if (Get(t => t.Id == Entity.Id) != null)
+
+            if (Get(t => t.Id == Entity.Id).FirstOrDefault() != null)
             {
                 _elements[Entity.Id] = (Entity, ElementState.Updated);
             }

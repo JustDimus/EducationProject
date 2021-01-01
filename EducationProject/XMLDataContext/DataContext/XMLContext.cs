@@ -2,6 +2,9 @@
 using System;
 using XMLDataContext.DataSets;
 using XMLDataContext.Interfaces;
+using System.Configuration;
+using XMLDataContext.Parsers;
+using System.Xml.Linq;
 
 namespace XMLDataContext.DataContext
 {
@@ -9,11 +12,13 @@ namespace XMLDataContext.DataContext
     {
         private IDbSet<User> _users;
 
+        private XDocument _document;
+
         private string filePath { get; set; }
 
-        public XMLContext(string FilePath)
+        public XMLContext()
         {
-            filePath = FilePath;
+            _document = new FileCheckers.FileChecker(ConfigurationManager.ConnectionStrings["XMLFile"].ConnectionString).Get();
         }
 
         public IDbSet<User> Users
@@ -22,7 +27,7 @@ namespace XMLDataContext.DataContext
             {
                 if(_users == null)
                 {
-                    _users = new UserDbSet();
+                    _users = new BaseDbSet<User>(new UserXMLParser(), _document);
                 }
                 return _users;
             }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 using XMLDataContext.Interfaces;
 
 namespace XMLDataContext.DataSets
@@ -10,13 +11,17 @@ namespace XMLDataContext.DataSets
     {
         IXMLParser<T> _parser;
 
-        public BaseDbSet(IXMLParser<T> Parser)
+        private XDocument _document;
+
+        public BaseDbSet(IXMLParser<T> Parser, XDocument Document)
         {
             _parser = Parser;
+            _elements = new Dictionary<T, ElementState>();
+
+            _document = Document;
         }
 
         private Dictionary<T, ElementState> _elements;
-
 
         public Dictionary<T, ElementState> Elements => _elements;
 
@@ -42,7 +47,9 @@ namespace XMLDataContext.DataSets
 
         public IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            foreach (var t in _elements)
+                yield return _parser.ParseToClass(null);
+            yield break;
         }
 
         public void Insert(T Entity)

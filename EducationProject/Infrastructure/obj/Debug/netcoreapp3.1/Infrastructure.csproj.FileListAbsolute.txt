@@ -1,0 +1,16 @@
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\Infrastructure.deps.json
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\Infrastructure.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\Infrastructure.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\DomainCore.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\DomainServices.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\XMLDataContext.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\DomainServices.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\XMLDataContext.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\bin\Debug\netcoreapp3.1\DomainCore.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.csprojAssemblyReference.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.AssemblyInfoInputs.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.AssemblyInfo.cs
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.csproj.CoreCompileInputs.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.csproj.CopyComplete
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\Infrastructure\obj\Debug\netcoreapp3.1\Infrastructure.pdb

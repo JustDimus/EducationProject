@@ -1,0 +1,9 @@
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\bin\Debug\netcoreapp3.1\DomainCore.deps.json
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\bin\Debug\netcoreapp3.1\DomainCore.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\bin\Debug\netcoreapp3.1\DomainCore.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\obj\Debug\netcoreapp3.1\DomainCore.csprojAssemblyReference.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\obj\Debug\netcoreapp3.1\DomainCore.AssemblyInfoInputs.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\obj\Debug\netcoreapp3.1\DomainCore.AssemblyInfo.cs
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\obj\Debug\netcoreapp3.1\DomainCore.csproj.CoreCompileInputs.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\obj\Debug\netcoreapp3.1\DomainCore.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainCore\obj\Debug\netcoreapp3.1\DomainCore.pdb

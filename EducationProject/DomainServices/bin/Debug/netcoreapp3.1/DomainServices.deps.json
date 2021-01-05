@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "DomainServices/1.0.0": {
+        "dependencies": {
+          "DomainCore": "1.0.0"
+        },
+        "runtime": {
+          "DomainServices.dll": {}
+        }
+      },
+      "DomainCore/1.0.0": {
+        "runtime": {
+          "DomainCore.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DomainServices/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DomainCore/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

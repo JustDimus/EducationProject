@@ -1,0 +1,12 @@
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\bin\Debug\netcoreapp3.1\DomainServices.deps.json
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\bin\Debug\netcoreapp3.1\DomainServices.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\bin\Debug\netcoreapp3.1\DomainServices.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\bin\Debug\netcoreapp3.1\DomainCore.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\bin\Debug\netcoreapp3.1\DomainCore.pdb
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.csprojAssemblyReference.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.AssemblyInfoInputs.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.AssemblyInfo.cs
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.csproj.CoreCompileInputs.cache
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.csproj.CopyComplete
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.dll
+C:\Saves\EducationProject\EducationProject\EducationProject\DomainServices\obj\Debug\netcoreapp3.1\DomainServices.pdb

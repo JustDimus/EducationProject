@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "dgSpecHash": "y0U5SVp/6nHom6Ks6S/0j/KpsX/t74B/mXG08dI9gQXdRYnYiS7s34BrYGOO+ocWU6O/RlPVxmNh3SY0NQScxw==",
+  "success": true,
+  "projectFilePath": "C:\\Saves\\EducationProject\\EducationProject\\EducationProject\\XMLDataContext\\XMLDataContext.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Lord\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0\\microsoft.win32.systemevents.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.configuration.configurationmanager\\5.0.0\\system.configuration.configurationmanager.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.drawing.common\\5.0.0\\system.drawing.common.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.security.cryptography.protecteddata\\5.0.0\\system.security.cryptography.protecteddata.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.security.permissions\\5.0.0\\system.security.permissions.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512",
+    "C:\\Users\\Lord\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

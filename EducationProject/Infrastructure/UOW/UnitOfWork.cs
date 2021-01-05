@@ -19,7 +19,6 @@ namespace Infrastructure.UOW
             _dataContext = DataContext;
         }
 
-
         public IRepository<User> Users
         {
             get

@@ -19,5 +19,7 @@ namespace DomainCore.BLL
         public string Country { get; set; }
 
         public string City { get; set; }
+
+        public string Password { get; set; }
     }
 }

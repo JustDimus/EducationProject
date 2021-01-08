@@ -47,7 +47,18 @@ namespace Homework2.Realizations
             {
                 for (int i = 0; i < _fields.Count; i++)
                 {
-                    builder.Append(_fields[i].GetValue(person));
+                    object value = _fields[i].GetValue(person);
+                    if (value != null)
+                    {
+                        if (value.ToString().Contains(',') || value.ToString().Contains("\""))
+                        {
+                            builder.Append($"\"{value}\"");
+                        }
+                        else
+                        {
+                            builder.Append(value);
+                        }
+                    }
 
                     if (i + 1 < _fields.Count)
                     {

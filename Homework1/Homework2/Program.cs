@@ -1,5 +1,6 @@
 ﻿using Homework2.Realizations;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Text;
 
@@ -21,7 +22,9 @@ namespace Homework2
 
             Writer writer = new Writer();
 
-            writer.CreateFile("")
+            string fileName = ConfigurationManager.AppSettings.Get("CSVFile");
+
+            writer.CreateFile(fileName, file);
         }
     }
 }

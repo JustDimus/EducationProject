@@ -53,7 +53,6 @@ namespace Homework1.Realizations
             Combination("");
         }
 
-
         private void ClearCombinations(BullXCow PrevResult)
         {
             if (PrevResult.Bulls == 0 && PrevResult.Cows == 0)
@@ -103,38 +102,6 @@ namespace Homework1.Realizations
         private string GetLikelyCombination()
         {
             return _combinations[new Random().Next(_combinations.Count)];
-
-            string result = "";
-            int count = _combinations.Count + 1;
-
-            int c = count;
-            int tt = 0;
-
-            foreach (var i in _combinations)
-            {
-                c = _combinations.Count;
-                foreach (var t in _combinations)
-                {
-                    tt = 0;
-                    for (int x = 0; x <= _valueLength; x++)
-                        for (int b = 0; b <= _valueLength - x; b++)
-                            if (CheckCombination(t, i, new BullXCow(x, b)) == true)
-                            {
-                                tt++;
-                            }
-                    if (tt < c)
-                    {
-                        c = tt;
-                    }
-                }
-                if(c < count)
-                {
-                    count = c;
-                    result = i;
-                }
-            }
-
-            return result;
         }
 
         public string Run(BullXCow PrevResult)

@@ -1,0 +1,13 @@
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\bin\Debug\netcoreapp3.1\Homework2.exe
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\bin\Debug\netcoreapp3.1\Homework2.deps.json
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\bin\Debug\netcoreapp3.1\Homework2.runtimeconfig.json
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\bin\Debug\netcoreapp3.1\Homework2.runtimeconfig.dev.json
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\bin\Debug\netcoreapp3.1\Homework2.dll
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\bin\Debug\netcoreapp3.1\Homework2.pdb
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.csprojAssemblyReference.cache
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.AssemblyInfoInputs.cache
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.AssemblyInfo.cs
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.csproj.CoreCompileInputs.cache
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.dll
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.pdb
+C:\Saves\EducationProject\EducationProject\Homework1\Homework2\obj\Debug\netcoreapp3.1\Homework2.genruntimeconfig.cache

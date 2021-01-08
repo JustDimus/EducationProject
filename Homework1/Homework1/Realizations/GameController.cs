@@ -29,6 +29,7 @@ namespace Homework1.Realizations
             int currentStep = 1;
             BullXCow currentResult = null;
             string currentValue;
+            int needLength = 0;
 
             _logger.Log("Game starts!");
 
@@ -38,6 +39,8 @@ namespace Homework1.Realizations
 
             _checker.InitValue(currentValue);
             _gameLogic.SetLength(currentValue.Length);
+
+            needLength = currentValue.Length;
 
             do
             {
@@ -50,7 +53,7 @@ namespace Homework1.Realizations
                 _logger.Log(currentResult, currentValue);
 
                 currentStep += 1;
-            } while (currentResult.Bulls != 4);
+            } while (currentResult.Bulls != needLength);
 
             _logger.Log($"You win!\nValue = {currentValue}\nRequired steps = {currentStep - 1}");
             _logger.Wait();

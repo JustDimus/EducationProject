@@ -24,21 +24,11 @@ namespace Homework1.Realizations
 
         private string StartValue()
         {
-            Random rand = new Random();
-            char fVal = (char)rand.Next('0', ('9' + 1));
-            char sVal;
-            do
-            {
-                sVal = (char)rand.Next('0', ('9' + 1));
-            } while (sVal == fVal);
-
             string result = "";
-            result += fVal;
-            result += fVal;
-            result += sVal;
-            result += sVal;
+            for (int i = 0; i < _valueLength; i++)
+                result += (char)('0' + i);
 
-            return "1234";
+            return result;
         }
 
         private void Combination(string already)
@@ -63,6 +53,7 @@ namespace Homework1.Realizations
             Combination("");
         }
 
+
         private void ClearCombinations(BullXCow PrevResult)
         {
             if (PrevResult.Bulls == 0 && PrevResult.Cows == 0)
@@ -74,6 +65,8 @@ namespace Homework1.Realizations
             {
                 _combinations.RemoveAll(s => CheckCombination(s, _lastValue, PrevResult));
             }
+            _combinations.Remove(_lastValue);
+
         }
 
         private bool CheckCombination(string Element, string Value, BullXCow PrevResult)
@@ -89,12 +82,7 @@ namespace Homework1.Realizations
 
             if (overlap != PrevResult.Bulls)
             {
-                if (Element == "3486")
-                    if (true)
-                    {
-
-                    }
-                return false;
+                return true;
             }
 
             overlap = 0;
@@ -107,38 +95,46 @@ namespace Homework1.Realizations
 
             if (overlap < PrevResult.Cows)
             {
-                if (Element == "3486")
-                    if (true)
-                    {
-
-                    }
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
 
         private string GetLikelyCombination()
         {
             return _combinations[new Random().Next(_combinations.Count)];
-            /*
+
             string result = "";
             int count = _combinations.Count + 1;
 
+            int c = count;
+            int tt = 0;
+
             foreach (var i in _combinations)
             {
-                int c = count;
+                c = _combinations.Count;
                 foreach (var t in _combinations)
                 {
-
+                    tt = 0;
+                    for (int x = 0; x <= _valueLength; x++)
+                        for (int b = 0; b <= _valueLength - x; b++)
+                            if (CheckCombination(t, i, new BullXCow(x, b)) == true)
+                            {
+                                tt++;
+                            }
+                    if (tt < c)
+                    {
+                        c = tt;
+                    }
+                }
+                if(c < count)
+                {
+                    count = c;
+                    result = i;
                 }
             }
 
-            if(result == "")
-                if(true)
-                {
-
-                }
-            return result;*/
+            return result;
         }
 
         public string Run(BullXCow PrevResult)

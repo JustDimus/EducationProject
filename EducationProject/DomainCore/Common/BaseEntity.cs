@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DomainCore.BLL
+namespace DomainCore.Common
 {
     public class BaseEntity
     {

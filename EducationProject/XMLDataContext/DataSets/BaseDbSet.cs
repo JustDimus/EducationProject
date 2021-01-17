@@ -1,4 +1,4 @@
-﻿using DomainCore.BLL;
+﻿using DomainCore.Common;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,7 +48,8 @@ namespace XMLDataContext.DataSets
 
         public IEnumerable<T> Get(Predicate<T> Condition)
         {
-            return (from element in _document.Root.Elements(_parser.ElementName) select _parser.ParseToClass(element)).Where(t => Condition(t));
+            return _document.Root.Elements(_parser.ElementName)
+                .Select(e => _parser.ParseToClass(e)).Where(t => Condition(t));
         }
 
         public T Get(T Entity)
@@ -58,7 +59,7 @@ namespace XMLDataContext.DataSets
 
         public IEnumerator<T> GetEnumerator()
         {
-            foreach(var i in (from element in _document.Root.Elements(_parser.ElementName) select element))
+            foreach(var i in _document.Root.Elements(_parser.ElementName))
             {
                 yield return _parser.ParseToClass(i);
             }
@@ -75,7 +76,7 @@ namespace XMLDataContext.DataSets
 
         public void Save()
         {
-            foreach(var i in (from element in _document.Root.Elements(_parser.ElementName) select element))
+            foreach(var i in _document.Root.Elements(_parser.ElementName))
             {
                 int currentId = Int32.Parse(i.Attribute("Id").Value);
                 if (_elements.ContainsKey(currentId))
@@ -130,7 +131,7 @@ namespace XMLDataContext.DataSets
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            foreach (var i in (from element in _document.Root.Elements(_parser.ElementName) select element))
+            foreach (var i in _document.Root.Elements(_parser.ElementName))
             {
                 yield return _parser.ParseToClass(i);
             }
@@ -139,7 +140,7 @@ namespace XMLDataContext.DataSets
 
         private T TryFindInLocalCollection(int Id)
         {
-            return (from pair in _elements.Values where pair.Item1.Id == Id select pair.Item1).FirstOrDefault();
+            return _elements.Values.Where(p => p.Item1.Id == Id).Select(p => p.Item1).FirstOrDefault();
         } 
     }
 }

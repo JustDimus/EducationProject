@@ -4,12 +4,13 @@ using XMLDataContext.Interfaces;
 using System.Configuration;
 using XMLDataContext.Parsers;
 using System.Xml.Linq;
+using DomainCore.AccountData;
 
 namespace XMLDataContext.DataContext
 {
     public class XMLContext
     {
-        private IDbSet<User> _users;
+        private IDbSet<Account> _users;
 
         private string _fileName;
 
@@ -23,13 +24,13 @@ namespace XMLDataContext.DataContext
             _document = new FileCheckers.FileChecker(_fileName).Get();
         }
 
-        public IDbSet<User> Users
+        public IDbSet<Account> Accounts
         {
             get
             {
                 if(_users == null)
                 {
-                    _users = new BaseDbSet<User>(new UserXMLParser(), _document);
+                    _users = new BaseDbSet<Account>(null/*new UserXMLParser()*/, _document);
                 }
                 return _users;
             }
@@ -37,7 +38,7 @@ namespace XMLDataContext.DataContext
 
         public void Save()
         {
-            Users.Save();
+            Accounts.Save();
 
             _document.Save(_fileName);
         }

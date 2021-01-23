@@ -1,10 +1,10 @@
-﻿using EducationProject.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace EducationProject.DAL
+namespace EducationProject.BLL.Interfaces
 {
-    public interface IRepository<T> where T: BaseEntity
+    public interface IMapping<T>
     {
         void Create(T Entity);
 

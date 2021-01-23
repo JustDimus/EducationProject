@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using EducationProject.Core.DAL;
 
-namespace EducationProject.Core
+namespace EducationProject.Core.BLL
 {
-    public class AccountSkills: BaseEntity
+    public class AccountSkill: BaseEntity
     {
         public Skill Skill { get; set; }
 

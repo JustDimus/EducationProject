@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core
+namespace EducationProject.Core.DAL
 {
     public class CourseMaterial: BaseEntity
     {

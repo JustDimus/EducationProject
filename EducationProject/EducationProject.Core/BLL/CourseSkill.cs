@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using EducationProject.Core.DAL;
 
-namespace EducationProject.Core
+namespace EducationProject.Core.BLL
 {
     public class CourseSkill: BaseEntity
     {
-        public int CourseId { get; set; }
-
-        public int SkillId { get; set; }
+        public Skill Skill { get; set; }
 
         public int SkillChange { get; set; }
     }

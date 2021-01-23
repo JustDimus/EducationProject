@@ -4,7 +4,7 @@ using System.Text;
 
 namespace XMLDataContext.Interfaces
 {
-    public interface IDbSet<T>
+    public interface IDbSet<T>: BaseDbSet
     {
         void Create(T Entity);
 
@@ -23,8 +23,6 @@ namespace XMLDataContext.Interfaces
         void Delete(int Id);
 
         void Delete(Predicate<T> Condition);
-
-        void Save();
 
         int CurrentId { get; }
     }

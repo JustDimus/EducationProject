@@ -5,7 +5,7 @@ using System.Collections;
 using System.Linq;
 using XMLDataContext.DataContext;
 using XMLDataContext.DataSets;
-using EducationProject.Core;
+using EducationProject.Core.DAL;
 
 namespace ConsoleInterface
 {
@@ -17,17 +17,35 @@ namespace ConsoleInterface
 
             var t = new XMLDataContext.DataContext.XMLContext();
 
-            
-            t.Skills.Create(new Skill()
+            t.Entity<Account>().Create(new Account()
             {
-                MaxValue = 100,
-                Title = "dsadsddsdffzsdddssa"
+                Email = "Hello@Mail.ru",
+                FirstName = "Jonathan",
+                SecondName = "Joestar"
             });
 
-            t.Skills.Delete(t => true);
+            t.Save();
+            /*
+            t.Accounts.Create(new Account()
+            {
+                Email = "dssadds",
+                FirstName = "dsad"
+            });
 
-            t.Skills.Save();
+            t.AccountSkills.Create(new AccountSkills()
+            {
+                CurrentResult = 15,
+                Id = 1,
+                Level = 2,
+                Skill = 123
+            });
 
+            t.AccountSkills.Delete(t => true);
+
+            //t.Accounts.Delete(t => true);
+
+            t.Accounts.Save();
+            */
             t.Save();
         }
     }

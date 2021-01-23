@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core
+namespace EducationProject.Core.DAL
 {
     public class Account: BaseEntity
     {
@@ -17,9 +17,5 @@ namespace EducationProject.Core
         public DateTime RegistrationData { get; set; }
 
         public string PhoneNumber { get; set; }
-
-        public IEnumerable<AccountCourse> PassedCourses { get; set; }
-
-        public IEnumerable<AccountSkills> SkillResults { get; set; }
     }
 }

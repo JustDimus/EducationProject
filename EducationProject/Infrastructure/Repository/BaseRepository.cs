@@ -18,59 +18,49 @@ namespace Infrastructure.Repository
             Elements = elements;
         }
 
-        private void CheckElements()
+        public void Create(T Entity)
         {
-            if (Elements == null)
-                throw new Exception();
-        }
-
-        public IEnumerable<T> Get(Predicate<T> Condition)
-        {
-            CheckElements();
-
-            return Elements.Get(Condition);
+            Elements.Create(Entity);
         }
 
         public void Delete(T Entity)
         {
-            CheckElements();
-
             Elements.Delete(Entity);
+        }
+
+        public void Delete(Predicate<T> Condition)
+        {
+            Elements.Delete(Condition);
+        }
+
+        public void Delete(int Id)
+        {
+            Elements.Delete(Id);
+        }
+
+        public IEnumerable<T> Get(Predicate<T> Condition)
+        {
+            return Elements.Get(Condition);
         }
 
         public T Get(int Id)
         {
-            CheckElements();
-
             return Elements.Get(Id);
-        }
-
-        public T Get(T Entity)
-        {
-            CheckElements();
-
-            return Elements.Get(Entity);
-        }
-
-        public void Insert(T Entity)
-        {
-            CheckElements();
-
-            Elements.Create(Entity);
         }
 
         public void Save()
         {
-            CheckElements();
-
-            Elements.Save();
+            throw new NotImplementedException();
         }
 
         public void Update(T Entity)
         {
-            CheckElements();
-
             Elements.Update(Entity);
+        }
+
+        public void Update(T Entity, Predicate<T> Condition)
+        {
+            Elements.Update(Entity, Condition);
         }
     }
 }

@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using XMLDataContext.DataContext;
+using XMLDataContext.DataSets;
+using EducationProject.Core;
 
 namespace ConsoleInterface
 {
@@ -10,26 +13,22 @@ namespace ConsoleInterface
     {
         static void Main(string[] args)
         {
-            var uow = new UnitOfWork(new XMLDataContext.DataContext.XMLContext());
+          //  var uow = new UnitOfWork();
 
-            var t = new DomainCore.BLL.User()
+            var t = new XMLDataContext.DataContext.XMLContext();
+
+            
+            t.Skills.Create(new Skill()
             {
-                Id = 15,
-                City = "Mahogon",
-                Country = "USA",
-                FirstName = "John",
-                SecondName = "Cena",
-                Mail = "JohnCena@gmail.com",
-                PhoneNumber = "+10777123456"
-            };
+                MaxValue = 100,
+                Title = "dsadsddsdffzsdddssa"
+            });
 
-            //uow.Users.Insert(z);
+            t.Skills.Delete(t => true);
 
-            //uow.Users.Update(t);
+            t.Skills.Save();
 
-            //uow.Save();
-
-            var u = uow.Users.Get(t => true).ToList();
+            t.Save();
         }
     }
 }

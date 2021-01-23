@@ -1,5 +1,5 @@
-﻿using DomainCore.BLL;
-using DomainServices.Interfaces;
+﻿using EducationProject.Core;
+using EducationProject.DAL;
 using Infrastructure.Repository;
 using System;
 using System.Collections.Generic;
@@ -12,20 +12,20 @@ namespace Infrastructure.UOW
     {
         private XMLContext _dataContext; 
 
-        private IRepository<User> _usersRepos;
+        private IRepository<Account> _usersRepos;
 
         public UnitOfWork(XMLContext DataContext)
         {
             _dataContext = DataContext;
         }
 
-        public IRepository<User> Users
+        public IRepository<Account> Users
         {
             get
             {
                 if(_usersRepos == null)
                 {
-                    _usersRepos = new BaseRepository<User>(_dataContext.Users);
+                    _usersRepos = new BaseRepository<Account>(_dataContext.Accounts);
                 }
                 return _usersRepos;
             }

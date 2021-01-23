@@ -1,5 +1,5 @@
-﻿using DomainCore.BLL;
-using DomainServices.Interfaces;
+﻿using EducationProject.Core;
+using EducationProject.DAL;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -56,7 +56,7 @@ namespace Infrastructure.Repository
         {
             CheckElements();
 
-            Elements.Insert(Entity);
+            Elements.Create(Entity);
         }
 
         public void Save()

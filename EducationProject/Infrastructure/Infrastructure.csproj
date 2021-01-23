@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DomainServices\DomainServices.csproj" />
+    <ProjectReference Include="..\EducationProject.DAL\EducationProject.DAL.csproj" />
     <ProjectReference Include="..\XMLDataContext\XMLDataContext.csproj" />
   </ItemGroup>
 

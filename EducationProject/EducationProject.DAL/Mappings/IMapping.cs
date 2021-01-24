@@ -1,8 +1,9 @@
-﻿using System;
+﻿using EducationProject.Core;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.BLL.Interfaces
+namespace EducationProject.DAL.Mappings
 {
     public interface IMapping<T>
     {

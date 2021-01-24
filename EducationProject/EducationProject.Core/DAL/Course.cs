@@ -10,6 +10,8 @@ namespace EducationProject.Core.DAL
 
         public string Description { get; set; }
 
+        public bool IsVisible { get; set; }
+
         public int CreatorId { get; set; }
     }
 }

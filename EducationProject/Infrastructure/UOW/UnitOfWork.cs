@@ -1,6 +1,6 @@
 ﻿using EducationProject.Core;
 using EducationProject.DAL;
-using Infrastructure.Repository;
+using Infrastructure.DAL.Repository;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,121 +13,24 @@ namespace Infrastructure.UOW
     {
         private XMLContext _dataContext; 
 
-        private IRepository<Account> _usersRepos;
-
-        private IRepository<AccountCourse> _accountCoursesRepos;
-
-        private IRepository<AccountSkills> _accountSkillsRepos;
-
-        private IRepository<Course> _courseRepos;
-
-        private IRepository<CourseMaterial> _courseMaterialRepos;
-
-        private IRepository<CourseSkill> _courseSkillRepos;
-
-        private IRepository<Material> _materialRepos;
-
-        private IRepository<Skill> _skillRepos;
-
         public UnitOfWork(XMLContext DataContext)
         {
             _dataContext = DataContext;
         }
 
-        public IRepository<Account> Accounts
-        {
-            get
-            {
-                if(_usersRepos == null)
-                {
-                    _usersRepos = new BaseRepository<Account>(_dataContext.Accounts);
-                }
-                return _usersRepos;
-            }
-        }
+        private Dictionary<Type, object> _reposes = new Dictionary<Type, object>();
 
-        public IRepository<AccountCourse> AccountCourses
+        public IRepository<T> Repository<T>() where T: BaseEntity
         {
-            get
-            {
-                if (_accountCoursesRepos == null)
-                {
-                    _accountCoursesRepos = new BaseRepository<AccountCourse>(_dataContext.AccountCourses);
-                }
-                return _accountCoursesRepos;
-            }
-        }
+            object res = null;
 
-        public IRepository<AccountSkills> AccountSkills
-        {
-            get
+            if (_reposes.TryGetValue(typeof(T), out res) == false)
             {
-                if (_accountSkillsRepos == null)
-                {
-                    _accountSkillsRepos = new BaseRepository<AccountSkills>(_dataContext.AccountSkills);
-                }
-                return _accountSkillsRepos;
+                res = new BaseRepository<T>(_dataContext.Entity<T>());
+                _reposes.Add(typeof(T), res);
             }
-        }
 
-        public IRepository<Course> Courses
-        {
-            get
-            {
-                if (_courseRepos == null)
-                {
-                    _courseRepos = new BaseRepository<Course>(_dataContext.Courses);
-                }
-                return _courseRepos;
-            }
-        }
-
-        public IRepository<CourseMaterial> CourseMaterials
-        {
-            get
-            {
-                if (_courseMaterialRepos == null)
-                {
-                    _courseMaterialRepos = new BaseRepository<CourseMaterial>(_dataContext.CourseMaterials);
-                }
-                return _courseMaterialRepos;
-            }
-        }
-
-        public IRepository<CourseSkill> CourseSkills
-        {
-            get
-            {
-                if (_courseSkillRepos == null)
-                {
-                    _courseSkillRepos = new BaseRepository<CourseSkill>(_dataContext.CourseSkills);
-                }
-                return _courseSkillRepos;
-            }
-        }
-
-        public IRepository<Material> Materials
-        {
-            get
-            {
-                if (_materialRepos == null)
-                {
-                    _materialRepos = new BaseRepository<Material>(_dataContext.Materials);
-                }
-                return _materialRepos;
-            }
-        }
-
-        public IRepository<Skill> Skills
-        {
-            get
-            {
-                if (_skillRepos == null)
-                {
-                    _skillRepos = new BaseRepository<Skill>(_dataContext.Skills);
-                }
-                return _skillRepos;
-            }
+            return (IRepository<T>)res;
         }
 
         public void Save()

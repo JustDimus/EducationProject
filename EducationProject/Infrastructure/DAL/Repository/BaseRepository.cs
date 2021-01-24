@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using XMLDataContext.DataContext;
 using XMLDataContext.Interfaces;
 
-namespace Infrastructure.Repository
+namespace Infrastructure.DAL.Repository
 {
     public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+//NONEED
+
 namespace EducationProject.Core.DAL
 {
     public class AccountSkills: BaseEntity

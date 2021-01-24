@@ -12,17 +12,15 @@ namespace XMLDataContext.DataContext
 {
     public class XMLContext
     {
-        private Dictionary<Type, BaseDbSet> _entites = new Dictionary<Type, BaseDbSet>();
+        private Dictionary<Type, IDbSet> _entites = new Dictionary<Type, IDbSet>();
 
         public IDbSet<T> Entity<T>() where T : BaseEntity
         {
-            BaseDbSet res = null;
+            var tt = typeof(T);
 
-            if (_entites.TryGetValue(typeof(T), out res))
-            {
-                return (IDbSet<T>)res;
-            }
-            else
+            IDbSet res = null;
+
+            if (_entites.TryGetValue(typeof(T), out res) == false)
             {
                 res = new BaseDbSet<T>(new BaseXMLParser<T>(), _document);
 

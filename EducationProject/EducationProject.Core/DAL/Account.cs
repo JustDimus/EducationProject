@@ -14,7 +14,7 @@ namespace EducationProject.Core.DAL
 
         public string SecondName { get; set; }
 
-        public DateTime RegistrationData { get; set; }
+        public DateTime RegistrationDate { get; set; }
 
         public string PhoneNumber { get; set; }
     }

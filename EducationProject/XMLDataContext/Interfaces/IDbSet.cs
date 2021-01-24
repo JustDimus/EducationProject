@@ -4,7 +4,7 @@ using System.Text;
 
 namespace XMLDataContext.Interfaces
 {
-    public interface IDbSet<T>: BaseDbSet
+    public interface IDbSet<T>: IDbSet
     {
         void Create(T Entity);
 

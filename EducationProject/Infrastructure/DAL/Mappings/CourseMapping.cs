@@ -31,26 +31,32 @@ namespace Infrastructure.DAL.Mappings
 
             Entity.Id = course.Id;
 
-            foreach(var material in Entity.Materials)
+            if (Entity.Materials != null)
             {
-                _uow.Repository<EducationProject.Core.DAL.CourseMaterial>()
-                    .Create(new EducationProject.Core.DAL.CourseMaterial()
-                    {
-                        CourseId = Entity.Id,
-                        MaterialId = material.Material.Id,
-                        Position = material.Position
-                    });
+                foreach (var material in Entity.Materials)
+                {
+                    _uow.Repository<EducationProject.Core.DAL.CourseMaterial>()
+                        .Create(new EducationProject.Core.DAL.CourseMaterial()
+                        {
+                            CourseId = Entity.Id,
+                            MaterialId = material.Material.Id,
+                            Position = material.Position
+                        });
+                }
             }
 
-            foreach (var skill in Entity.Skills)
+            if (Entity.Skills != null)
             {
-                _uow.Repository<EducationProject.Core.DAL.CourseSkill>()
-                    .Create(new EducationProject.Core.DAL.CourseSkill()
-                    {
-                        CourseId = Entity.Id,
-                        SkillChange = skill.SkillChange,
-                        SkillId = skill.Skill.Id
-                    });
+                foreach (var skill in Entity.Skills)
+                {
+                    _uow.Repository<EducationProject.Core.DAL.CourseSkill>()
+                        .Create(new EducationProject.Core.DAL.CourseSkill()
+                        {
+                            CourseId = Entity.Id,
+                            SkillChange = skill.SkillChange,
+                            SkillId = skill.Skill.Id
+                        });
+                }
             }
         }
 
@@ -87,13 +93,13 @@ namespace Infrastructure.DAL.Mappings
                     Materials = _uow.Repository<EducationProject.Core.DAL.CourseMaterial>()
                     .Get(b => b.CourseId == c.Id).Select(b => new CourseMaterial 
                     { 
-                        Material = _uow.Repository<EducationProject.Core.DAL.Material>().Get(b.MaterialId),
+                        Material = (Material)_uow.Repository<EducationProject.Core.DAL.Material>().Get(b.MaterialId),
                         Position = b.Position
                     }),
                     Skills = _uow.Repository<EducationProject.Core.DAL.CourseSkill>()
                     .Get(b => b.CourseId == c.Id).Select(b => new CourseSkill
                     {
-                        Skill = _uow.Repository<EducationProject.Core.DAL.Skill>().Get(b.SkillId),
+                        Skill = (Skill)_uow.Repository<EducationProject.Core.DAL.Skill>().Get(b.SkillId),
                         SkillChange = b.SkillChange
                     })
                 }).Where(c => Condition(c) == true);

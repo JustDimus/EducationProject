@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface ICommand
+    public interface IChain
     {
         public string Name { get; }
 

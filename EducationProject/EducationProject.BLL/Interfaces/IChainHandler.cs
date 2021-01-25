@@ -4,10 +4,11 @@ using System.Text;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface ICommand
+    public interface IChainHandler
     {
-        public string Name { get; }
-
-        public IOperationResult Handle(object[] Params);
+        IChain this[string Command]
+        {
+            get;
+        }
     }
 }

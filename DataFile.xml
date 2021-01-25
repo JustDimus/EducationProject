@@ -3,7 +3,7 @@
   <Skill xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Title>Working</Title>
-    <MaxValue>100</MaxValue>
+    <MaxValue>150</MaxValue>
   </Skill>
   <Material xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
@@ -45,4 +45,11 @@
     <CourseId>1</CourseId>
     <Status>InProgress</Status>
   </AccountCourse>
+  <Account xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>2</Id>
+    <Email>User1</Email>
+    <Password>Password1</Password>
+    <RegistrationDate>2021-01-26T00:41:28.5626751+02:00</RegistrationDate>
+    <PhoneNumber></PhoneNumber>
+  </Account>
 </root>

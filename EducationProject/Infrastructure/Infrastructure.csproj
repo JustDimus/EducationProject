@@ -10,8 +10,4 @@
     <ProjectReference Include="..\XMLDataContext\XMLDataContext.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BLL\" />
-  </ItemGroup>
-
 </Project>

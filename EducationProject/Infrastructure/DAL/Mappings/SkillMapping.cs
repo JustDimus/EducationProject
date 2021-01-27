@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Infrastructure.DAL.Mappings
 {
-    public class SkillMapping: IMapping<Skill>
+    public class SkillMapping: IMapping<SkillBO>
     {
         private UnitOfWork _uow;
 
@@ -17,29 +17,29 @@ namespace Infrastructure.DAL.Mappings
             _uow = UOW;
         }
 
-        public void Create(Skill Entity)
+        public void Create(SkillBO Entity)
         {
-            var material = new EducationProject.Core.DAL.Skill()
+            var material = new EducationProject.Core.DAL.SkillDBO()
             {
                 MaxValue = Entity.MaxValue,
                 Title = Entity.Title
             };
 
-            _uow.Repository<EducationProject.Core.DAL.Skill>().Create(material);
+            _uow.Repository<EducationProject.Core.DAL.SkillDBO>().Create(material);
 
             Entity.Id = material.Id;
         }
 
-        public void Delete(Skill Entity)
+        public void Delete(SkillBO Entity)
         {
             Delete(e => e.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<Skill> Condition)
+        public void Delete(Predicate<SkillBO> Condition)
         {
             foreach (var element in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Skill>().Delete(element.Id);
+                _uow.Repository<EducationProject.Core.DAL.SkillDBO>().Delete(element.Id);
             }
         }
 
@@ -48,10 +48,10 @@ namespace Infrastructure.DAL.Mappings
             Delete(e => e.Id == Id);
         }
 
-        public IEnumerable<Skill> Get(Predicate<Skill> Condition)
+        public IEnumerable<SkillBO> Get(Predicate<SkillBO> Condition)
         {
-            return _uow.Repository<EducationProject.Core.DAL.Skill>().Get(t => true)
-                .Select(e => new Skill()
+            return _uow.Repository<EducationProject.Core.DAL.SkillDBO>().Get(t => true)
+                .Select(e => new SkillBO()
                 {
                     MaxValue = e.MaxValue,
                     Id = e.Id,
@@ -59,7 +59,7 @@ namespace Infrastructure.DAL.Mappings
                 }).Where(e => Condition(e) == true);
         }
 
-        public Skill Get(int Id)
+        public SkillBO Get(int Id)
         {
             return Get(e => e.Id == Id).FirstOrDefault();
         }
@@ -69,17 +69,17 @@ namespace Infrastructure.DAL.Mappings
             _uow.Save();
         }
 
-        public void Update(Skill Entity)
+        public void Update(SkillBO Entity)
         {
             Update(Entity, e => e.Id == Entity.Id);
         }
 
-        public void Update(Skill Entity, Predicate<Skill> Condition)
+        public void Update(SkillBO Entity, Predicate<SkillBO> Condition)
         {
             foreach (var element in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Skill>()
-                    .Update(new EducationProject.Core.DAL.Skill()
+                _uow.Repository<EducationProject.Core.DAL.SkillDBO>()
+                    .Update(new EducationProject.Core.DAL.SkillDBO()
                     {
                         MaxValue = Entity.MaxValue,
                         Title = Entity.Title,

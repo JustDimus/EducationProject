@@ -14,9 +14,9 @@ namespace Infrastructure.BLL.Commands
 
       //  private ICommandHandler _commands;
 
-        private IMapping<Account> _accounts;
+        private IMapping<AccountBO> _accounts;
 
-        public CreateAccountCommand(IMapping<Account> AccMapping)
+        public CreateAccountCommand(IMapping<AccountBO> AccMapping)
         {
            // _commands = Commands;
 
@@ -33,7 +33,7 @@ namespace Infrastructure.BLL.Commands
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = "Invalid data: AccountCommand"
                 };
             }
@@ -42,12 +42,12 @@ namespace Infrastructure.BLL.Commands
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = "Account with that login already exist!"
                 };
             }
 
-            Account account = new Account()
+            AccountBO account = new AccountBO()
             {
                 RegistrationDate = DateTime.Now,
                 Email = Login,

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EducationProject.Core.PL
 {
-    public class Account
+    public class AccountPL
     {
         public int Id { get; set; }
 
@@ -19,10 +19,10 @@ namespace EducationProject.Core.PL
 
         public string PhoneNumber { get; set; }
 
-        public IEnumerable<Course> CoursesInProgress { get; set; }
+        public IEnumerable<CourseBO> CoursesInProgress { get; set; }
 
-        public IEnumerable<Course> PassedCourses { get; set; }
+        public IEnumerable<CourseBO> PassedCourses { get; set; }
 
-        public IEnumerable<AccountSkill> SkillResults { get; set; }
+        public IEnumerable<AccountSkillBO> SkillResults { get; set; }
     }
 }

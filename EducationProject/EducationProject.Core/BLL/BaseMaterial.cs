@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core.DAL
+namespace EducationProject.Core.BLL
 {
-    public class Material: BaseEntity 
+    public abstract class BaseMaterial: BaseEntity
     {
         public string Title { get; set; }
 
@@ -12,6 +12,6 @@ namespace EducationProject.Core.DAL
 
         public string Type { get; set; }
 
-        public string Data { get; set; }
+        public enum MaterialType { Video, Article, Book }
     }
 }

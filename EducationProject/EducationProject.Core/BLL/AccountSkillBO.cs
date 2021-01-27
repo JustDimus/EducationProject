@@ -5,9 +5,9 @@ using EducationProject.Core.DAL;
 
 namespace EducationProject.Core.BLL
 {
-    public class AccountSkill: BaseEntity
+    public class AccountSkillBO: BaseEntity
     {
-        public Skill Skill { get; set; }
+        public SkillBO Skill { get; set; }
 
         public int CurrentResult { get; set; }
 

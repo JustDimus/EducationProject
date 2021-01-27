@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.Core.DAL
 {
-    public class Skill: BaseEntity
+    public class SkillDBO: BaseEntity
     {
         public string Title { get; set; }
 

@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 
 namespace Infrastructure.DAL.Mappings
 {
-    public class MaterialMapping : IMapping<Material>
+    public class MaterialMapping : IMapping<BaseMaterial>
     {
         private UnitOfWork _uow;
 
@@ -17,31 +18,52 @@ namespace Infrastructure.DAL.Mappings
             _uow = UOW;
         }
 
-        public void Create(Material Entity)
+        public void Create(BaseMaterial Entity)
         {
-            var material = new EducationProject.Core.DAL.Material()
+            var material = new EducationProject.Core.DAL.MaterialDBO()
             {
                 Description = Entity.Description,
-                Data = Entity.Data,
                 Title = Entity.Title,
                 Type = Entity.Type
             };
 
-            _uow.Repository<EducationProject.Core.DAL.Material>().Create(material);
+            material.Data = GetSerializedData(Entity);
+
+            _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Create(material);
 
             Entity.Id = material.Id;
         }
 
-        public void Delete(Material Entity)
+        private string GetSerializedData(BaseMaterial material)
+        {
+            string jsonData = "";
+            switch (material)
+            {
+                case VideoMaterial video:
+                    jsonData = JsonSerializer.Serialize(video.VideoData);
+                    break;
+                case ArticleMaterial article:
+                    jsonData = JsonSerializer.Serialize(article.ArticleData);
+                    break;
+                case BookMaterial book:
+                    jsonData = JsonSerializer.Serialize(book.BookData);
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+            return jsonData;
+        }
+
+        public void Delete(BaseMaterial Entity)
         {
             Delete(e => e.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<Material> Condition)
+        public void Delete(Predicate<BaseMaterial> Condition)
         {
             foreach(var element in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Material>().Delete(element.Id);
+                _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Delete(element.Id);
             }
         }
 
@@ -50,20 +72,50 @@ namespace Infrastructure.DAL.Mappings
             Delete(e => e.Id == Id);
         }
 
-        public IEnumerable<Material> Get(Predicate<Material> Condition)
+        public IEnumerable<BaseMaterial> Get(Predicate<BaseMaterial> Condition)
         {
-            return _uow.Repository<EducationProject.Core.DAL.Material>().Get(t => true)
-                .Select(e => new Material()
+            return _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Get(t => true)
+                .Select(e => 
                 {
-                    Data = e.Data,
-                    Description = e.Description,
-                    Id = e.Id,
-                    Title = e.Title,
-                    Type = e.Type
+                    BaseMaterial material = null;
+                    switch(e.Type)
+                    {
+                        case "Video":
+                            material = new VideoMaterial()
+                            { 
+                                Id = e.Id,
+                                Description = e.Description,
+                                Title = e.Title,
+                                Type = e.Type,
+                                VideoData = (VideoData)JsonSerializer.Deserialize(e.Data, typeof(VideoData))
+                            };
+                            break;
+                        case "Article":
+                            material = new ArticleMaterial()
+                            {
+                                Id = e.Id,
+                                Description = e.Description,
+                                Title = e.Title,
+                                Type = e.Type,
+                                ArticleData = (ArticleData)JsonSerializer.Deserialize(e.Data, typeof(ArticleData))
+                            };
+                            break;
+                        case "Book":
+                            material = new BookMaterial()
+                            {
+                                Id = e.Id,
+                                Description = e.Description,
+                                Title = e.Title,
+                                Type = e.Type,
+                                BookData = (BookData)JsonSerializer.Deserialize(e.Data, typeof(BookData))
+                            };
+                            break;
+                    }
+                    return material;
                 }).Where(e => Condition(e) == true);
         }
 
-        public Material Get(int Id)
+        public BaseMaterial Get(int Id)
         {
             return Get(e => e.Id == Id).FirstOrDefault();
         }
@@ -73,19 +125,19 @@ namespace Infrastructure.DAL.Mappings
             _uow.Save();
         }
 
-        public void Update(Material Entity)
+        public void Update(BaseMaterial Entity)
         {
             Update(Entity, e => e.Id == Entity.Id);
         }
 
-        public void Update(Material Entity, Predicate<Material> Condition)
+        public void Update(BaseMaterial Entity, Predicate<BaseMaterial> Condition)
         {
             foreach(var element in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Material>()
-                    .Update(new EducationProject.Core.DAL.Material()
+                _uow.Repository<EducationProject.Core.DAL.MaterialDBO>()
+                    .Update(new EducationProject.Core.DAL.MaterialDBO()
                     {
-                        Data = Entity.Data,
+                        Data = GetSerializedData(element),
                         Description = Entity.Description,
                         Title = Entity.Title,
                         Type = Entity.Type,

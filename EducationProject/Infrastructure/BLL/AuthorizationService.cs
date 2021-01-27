@@ -12,24 +12,29 @@ namespace Infrastructure.BLL
     {
         private List<string> _authorizedAccounts;
         
-        private IMapping<Account> _accounts;
+        private IMapping<AccountBO> _accounts;
 
-        public AuthorizationService(IMapping<Account> AccMapping)
+        private AccountConverterService _converter;
+
+        public AuthorizationService(IMapping<AccountBO> AccMapping, AccountConverterService converter)
         {
             _accounts = AccMapping;
 
             _authorizedAccounts = new List<string>();
+
+            _converter = converter;
         }
 
         public IOperationResult AuthorizeAccount(string Login, string Password)
         {
-            Account account = _accounts.Get(a => a.Email == Login && a.Password == Password).FirstOrDefault();
+            AccountBO account = _accounts.Get(a => a.Email == Login && a.Password == Password)
+                .FirstOrDefault();
 
             if(account is null)
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = "Invalid login or password"
                 };
             }
@@ -43,19 +48,7 @@ namespace Infrastructure.BLL
                 Status = ResultType.Success,
                 Result = new EducationProject.Core.PL.AccountAuthenticationData()
                 {
-                    AccountData = new EducationProject.Core.PL.Account()
-                    {
-                        Id = account.Id,
-                        RegistrationDate = account.RegistrationDate,
-                        CoursesInProgress = account.CoursesInProgress,
-                        Email = account.Email,
-                        FirstName = account.FirstName,
-                        PassedCourses = account.PassedCourses,
-                        PhoneNumber = account.PhoneNumber,
-                        SecondName = account.SecondName,
-                        SkillResults = account.SkillResults
-
-                    },
+                    AccountData = _converter.ConvertBLLToPL(account),
                     Login = account.Email,
                     Token = token
                 }
@@ -76,7 +69,7 @@ namespace Infrastructure.BLL
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = "Account not authorized"
                 };
             }
@@ -98,8 +91,8 @@ namespace Infrastructure.BLL
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
-                    Status = ResultType.Error,
-                    Result = "Account not authorized"
+                    Status = ResultType.Success,
+                    Result = false
                 };
             }
         }

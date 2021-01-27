@@ -6,36 +6,37 @@ using System.Text;
 
 namespace Infrastructure.BLL.Chains
 {
-    public class CreateCourseChain: IChain
+    public class CreateMaterialChain : IChain
     {
-        public string Name => "CreateCourse";
+        public string Name => "CreateMaterial";
+
 
         ICommandHandler _commands;
 
-        public CreateCourseChain(ICommandHandler Commands)
+        public CreateMaterialChain(ICommandHandler Commands)
         {
             _commands = Commands;
         }
 
-        public IOperationResult Handle(object[] Params)
+        public IOperationResult Handle(object[] Params)//AccountData/Title/Desc/Type/...Data...
         {
-            if(Params.Length < 3)
+            if(Params.Length < 6)
             {
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Invalid data count: CreateCourseChain"
+                    Result = $"Invalid data count: CreateMaterialChain"
                 };
             }
 
             var authenticationResult = _commands["AuthenticateAccount"].Handle(Params);
 
-            if(authenticationResult.Status == ResultType.Failed)
+            if (authenticationResult.Status == ResultType.Failed)
             {
                 return authenticationResult;
             }
 
-            return _commands["CreateCourse"].Handle(Params);
+            return _commands["CreateMaterial"].Handle(Params);
         }
     }
 }

@@ -4,12 +4,12 @@ using System.Text;
 
 namespace EducationProject.Core.DAL
 {
-    public class CourseMaterial: BaseEntity
+    public class CourseSkillDBO: BaseEntity
     {
-        public int MaterialId { get; set; }
-
         public int CourseId { get; set; }
 
-        public int Position { get; set; }
+        public int SkillId { get; set; }
+
+        public int SkillChange { get; set; }
     }
 }

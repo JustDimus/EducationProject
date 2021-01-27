@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public enum ResultType { Error, Success }
+    public enum ResultType { Failed, Success }
 
     public interface IOperationResult
     {

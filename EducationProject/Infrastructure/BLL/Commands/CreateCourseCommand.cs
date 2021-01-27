@@ -12,9 +12,9 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "CreateCourse";
 
-        private IMapping<Course> _courses;
+        private IMapping<CourseBO> _courses;
 
-        public CreateCourseCommand(IMapping<Course> AccMapping)
+        public CreateCourseCommand(IMapping<CourseBO> AccMapping)
         {
             _courses = AccMapping;
         }
@@ -31,12 +31,12 @@ namespace Infrastructure.BLL.Commands
             {
                 return new OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = $"Invalid course data: CreateAccountCommand"
                 };
             }
 
-            var course = new Course()
+            var course = new CourseBO()
             {
                 CreatorId = account.AccountData.Id,
                 Description = courseDescription,

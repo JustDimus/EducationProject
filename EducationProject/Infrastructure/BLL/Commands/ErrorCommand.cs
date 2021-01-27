@@ -14,8 +14,8 @@ namespace Infrastructure.BLL.Commands
         {
             return new OperationResult()
             {
-                Status = ResultType.Error,
-                Result = "Invalid command: ErrorCommand"
+                Status = ResultType.Failed,
+                Result = $"Invalid command: ErrorCommand"
             };
         }
     }

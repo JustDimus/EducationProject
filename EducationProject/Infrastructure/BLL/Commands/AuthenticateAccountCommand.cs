@@ -23,7 +23,7 @@ namespace Infrastructure.BLL.Commands
             {
                 return new OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = "Invalid data: authentication"
                 };
             }
@@ -34,7 +34,7 @@ namespace Infrastructure.BLL.Commands
             {
                 return new OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = "Invalid data: authentication"
                 };
             }

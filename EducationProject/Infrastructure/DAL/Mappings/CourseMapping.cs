@@ -1,4 +1,5 @@
 ﻿using EducationProject.Core.BLL;
+using EducationProject.Core.DAL;
 using EducationProject.DAL.Mappings;
 using Infrastructure.UOW;
 using System;
@@ -8,18 +9,22 @@ using System.Text;
 
 namespace Infrastructure.DAL.Mappings
 {
-    public class CourseMapping : IMapping<Course>
+    public class CourseMapping : IMapping<CourseBO>
     {
         private UnitOfWork _uow;
 
-        public CourseMapping(UnitOfWork UOW)
+        private IMapping<BaseMaterial> _materials;
+
+        public CourseMapping(UnitOfWork UOW, IMapping<BaseMaterial> materials)
         {
             _uow = UOW;
+
+            _materials = materials;
         }
 
-        public void Create(Course Entity)
+        public void Create(CourseBO Entity)
         {
-            var course = new EducationProject.Core.DAL.Course()
+            var course = new EducationProject.Core.DAL.CourseDBO()
             {
                 Description = Entity.Description,
                 CreatorId = Entity.CreatorId,
@@ -27,7 +32,7 @@ namespace Infrastructure.DAL.Mappings
                 Title = Entity.Title
             };
 
-            _uow.Repository<EducationProject.Core.DAL.Course>().Create(course);
+            _uow.Repository<EducationProject.Core.DAL.CourseDBO>().Create(course);
 
             Entity.Id = course.Id;
 
@@ -35,8 +40,8 @@ namespace Infrastructure.DAL.Mappings
             {
                 foreach (var material in Entity.Materials)
                 {
-                    _uow.Repository<EducationProject.Core.DAL.CourseMaterial>()
-                        .Create(new EducationProject.Core.DAL.CourseMaterial()
+                    _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>()
+                        .Create(new EducationProject.Core.DAL.CourseMaterialDBO()
                         {
                             CourseId = Entity.Id,
                             MaterialId = material.Material.Id,
@@ -49,8 +54,8 @@ namespace Infrastructure.DAL.Mappings
             {
                 foreach (var skill in Entity.Skills)
                 {
-                    _uow.Repository<EducationProject.Core.DAL.CourseSkill>()
-                        .Create(new EducationProject.Core.DAL.CourseSkill()
+                    _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>()
+                        .Create(new EducationProject.Core.DAL.CourseSkillDBO()
                         {
                             CourseId = Entity.Id,
                             SkillChange = skill.SkillChange,
@@ -60,18 +65,20 @@ namespace Infrastructure.DAL.Mappings
             }
         }
 
-        public void Delete(Course Entity)
+        public void Delete(CourseBO Entity)
         {
             Delete(c => c.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<Course> Condition)
+        public void Delete(Predicate<CourseBO> Condition)
         {
             foreach(var course in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Course>().Delete(course.Id);
+                _uow.Repository<EducationProject.Core.DAL.CourseDBO>().Delete(course.Id);
 
-                _uow.Repository<EducationProject.Core.DAL.CourseMaterial>().Delete(m => m.CourseId == course.Id);
+                _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>().Delete(m => m.CourseId == course.Id);
+
+                _uow.Repository<AccountCourse>().Delete(m => m.CourseId == course.Id);  
             }
         }
 
@@ -80,32 +87,32 @@ namespace Infrastructure.DAL.Mappings
             Delete(c => c.Id == Id);
         }
 
-        public IEnumerable<Course> Get(Predicate<Course> Condition)
+        public IEnumerable<CourseBO> Get(Predicate<CourseBO> Condition)
         {
-            return _uow.Repository<EducationProject.Core.DAL.Course>().Get(t => true)
-                .Select(c => new Course()
+            return _uow.Repository<EducationProject.Core.DAL.CourseDBO>().Get(t => true)
+                .Select(c => new CourseBO()
                 {
                     Description = c.Description,
                     CreatorId = c.CreatorId,
                     IsVisible = c.IsVisible,
                     Title = c.Title,
                     Id = c.Id,
-                    Materials = _uow.Repository<EducationProject.Core.DAL.CourseMaterial>()
-                    .Get(b => b.CourseId == c.Id).Select(b => new CourseMaterial 
+                    Materials = _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>()
+                    .Get(b => b.CourseId == c.Id).Select(b => new CourseMaterialBO 
                     { 
-                        Material = (Material)_uow.Repository<EducationProject.Core.DAL.Material>().Get(b.MaterialId),
+                        Material = _materials.Get(b.MaterialId),
                         Position = b.Position
                     }),
-                    Skills = _uow.Repository<EducationProject.Core.DAL.CourseSkill>()
-                    .Get(b => b.CourseId == c.Id).Select(b => new CourseSkill
+                    Skills = _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>()
+                    .Get(b => b.CourseId == c.Id).Select(b => new CourseSkillBO
                     {
-                        Skill = (Skill)_uow.Repository<EducationProject.Core.DAL.Skill>().Get(b.SkillId),
+                        Skill = (SkillBO)_uow.Repository<EducationProject.Core.DAL.SkillDBO>().Get(b.SkillId),
                         SkillChange = b.SkillChange
                     })
                 }).Where(c => Condition(c) == true);
         }
 
-        public Course Get(int Id)
+        public CourseBO Get(int Id)
         {
             return Get(c => c.Id == Id).FirstOrDefault();
         }
@@ -115,17 +122,17 @@ namespace Infrastructure.DAL.Mappings
             _uow.Save();
         }
 
-        public void Update(Course Entity)
+        public void Update(CourseBO Entity)
         {
             Update(Entity, e => e.Id == Entity.Id);
         }
 
-        public void Update(Course Entity, Predicate<Course> Condition)
+        public void Update(CourseBO Entity, Predicate<CourseBO> Condition)
         {
             foreach(var i in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Course>()
-                    .Update(new EducationProject.Core.DAL.Course()
+                _uow.Repository<EducationProject.Core.DAL.CourseDBO>()
+                    .Update(new EducationProject.Core.DAL.CourseDBO()
                     {
                         Description = Entity.Description,
                         CreatorId = Entity.CreatorId,
@@ -134,12 +141,12 @@ namespace Infrastructure.DAL.Mappings
                         Title = Entity.Title
                     });
 
-                _uow.Repository<EducationProject.Core.DAL.CourseMaterial>().Delete(c => c.CourseId == i.Id);
+                _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>().Delete(c => c.CourseId == i.Id);
 
                 foreach(var courseMaterial in i.Materials)
                 {
-                    _uow.Repository<EducationProject.Core.DAL.CourseMaterial>()
-                        .Create(new EducationProject.Core.DAL.CourseMaterial()
+                    _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>()
+                        .Create(new EducationProject.Core.DAL.CourseMaterialDBO()
                         {
                             CourseId = i.Id,
                             MaterialId = courseMaterial.Material.Id,
@@ -147,12 +154,12 @@ namespace Infrastructure.DAL.Mappings
                         });
                 }
 
-                _uow.Repository<EducationProject.Core.DAL.CourseSkill>().Delete(c => c.CourseId == i.Id);
+                _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>().Delete(c => c.CourseId == i.Id);
 
                 foreach (var courseSkill in i.Skills)
                 {
-                    _uow.Repository<EducationProject.Core.DAL.CourseSkill>()
-                        .Create(new EducationProject.Core.DAL.CourseSkill()
+                    _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>()
+                        .Create(new EducationProject.Core.DAL.CourseSkillDBO()
                         {
                             CourseId = i.Id,
                             SkillId = courseSkill.Skill.Id,

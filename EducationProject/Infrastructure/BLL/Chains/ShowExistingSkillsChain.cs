@@ -6,29 +6,29 @@ using System.Text;
 
 namespace Infrastructure.BLL.Chains
 {
-    public class CreateAccountChain : IChain
+    public class ShowExistingSkillsChain: IChain
     {
-        public string Name => "CreateAccount";
+        public string Name => "ShowExistingSkills";
 
-        ICommandHandler _commands;
+        private ICommandHandler _commands;
 
-        public CreateAccountChain(ICommandHandler Commands)
+        public ShowExistingSkillsChain(ICommandHandler commands)
         {
-            _commands = Commands;
+            _commands = commands;
         }
 
         public IOperationResult Handle(object[] Params)
         {
-            if(Params.Length < 2)
+            if (Params.Length < 1)
             {
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = "Invalid data count: CreateAccountChain"
+                    Result = $"Invalid data count: ShowExistingSkillsChain"
                 };
             }
 
-            return _commands["CreateAccount"].Handle(Params);
+            return _commands["ShowExistingSkills"].Handle(Params);
         }
     }
 }

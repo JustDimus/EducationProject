@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.Core.BLL
 {
-    public class Skill: DAL.Skill
+    public class SkillBO: DAL.SkillDBO
     {
     }
 }

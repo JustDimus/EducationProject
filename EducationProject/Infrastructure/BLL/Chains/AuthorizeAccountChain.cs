@@ -23,7 +23,7 @@ namespace Infrastructure.BLL.Chains
             {
                 return new OperationResult()
                 {
-                    Status = ResultType.Error,
+                    Status = ResultType.Failed,
                     Result = $"Invalid data count: AuthorizeAccountChain"
                 };
             }

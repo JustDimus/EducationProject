@@ -8,31 +8,31 @@ using System.Linq;
 
 namespace Infrastructure.DAL.Mappings
 {
-    public class AccountMapping : IMapping<Account>
+    public class AccountMapping : IMapping<AccountBO>
     {
         private UnitOfWork _uow;
 
-        private IMapping<Course> _courses;
+        private IMapping<CourseBO> _courses;
 
-        public AccountMapping(UnitOfWork UOW, IMapping<Course> Courses)
+        public AccountMapping(UnitOfWork UOW, IMapping<CourseBO> Courses)
         {
             _uow = UOW;
             _courses = Courses;
         }
 
-        public void Create(Account Entity)
+        public void Create(AccountBO Entity)
         {
-            var account = new EducationProject.Core.DAL.Account()
+            var account = new EducationProject.Core.DAL.AccountDBO()
             {
                 Email = Entity.Email,
                 FirstName = Entity.FirstName,
                 Password = Entity.Password,
-                PhoneNumber = Entity.Password,
+                PhoneNumber = Entity.PhoneNumber,
                 SecondName = Entity.SecondName,
                 RegistrationDate = Entity.RegistrationDate
             };
 
-            _uow.Repository<EducationProject.Core.DAL.Account>().Create(account);
+            _uow.Repository<EducationProject.Core.DAL.AccountDBO>().Create(account);
 
             Entity.Id = account.Id;
 
@@ -65,18 +65,18 @@ namespace Infrastructure.DAL.Mappings
             }
         }
 
-        public void Delete(Account Entity)
+        public void Delete(AccountBO Entity)
         {
             Delete(a => a.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<Account> Condition)
+        public void Delete(Predicate<AccountBO> Condition)
         {
             foreach (var entity in Get(Condition))
             {
                 _uow.Repository<EducationProject.Core.DAL.AccountCourse>().Delete(t => t.AccountId == entity.Id);
 
-                _uow.Repository<EducationProject.Core.DAL.Account>().Delete(entity.Id);
+                _uow.Repository<EducationProject.Core.DAL.AccountDBO>().Delete(entity.Id);
             }
         }
 
@@ -85,15 +85,15 @@ namespace Infrastructure.DAL.Mappings
             Delete(a => a.Id == Id);
         }
 
-        public IEnumerable<Account> Get(Predicate<Account> Condition)
+        public IEnumerable<AccountBO> Get(Predicate<AccountBO> Condition)
         {
-            return _uow.Repository<EducationProject.Core.DAL.Account>().Get(t => true)
+            return _uow.Repository<EducationProject.Core.DAL.AccountDBO>().Get(t => true)
                 .Select(a => 
                 {
                     var passed = _courses.Get(c => _uow.Repository<EducationProject.Core.DAL.AccountCourse>()
                     .Get(c => c.AccountId == a.Id && c.Status == "Passed").Select(c => c.CourseId).Contains(c.Id));
 
-                    return new Account()
+                    return new AccountBO()
                     {
                         RegistrationDate = a.RegistrationDate,
                         Email = a.Email,
@@ -105,7 +105,7 @@ namespace Infrastructure.DAL.Mappings
                         PassedCourses = passed,
                         CoursesInProgress = _courses.Get(c => _uow.Repository<EducationProject.Core.DAL.AccountCourse>()
                         .Get(c => c.AccountId == a.Id && c.Status == "InProgress").Select(c => c.CourseId).Contains(c.Id)),
-                        SkillResults = passed.SelectMany(c => c.Skills).GroupBy(c => c.Skill.Id).Select(c => new AccountSkill()
+                        SkillResults = passed.SelectMany(c => c.Skills).GroupBy(c => c.Skill.Id).Select(c => new AccountSkillBO()
                         {
                             Skill = c.FirstOrDefault().Skill,
                             CurrentResult = c.Select(f => f.SkillChange).Sum() % c.FirstOrDefault().Skill.MaxValue,
@@ -115,7 +115,7 @@ namespace Infrastructure.DAL.Mappings
                 }).Where(a => Condition(a) == true);
         }
 
-        public Account Get(int Id)
+        public AccountBO Get(int Id)
         {
             return Get(a => a.Id == Id).FirstOrDefault();
         }
@@ -125,17 +125,17 @@ namespace Infrastructure.DAL.Mappings
             _uow.Save();
         }
 
-        public void Update(Account Entity)
+        public void Update(AccountBO Entity)
         {
             Update(Entity, a => a.Id == Entity.Id);
         }
 
-        public void Update(Account Entity, Predicate<Account> Condition)
+        public void Update(AccountBO Entity, Predicate<AccountBO> Condition)
         {
             foreach (var entity in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.Account>().Update(
-                new EducationProject.Core.DAL.Account()
+                _uow.Repository<EducationProject.Core.DAL.AccountDBO>().Update(
+                new EducationProject.Core.DAL.AccountDBO()
                 {
                     Email = Entity.Email,
                     RegistrationDate = Entity.RegistrationDate,

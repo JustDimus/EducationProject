@@ -1,36 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <Skill xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Title>Working</Title>
     <MaxValue>150</MaxValue>
-  </Skill>
-  <Material xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  </SkillDBO>
+  <MaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Title>Work_1</Title>
     <Description>It's working</Description>
     <Type>Text</Type>
-  </Material>
-  <Course xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  </MaterialDBO>
+  <CourseDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Title>Hello</Title>
     <Description>TestCourse</Description>
-    <IsVisible>false</IsVisible>
+    <IsVisible>true</IsVisible>
     <CreatorId>0</CreatorId>
-  </Course>
+  </CourseDBO>
   <CourseMaterial xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <MaterialId>1</MaterialId>
     <CourseId>1</CourseId>
     <Position>1</Position>
   </CourseMaterial>
-  <CourseSkill xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <CourseSkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <CourseId>1</CourseId>
     <SkillId>1</SkillId>
     <SkillChange>150</SkillChange>
-  </CourseSkill>
-  <Account xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  </CourseSkillDBO>
+  <AccountDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Email>helloWorld</Email>
     <Password>dsadsa</Password>
@@ -38,18 +38,37 @@
     <SecondName>Name</SecondName>
     <RegistrationDate>2021-01-24T02:02:16.8467117+02:00</RegistrationDate>
     <PhoneNumber>dsadsa</PhoneNumber>
-  </Account>
+  </AccountDBO>
   <AccountCourse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>5</Id>
     <AccountId>1</AccountId>
     <CourseId>1</CourseId>
     <Status>InProgress</Status>
   </AccountCourse>
-  <Account xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <AccountDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>2</Id>
     <Email>User1</Email>
     <Password>Password1</Password>
     <RegistrationDate>2021-01-26T00:41:28.5626751+02:00</RegistrationDate>
     <PhoneNumber></PhoneNumber>
-  </Account>
+  </AccountDBO>
+  <AccountDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>3</Id>
+    <Email>Hello</Email>
+    <Password>User</Password>
+    <RegistrationDate>2021-01-27T23:29:45.0279135+02:00</RegistrationDate>
+    <PhoneNumber></PhoneNumber>
+  </AccountDBO>
+  <CourseDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>2</Id>
+    <Title>CourseTitle</Title>
+    <Description>CourseDesc</Description>
+    <IsVisible>false</IsVisible>
+    <CreatorId>3</CreatorId>
+  </CourseDBO>
+  <SkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>2</Id>
+    <Title>Человек</Title>
+    <MaxValue>145</MaxValue>
+  </SkillDBO>
 </root>

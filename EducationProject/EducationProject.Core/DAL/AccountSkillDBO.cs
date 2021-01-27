@@ -6,7 +6,7 @@ using System.Text;
 
 namespace EducationProject.Core.DAL
 {
-    public class AccountSkills: BaseEntity
+    public class AccountSkillDBO: BaseEntity
     {
         public int Skill { get; set; }
 

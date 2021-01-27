@@ -5,10 +5,10 @@ using EducationProject.Core.DAL;
 
 namespace EducationProject.Core.BLL
 {
-    public class CourseMaterial: BaseEntity
+    public class CourseSkillBO: BaseEntity
     {
-        public Material Material { get; set; }
+        public SkillBO Skill { get; set; }
 
-        public int Position { get; set; }
+        public int SkillChange { get; set; }
     }
 }

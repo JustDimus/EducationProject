@@ -6,15 +6,15 @@ using System.Text;
 
 namespace Infrastructure.BLL.Chains
 {
-    public class CreateCourseChain: IChain
+    public class CreateSkillChain : IChain
     {
-        public string Name => "CreateCourse";
+        public string Name => "CreateSkill";
 
         ICommandHandler _commands;
 
-        public CreateCourseChain(ICommandHandler Commands)
+        public CreateSkillChain(ICommandHandler commands)
         {
-            _commands = Commands;
+            _commands = commands;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -24,18 +24,18 @@ namespace Infrastructure.BLL.Chains
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Invalid data count: CreateCourseChain"
+                    Result = $"Invalid data count: CreateSkillChain"
                 };
             }
 
-            var authenticationResult = _commands["AuthenticateAccount"].Handle(Params);
+            var authResult = _commands["AuthenticateAccount"].Handle(Params);
 
-            if(authenticationResult.Status == ResultType.Failed)
+            if(authResult.Status == ResultType.Failed)
             {
-                return authenticationResult;
+                return authResult;
             }
 
-            return _commands["CreateCourse"].Handle(Params);
+            return _commands["CreateSkill"].Handle(Params);
         }
     }
 }

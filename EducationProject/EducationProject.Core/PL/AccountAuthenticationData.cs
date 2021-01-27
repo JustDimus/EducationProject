@@ -10,6 +10,6 @@ namespace EducationProject.Core.PL
 
         public string Token { get; set; }
 
-        public Account AccountData { get; set; }
+        public AccountPL AccountData { get; set; }
     }
 }

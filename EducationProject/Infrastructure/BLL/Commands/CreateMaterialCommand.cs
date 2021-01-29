@@ -56,7 +56,7 @@ namespace Infrastructure.BLL.Commands
                     {
                         Title = title,
                         Description = description,
-                        Type = "Video",
+                        Type = type,
                         VideoData = new VideoData()
                         {
                             URI = Params[4] as string,
@@ -70,7 +70,7 @@ namespace Infrastructure.BLL.Commands
                     {
                         Title = title,
                         Description = description,
-                        Type = "Video",
+                        Type = type,
                         ArticleData = new ArticleData()
                         {
                             URI = Params[4] as string,
@@ -83,7 +83,7 @@ namespace Infrastructure.BLL.Commands
                     {
                         Title = title,
                         Description = description,
-                        Type = "Video",
+                        Type = type,
                         BookData = new BookData()
                         { 
                             Author = Params[4] as string,
@@ -97,7 +97,6 @@ namespace Infrastructure.BLL.Commands
                         Status = ResultType.Failed,
                         Result = $"Invalid material type: CreateMaterialCommand"
                     };
-                    break;
             }
 
             _materials.Create(material);

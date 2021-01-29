@@ -21,11 +21,9 @@ namespace Infrastructure.BLL.Commands
 
         public IOperationResult Handle(object[] Params)
         {
-            int materialId = 0;
+            int? materialId = Params[0] as int?;
 
-            Convert.ToInt32(Params[0]);
-
-            if (materialId == 0)
+            if (materialId is null)
             {
                 return new OperationResult()
                 {
@@ -34,7 +32,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if(_materials.Get(materialId) == null)
+            if(_materials.Get(materialId.GetValueOrDefault()) == null)
             {
                 return new OperationResult()
                 {

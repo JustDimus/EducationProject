@@ -42,7 +42,7 @@ namespace Infrastructure.BLL.Chains
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Such course doesn't exist: AddExistingMaterialToCourseChain"
+                    Result = $"Such skill doesn't exist: AddExistingSkillToCourseChain"
                 };
             }
 

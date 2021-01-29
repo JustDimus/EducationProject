@@ -43,16 +43,20 @@ namespace Infrastructure.BLL.Commands
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Such material '{skill.Title}' already exists in this course '{course.Title}'"
+                    Result = $"Such skill '{skill.Title}' already exists in this course '{course.Title}'"
                 };
             }
             else
             {
+                var rt = course.Skills.ToList();
                 course.Skills = course.Skills.Append(new CourseSkillBO()
                 {
                     Skill = skill,
                     SkillChange = skillChange
                 });
+                var ttytr = course.Skills.ToList();
+
+                Console.WriteLine();
             }
 
             _courses.Update(course);

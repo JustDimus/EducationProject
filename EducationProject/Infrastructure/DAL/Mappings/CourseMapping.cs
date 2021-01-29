@@ -15,11 +15,15 @@ namespace Infrastructure.DAL.Mappings
 
         private IMapping<BaseMaterial> _materials;
 
-        public CourseMapping(UnitOfWork UOW, IMapping<BaseMaterial> materials)
+        private IMapping<SkillBO> _skills;
+
+        public CourseMapping(UnitOfWork UOW, IMapping<BaseMaterial> materials, IMapping<SkillBO> skills)
         {
             _uow = UOW;
 
             _materials = materials;
+
+            _skills = skills;
         }
 
         public void Create(CourseBO Entity)
@@ -40,8 +44,8 @@ namespace Infrastructure.DAL.Mappings
             {
                 foreach (var material in Entity.Materials)
                 {
-                    _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>()
-                        .Create(new EducationProject.Core.DAL.CourseMaterialDBO()
+                    _uow.Repository<CourseMaterialDBO>()
+                        .Create(new CourseMaterialDBO()
                         {
                             CourseId = Entity.Id,
                             MaterialId = material.Material.Id,
@@ -54,8 +58,8 @@ namespace Infrastructure.DAL.Mappings
             {
                 foreach (var skill in Entity.Skills)
                 {
-                    _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>()
-                        .Create(new EducationProject.Core.DAL.CourseSkillDBO()
+                    _uow.Repository<CourseSkillDBO>()
+                        .Create(new CourseSkillDBO()
                         {
                             CourseId = Entity.Id,
                             SkillChange = skill.SkillChange,
@@ -74,9 +78,9 @@ namespace Infrastructure.DAL.Mappings
         {
             foreach(var course in Get(Condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.CourseDBO>().Delete(course.Id);
+                _uow.Repository<CourseDBO>().Delete(course.Id);
 
-                _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>().Delete(m => m.CourseId == course.Id);
+                _uow.Repository<CourseMaterialDBO>().Delete(m => m.CourseId == course.Id);
 
                 _uow.Repository<AccountCourse>().Delete(m => m.CourseId == course.Id);  
             }
@@ -106,7 +110,7 @@ namespace Infrastructure.DAL.Mappings
                     Skills = _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>()
                     .Get(b => b.CourseId == c.Id).Select(b => new CourseSkillBO
                     {
-                        Skill = (SkillBO)_uow.Repository<EducationProject.Core.DAL.SkillDBO>().Get(b.SkillId),
+                        Skill = _skills.Get(b.SkillId),
                         SkillChange = b.SkillChange
                     })
                 }).Where(c => Condition(c) == true);
@@ -143,7 +147,7 @@ namespace Infrastructure.DAL.Mappings
 
                 _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>().Delete(c => c.CourseId == i.Id);
 
-                foreach(var courseMaterial in i.Materials)
+                foreach(var courseMaterial in Entity.Materials)
                 {
                     _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>()
                         .Create(new EducationProject.Core.DAL.CourseMaterialDBO()
@@ -156,7 +160,7 @@ namespace Infrastructure.DAL.Mappings
 
                 _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>().Delete(c => c.CourseId == i.Id);
 
-                foreach (var courseSkill in i.Skills)
+                foreach (var courseSkill in Entity.Skills)
                 {
                     _uow.Repository<EducationProject.Core.DAL.CourseSkillDBO>()
                         .Create(new EducationProject.Core.DAL.CourseSkillDBO()

@@ -16,20 +16,32 @@ namespace ConsoleInterface
 
         public const string LogoutCommand = "_logout";
 
-        public const string ShowAll = "_showall";
+        public const string ShowAllCommand = "_showall";
 
         public const string ShowAllCoursesCommand = "_showallcourses";
 
-        public const string ShowMyCoursesCommand = "_showmycourses";
+        public const string ShowMyCoursesCommand = "_showmy";
 
         public const string GotoCoursesCommand = "_gotocourses";
 
         public const string GotoSkillsCommand = "_gotoskills";
 
-        public const string CreateNewCourseCommand = "_createnew";
+        public const string GotoMaterialsCommand = "_gotomaterials";
 
         public const string CreateNewCommand = "_createnew";
 
-        //public const string 
+        public const string AddSkillToCourseCommand = "_addskill";
+
+        public const string AddMaterialToCourseCommand = "_addmaterial";
+
+        public const string HelpCommandCommand = "_help";
+
+        public const string PublishCourseCommand = "_publish";
+
+        public const string HideCourseCommand = "_hide";
+
+        public const string AddCourseToAccountCommand = "_addcourse";
+
+        public const string PassCourseCommand = "_pass";
     }
 }

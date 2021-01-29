@@ -40,6 +40,7 @@ namespace ConsoleInterface.Realizations
 
                 OperateCommand(currentCommand);
 
+                Console.WriteLine();
             } while (currentCommand != ConsoleCommands.ExitCommand);
 
             Console.WriteLine("Returning...");
@@ -62,6 +63,8 @@ namespace ConsoleInterface.Realizations
 
         private void CreateNew()
         {
+            Console.WriteLine("Creating new skill...");
+
             string title = string.Empty;
 
             int maxValue;
@@ -107,7 +110,7 @@ namespace ConsoleInterface.Realizations
         {
             switch (command)
             {
-                case ConsoleCommands.ShowAll:
+                case ConsoleCommands.ShowAllCommand:
                     ShowAll();
                     return;
                 case ConsoleCommands.CreateNewCommand:

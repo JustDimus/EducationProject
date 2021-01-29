@@ -11,7 +11,7 @@ namespace Infrastructure.BLL.Commands
 {
     public class ShowExistingMaterialsCommand: ICommand
     {
-        public string Name => "ShowExistingSkills";
+        public string Name => "ShowExistingMaterials";
 
         private IMapping<BaseMaterial> _materials;
 

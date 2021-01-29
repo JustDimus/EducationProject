@@ -21,13 +21,20 @@ namespace ConsoleInterface.Realizations
 
         private SkillSectionHandler _skillsHandler;
 
-        public AccountSectionHandler(IChainHandler commands, CourseSectionHandler courseHandler, SkillSectionHandler skills)
+        private MaterialSectionHandler _materials;
+
+        public AccountSectionHandler(IChainHandler commands, 
+            CourseSectionHandler courseHandler, 
+            SkillSectionHandler skills,
+            MaterialSectionHandler materials)
         {
             _commands = commands;
 
             _courseHandler = courseHandler;
 
             _skillsHandler = skills;
+
+            _materials = materials;
         }
 
         public void Run(AccountAuthenticationData data = null)
@@ -47,6 +54,7 @@ namespace ConsoleInterface.Realizations
 
                 OperateCommand(currentCommand);
 
+                Console.WriteLine();
             } while (currentCommand != ConsoleCommands.ExitCommand);
 
             Console.WriteLine("\nProgramEnding");
@@ -61,7 +69,7 @@ namespace ConsoleInterface.Realizations
                 case ConsoleCommands.LoginCommand:
                     LogIn();
                     return;
-                case ConsoleCommands.RegistrationCommand:
+                case ConsoleCommands.CreateNewCommand:
                     Registration();
                     return;
                 case ConsoleCommands.ShowDataCommand:
@@ -76,22 +84,43 @@ namespace ConsoleInterface.Realizations
                 case ConsoleCommands.GotoSkillsCommand:
                     _skillsHandler.Run(_currentAccount);
                     return;
-                case ConsoleCommands.ShowMyCoursesCommand:
-                    ShowCourses(true);
+                case ConsoleCommands.AddCourseToAccountCommand:
+                    AddCourseToAccount();
+                    return;
+                case ConsoleCommands.PassCourseCommand:
+                    PassCourse();
                     return;
             }
         }
 
-        private void ShowCourses(bool isMyCourses)
+        private void AddCourseToAccount()
         {
-            if(isMyCourses == false)
+            if(_currentAccount is null)
             {
-                
+                Console.WriteLine("Please log in...");
+                return;
             }
-            else
-            {
 
-            }
+            string currentMessage = String.Empty;
+
+            int courseId;
+
+            do
+            {
+                Console.Write("Enter course id: ");
+
+                currentMessage = Console.ReadLine();
+
+                if (currentMessage == ConsoleCommands.ExitCommand)
+                {
+                    Console.WriteLine("Returning...");
+                    return;
+                }
+
+            } while (Int32.TryParse(currentMessage, out courseId) == false);
+           
+            Console.WriteLine(_commands["AddExistingCourseToAccount"]
+                .Handle(new object[] { _currentAccount, _currentAccount.AccountData.Id, courseId }).Result);
         }
 
         private void LogOut()
@@ -99,6 +128,7 @@ namespace ConsoleInterface.Realizations
             if(_currentAccount is null)
             {
                 Console.WriteLine("You're not authorized");
+                return;
             }
 
             _commands["DeauthorizeAccount"].Handle(new object[] { _currentAccount.Token });
@@ -123,13 +153,45 @@ namespace ConsoleInterface.Realizations
                 $"Phone number: {_currentAccount.AccountData.PhoneNumber}\n" +
                 $"Registration date: {_currentAccount.AccountData.RegistrationDate}\n" +
                 $"Courses in progress: {_currentAccount.AccountData.CoursesInProgress.Count()}\n" +
+                $"\t{String.Join("\n\t", _currentAccount.AccountData.CoursesInProgress.Select(c => $"Id: {c.Id}: '{c.Title}'"))}\n" +
                 $"Passed courses: {_currentAccount.AccountData.PassedCourses.Count()}\n" +
+                $"\t{String.Join("\n\t", _currentAccount.AccountData.PassedCourses.Select(c => $"Id: {c.Id} '{c.Title}'"))}\n" +
                 $"Skills:\n\t{String.Join("\n\t", _currentAccount.AccountData.SkillResults.Select(s => $"{s.Skill.Title} Lvl: {s.Level} Current progress: {s.CurrentResult}"))}");
+        }
+
+        private void PassCourse()
+        {
+            if (_currentAccount is null)
+            {
+                Console.WriteLine("Please log in...");
+                return;
+            }
+
+            string currentMessage = String.Empty;
+
+            int courseId;
+
+            do
+            {
+                Console.Write("Enter course id: ");
+
+                currentMessage = Console.ReadLine();
+
+                if (currentMessage == ConsoleCommands.ExitCommand)
+                {
+                    Console.WriteLine("Returning...");
+                    return;
+                }
+
+            } while (Int32.TryParse(currentMessage, out courseId) == false);
+
+            Console.WriteLine(_commands["MoveCourseToPassed"]
+                .Handle(new object[] { _currentAccount, _currentAccount.AccountData.Id, courseId }).Result);
         }
 
         private void Registration()
         {
-            Console.WriteLine("Registration process");
+            Console.WriteLine("Registration process...");
 
             string login = String.Empty;
             string password = String.Empty;

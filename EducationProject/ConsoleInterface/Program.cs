@@ -50,7 +50,9 @@ namespace ConsoleInterface
             Services.AddSingleton<ICommand, ShowExistingAccountsCommand>();
             Services.AddSingleton<ICommand, ShowExistingCoursesCommand>();
             Services.AddSingleton<ICommand, ShowExistingSkillsCommand>();
+            Services.AddSingleton<ICommand, ShowExistingMaterialsCommand>();
             Services.AddSingleton<ICommand, DeauthorizeAccountCommand>();
+            Services.AddSingleton<ICommand, ChangeCourseVisibilityCommand>();
 
             Services.AddSingleton<AuthorizationService>();
             Services.AddSingleton<AccountConverterService>();
@@ -70,6 +72,7 @@ namespace ConsoleInterface
             Services.AddSingleton<IChain, ShowExistingMaterialsChain>();
             Services.AddSingleton<IChain, ShowExistingSkillsChain>();
             Services.AddSingleton<IChain, DeauthorizeAccountChain>();
+            Services.AddSingleton<IChain, ChangeCourseVisibilityChain>();
 
             Services.AddTransient<ICommandHandler, CommandHandler>();
             Services.AddTransient<IConsoleHandler, ConsoleHandler>();
@@ -78,6 +81,7 @@ namespace ConsoleInterface
             Services.AddSingleton<AccountSectionHandler>();
             Services.AddSingleton<CourseSectionHandler>();
             Services.AddSingleton<SkillSectionHandler>();
+            Services.AddSingleton<MaterialSectionHandler>();
         }
 
         static void Main(string[] args)

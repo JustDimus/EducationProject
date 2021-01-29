@@ -7,7 +7,7 @@ namespace EducationProject.Core.BLL
 {
     public class AccountSkillBO: BaseEntity
     {
-        public SkillBO Skill { get; set; }
+        public SkillDBO Skill { get; set; }
 
         public int CurrentResult { get; set; }
 

@@ -46,7 +46,7 @@ namespace Infrastructure.BLL.Commands
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Only account owner can add courses to it's account: AddExistingCourseToAccountCommand"
+                    Result = $"Only account's owner can add courses to account: AddExistingCourseToAccountCommand"
                 };
             }
 

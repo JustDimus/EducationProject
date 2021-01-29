@@ -21,11 +21,9 @@ namespace Infrastructure.BLL.Commands
 
         public IOperationResult Handle(object[] Params)
         {
-            int skillId = 0;
+            int? skillId = Params[0] as int?;
 
-            Convert.ToInt32(Params[0]);
-
-            if (skillId == 0)
+            if (skillId is null)
             {
                 return new OperationResult()
                 {
@@ -34,7 +32,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if (_skills.Get(skillId) == null)
+            if (_skills.Get(skillId.GetValueOrDefault()) == null)
             {
                 return new OperationResult()
                 {

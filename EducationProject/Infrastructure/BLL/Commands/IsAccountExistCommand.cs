@@ -12,9 +12,9 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "IsAccountExist";
 
-        private IMapping<SkillBO> _accounts;
+        private IMapping<AccountBO> _accounts;
 
-        public IsAccountExistCommand(IMapping<SkillBO> accounts)
+        public IsAccountExistCommand(IMapping<AccountBO> accounts)
         {
             _accounts = accounts;
         }

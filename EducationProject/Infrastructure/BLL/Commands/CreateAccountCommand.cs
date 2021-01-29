@@ -12,14 +12,10 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "CreateAccount";
 
-      //  private ICommandHandler _commands;
-
         private IMapping<AccountBO> _accounts;
 
         public CreateAccountCommand(IMapping<AccountBO> AccMapping)
         {
-           // _commands = Commands;
-
             _accounts = AccMapping;
         }
 

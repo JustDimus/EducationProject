@@ -5,12 +5,6 @@
     <Title>Working</Title>
     <MaxValue>150</MaxValue>
   </SkillDBO>
-  <MaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <Id>1</Id>
-    <Title>Work_1</Title>
-    <Description>It's working</Description>
-    <Type>Text</Type>
-  </MaterialDBO>
   <CourseDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Title>Hello</Title>
@@ -18,18 +12,6 @@
     <IsVisible>true</IsVisible>
     <CreatorId>0</CreatorId>
   </CourseDBO>
-  <CourseMaterial xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <Id>1</Id>
-    <MaterialId>1</MaterialId>
-    <CourseId>1</CourseId>
-    <Position>1</Position>
-  </CourseMaterial>
-  <CourseSkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <Id>1</Id>
-    <CourseId>1</CourseId>
-    <SkillId>1</SkillId>
-    <SkillChange>150</SkillChange>
-  </CourseSkillDBO>
   <AccountDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>1</Id>
     <Email>helloWorld</Email>
@@ -57,13 +39,13 @@
     <Email>Hello</Email>
     <Password>User</Password>
     <RegistrationDate>2021-01-27T23:29:45.0279135+02:00</RegistrationDate>
-    <PhoneNumber></PhoneNumber>
+    <PhoneNumber />
   </AccountDBO>
   <CourseDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Id>2</Id>
     <Title>CourseTitle</Title>
     <Description>CourseDesc</Description>
-    <IsVisible>false</IsVisible>
+    <IsVisible>true</IsVisible>
     <CreatorId>3</CreatorId>
   </CourseDBO>
   <SkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -71,4 +53,116 @@
     <Title>Человек</Title>
     <MaxValue>145</MaxValue>
   </SkillDBO>
+  <AccountDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>4</Id>
+    <Email>newgf</Email>
+    <Password>dsa</Password>
+    <RegistrationDate>2021-01-28T01:53:49.6480327+02:00</RegistrationDate>
+  </AccountDBO>
+  <CourseDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>3</Id>
+    <Title>tty</Title>
+    <Description>tty</Description>
+    <IsVisible>false</IsVisible>
+    <CreatorId>4</CreatorId>
+  </CourseDBO>
+  <MaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>1</Id>
+    <Title>Video</Title>
+    <Description>ds</Description>
+    <Type>Video</Type>
+    <Data>{"URI":"htre","Duration":14,"Quality":16}</Data>
+  </MaterialDBO>
+  <MaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>2</Id>
+    <Title>Article</Title>
+    <Description>dsds</Description>
+    <Type>Article</Type>
+    <Data>{"URI":"articleuri","PublicationDate":"2003-05-15T00:00:00"}</Data>
+  </MaterialDBO>
+  <MaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>3</Id>
+    <Title>book</Title>
+    <Description>bfbd</Description>
+    <Type>Book</Type>
+    <Data>{"Author":"Johnathan Joestar","Pages":135}</Data>
+  </MaterialDBO>
+  <CourseSkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>2</Id>
+    <CourseId>1</CourseId>
+    <SkillId>1</SkillId>
+    <SkillChange>150</SkillChange>
+  </CourseSkillDBO>
+  <CourseMaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>10</Id>
+    <MaterialId>2</MaterialId>
+    <CourseId>2</CourseId>
+    <Position>0</Position>
+  </CourseMaterialDBO>
+  <CourseMaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>11</Id>
+    <MaterialId>1</MaterialId>
+    <CourseId>2</CourseId>
+    <Position>1</Position>
+  </CourseMaterialDBO>
+  <CourseSkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>9</Id>
+    <CourseId>2</CourseId>
+    <SkillId>2</SkillId>
+    <SkillChange>111</SkillChange>
+  </CourseSkillDBO>
+  <CourseDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>4</Id>
+    <Title>created by id 3 'Hello'</Title>
+    <Description>description</Description>
+    <IsVisible>true</IsVisible>
+    <CreatorId>3</CreatorId>
+  </CourseDBO>
+  <CourseMaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>12</Id>
+    <MaterialId>2</MaterialId>
+    <CourseId>3</CourseId>
+    <Position>0</Position>
+  </CourseMaterialDBO>
+  <AccountCourse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>26</Id>
+    <AccountId>3</AccountId>
+    <CourseId>2</CourseId>
+    <Status>InProgress</Status>
+  </AccountCourse>
+  <AccountCourse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>27</Id>
+    <AccountId>3</AccountId>
+    <CourseId>4</CourseId>
+    <Status>Passed</Status>
+  </AccountCourse>
+  <AccountCourse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>28</Id>
+    <AccountId>3</AccountId>
+    <CourseId>3</CourseId>
+    <Status>Passed</Status>
+  </AccountCourse>
+  <SkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>3</Id>
+    <Title>Durability</Title>
+    <MaxValue>90</MaxValue>
+  </SkillDBO>
+  <CourseMaterialDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>16</Id>
+    <MaterialId>1</MaterialId>
+    <CourseId>4</CourseId>
+    <Position>0</Position>
+  </CourseMaterialDBO>
+  <CourseSkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>12</Id>
+    <CourseId>4</CourseId>
+    <SkillId>2</SkillId>
+    <SkillChange>190</SkillChange>
+  </CourseSkillDBO>
+  <CourseSkillDBO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Id>13</Id>
+    <CourseId>4</CourseId>
+    <SkillId>3</SkillId>
+    <SkillChange>150</SkillChange>
+  </CourseSkillDBO>
 </root>

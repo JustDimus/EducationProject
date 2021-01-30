@@ -15,6 +15,7 @@ using Infrastructure.BLL;
 using ConsoleInterface.Interfaces;
 using ConsoleInterface.Realizations;
 using Infrastructure.BLL.Chains;
+using System.Configuration;
 
 namespace ConsoleInterface
 {
@@ -24,7 +25,9 @@ namespace ConsoleInterface
 
         static void ConfigureServices(IServiceCollection Services)
         {
-            Services.AddSingleton<XMLContext>();
+            string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
+
+            Services.AddSingleton<XMLContext>(x => new XMLContext(xmlFileName));
             Services.AddSingleton<UnitOfWork>();
 
             Services.AddSingleton<IMapping<AccountBO>, AccountMapping>();

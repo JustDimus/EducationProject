@@ -12,6 +12,8 @@ namespace EducationProject.DAL
 
         T Get(int Id);
 
+        T Get(T Entity);
+
         void Update(T Entity);
 
         void Update(T Entity, Predicate<T> Condition);
@@ -22,6 +24,6 @@ namespace EducationProject.DAL
 
         void Delete(int Id);
 
-        void Save();
+        //void Save();
     }
 }

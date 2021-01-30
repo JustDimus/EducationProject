@@ -8,15 +8,15 @@ namespace XMLDataContext.Interfaces
     {
         void Create(T Entity);
 
+        IEnumerable<T> Get(Predicate<T> Condition);
+
         T Get(int Id);
 
         T Get(T Entity);
 
-        IEnumerable<T> Get(Predicate<T> Condition);
+        void Update(T Entity);
 
         void Update(T Entity, Predicate<T> Condition);
-
-        void Update(T Entity);
 
         void Delete(T Entity);
 

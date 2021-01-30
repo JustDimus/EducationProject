@@ -36,9 +36,9 @@ namespace XMLDataContext.DataContext
 
         private string filePath { get; set; }
 
-        public XMLContext()
+        public XMLContext(string fileName)
         {
-            _fileName = ConfigurationManager.AppSettings.Get("XMLFile");
+            _fileName = fileName;
             _document = new FileCheckers.FileChecker(_fileName).Get();
         }
 

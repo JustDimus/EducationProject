@@ -48,6 +48,11 @@ namespace Infrastructure.DAL.Repository
             return Elements.Get(Id);
         }
 
+        public T Get(T Entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Save()
         {
             throw new NotImplementedException();

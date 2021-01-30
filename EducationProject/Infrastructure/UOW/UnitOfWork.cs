@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Text;
 using XMLDataContext.DataContext;
 using EducationProject.Core.DAL;
+using XMLDataContext.Interfaces;
+using System.Linq;
+
 
 namespace Infrastructure.UOW
 {
@@ -20,17 +23,20 @@ namespace Infrastructure.UOW
 
         private Dictionary<Type, object> _reposes = new Dictionary<Type, object>();
 
-        public IRepository<T> Repository<T>() where T: BaseEntity
+        private IEnumerable<IDbSet> _dbSets;
+
+        public IDbSet<T> Repository<T>() where T: BaseEntity
         {
             object res = null;
 
             if (_reposes.TryGetValue(typeof(T), out res) == false)
             {
-                res = new BaseRepository<T>(_dataContext.Entity<T>());
+                res = _dataContext.Entity<T>();
+                //new BaseRepository<T>(_dataContext.Entity<T>());
                 _reposes.Add(typeof(T), res);
             }
 
-            return (IRepository<T>)res;
+            return (IDbSet<T>) res;
         }
 
         public void Save()

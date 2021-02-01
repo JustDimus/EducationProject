@@ -16,9 +16,9 @@ namespace Infrastructure.UOW
     {
         private XMLContext _dataContext; 
 
-        public UnitOfWork(XMLContext DataContext)
+        public UnitOfWork(XMLContext dataContext)
         {
-            _dataContext = DataContext;
+            _dataContext = dataContext;
         }
 
         private Dictionary<Type, object> _reposes = new Dictionary<Type, object>();

@@ -97,7 +97,7 @@ namespace XMLDataContext.DataSets
 
             foundElements.AddRange(FindInLocalCollection(Condition).Where(e => foundElements.Any(d => d.Id == e.Id) == false));
 
-            return foundElements; 
+            return foundElements;
         }
 
         public void Delete(T Entity)

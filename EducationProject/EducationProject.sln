@@ -9,11 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XMLDataContext", "XMLDataContext\XMLDataContext.csproj", "{F3BEBC14-4E1A-4580-8EB1-F498E2F2AC24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EducationProject.Core", "EducationProject.Core\EducationProject.Core.csproj", "{53D85054-3714-44F4-AF30-A709F2B73BB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.Core", "EducationProject.Core\EducationProject.Core.csproj", "{53D85054-3714-44F4-AF30-A709F2B73BB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EducationProject.BLL", "EducationProject.BLL\EducationProject.BLL.csproj", "{B4B1F8AB-42DB-4975-9D41-BB8FD5958438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.BLL", "EducationProject.BLL\EducationProject.BLL.csproj", "{B4B1F8AB-42DB-4975-9D41-BB8FD5958438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EducationProject.DAL", "EducationProject.DAL\EducationProject.DAL.csproj", "{8D35E05F-432B-45A5-ADC1-88B0871E2784}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.DAL", "EducationProject.DAL\EducationProject.DAL.csproj", "{8D35E05F-432B-45A5-ADC1-88B0871E2784}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADODataContext", "ADODataContext\ADODataContext.csproj", "{10E8730C-272C-4BAF-B1CD-FB5698A5E4AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{8D35E05F-432B-45A5-ADC1-88B0871E2784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D35E05F-432B-45A5-ADC1-88B0871E2784}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D35E05F-432B-45A5-ADC1-88B0871E2784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10E8730C-272C-4BAF-B1CD-FB5698A5E4AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10E8730C-272C-4BAF-B1CD-FB5698A5E4AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10E8730C-272C-4BAF-B1CD-FB5698A5E4AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10E8730C-272C-4BAF-B1CD-FB5698A5E4AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

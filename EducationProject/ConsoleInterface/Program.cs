@@ -23,68 +23,68 @@ namespace ConsoleInterface
     {
         static IServiceCollection _services = new ServiceCollection();
 
-        static void ConfigureServices(IServiceCollection Services)
+        static void ConfigureServices(IServiceCollection services)
         {
             string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
 
-            Services.AddSingleton<XMLContext>(x => new XMLContext(xmlFileName));
-            Services.AddSingleton<UnitOfWork>();
+            services.AddSingleton<XMLContext>(x => new XMLContext(xmlFileName));
+            services.AddSingleton<UnitOfWork>();
 
-            Services.AddSingleton<IMapping<AccountBO>, AccountMapping>();
-            Services.AddSingleton<IMapping<CourseBO>, CourseMapping>();
-            Services.AddSingleton<IMapping<SkillBO>, SkillMapping>();
-            Services.AddSingleton<IMapping<BaseMaterial>, MaterialMapping>();
+            services.AddSingleton<IMapping<AccountBO>, AccountMapping>();
+            services.AddSingleton<IMapping<CourseBO>, CourseMapping>();
+            services.AddSingleton<IMapping<SkillBO>, SkillMapping>();
+            services.AddSingleton<IMapping<BaseMaterial>, MaterialMapping>();
 
-            Services.AddSingleton<ICommand, AuthorizeAccountCommand>();
-            Services.AddSingleton<ICommand, CreateAccountCommand>();
-            Services.AddSingleton<ICommand, ErrorCommand>();
-            Services.AddSingleton<ICommand, CreateCourseCommand>();
-            Services.AddSingleton<ICommand, AuthenticateAccountCommand>();
-            Services.AddSingleton<ICommand, AddExistingCourseToAccountCommand>();
-            Services.AddSingleton<ICommand, AddExistingMaterialToCourseCommand>();
-            Services.AddSingleton<ICommand, AddExistingSkillToCourseCommand>();
-            Services.AddSingleton<ICommand, CreateMaterialCommand>();
-            Services.AddSingleton<ICommand, CreateSkillCommand>();
-            Services.AddSingleton<ICommand, IsAccountExistCommand>();
-            Services.AddSingleton<ICommand, IsCourseExistCommand>();
-            Services.AddSingleton<ICommand, IsMaterialExistCommand>();
-            Services.AddSingleton<ICommand, IsSkillExistCommand>();
-            Services.AddSingleton<ICommand, MoveCourseToPassedInAccountCommand>();
-            Services.AddSingleton<ICommand, ShowExistingAccountsCommand>();
-            Services.AddSingleton<ICommand, ShowExistingCoursesCommand>();
-            Services.AddSingleton<ICommand, ShowExistingSkillsCommand>();
-            Services.AddSingleton<ICommand, ShowExistingMaterialsCommand>();
-            Services.AddSingleton<ICommand, DeauthorizeAccountCommand>();
-            Services.AddSingleton<ICommand, ChangeCourseVisibilityCommand>();
+            services.AddSingleton<ICommand, AuthorizeAccountCommand>();
+            services.AddSingleton<ICommand, CreateAccountCommand>();
+            services.AddSingleton<ICommand, ErrorCommand>();
+            services.AddSingleton<ICommand, CreateCourseCommand>();
+            services.AddSingleton<ICommand, AuthenticateAccountCommand>();
+            services.AddSingleton<ICommand, AddExistingCourseToAccountCommand>();
+            services.AddSingleton<ICommand, AddExistingMaterialToCourseCommand>();
+            services.AddSingleton<ICommand, AddExistingSkillToCourseCommand>();
+            services.AddSingleton<ICommand, CreateMaterialCommand>();
+            services.AddSingleton<ICommand, CreateSkillCommand>();
+            services.AddSingleton<ICommand, IsAccountExistCommand>();
+            services.AddSingleton<ICommand, IsCourseExistCommand>();
+            services.AddSingleton<ICommand, IsMaterialExistCommand>();
+            services.AddSingleton<ICommand, IsSkillExistCommand>();
+            services.AddSingleton<ICommand, MoveCourseToPassedInAccountCommand>();
+            services.AddSingleton<ICommand, ShowExistingAccountsCommand>();
+            services.AddSingleton<ICommand, ShowExistingCoursesCommand>();
+            services.AddSingleton<ICommand, ShowExistingSkillsCommand>();
+            services.AddSingleton<ICommand, ShowExistingMaterialsCommand>();
+            services.AddSingleton<ICommand, DeauthorizeAccountCommand>();
+            services.AddSingleton<ICommand, ChangeCourseVisibilityCommand>();
 
-            Services.AddSingleton<AuthorizationService>();
-            Services.AddSingleton<AccountConverterService>();
+            services.AddSingleton<AuthorizationService>();
+            services.AddSingleton<AccountConverterService>();
 
-            Services.AddSingleton<IChain, CreateAccountChain>();
-            Services.AddSingleton<IChain, CreateCourseChain>();
-            Services.AddSingleton<IChain, AuthorizeAccountChain>();
-            Services.AddSingleton<IChain, ErrorChain>();
-            Services.AddSingleton<IChain, AddExistingCourseToAccountChain>();
-            Services.AddSingleton<IChain, AddExistingMaterialToCourseChain>();
-            Services.AddSingleton<IChain, AddExistingSkillToCourseChain>();
-            Services.AddSingleton<IChain, CreateMaterialChain>();
-            Services.AddSingleton<IChain, CreateSkillChain>();
-            Services.AddSingleton<IChain, MoveCourseToPassedInAccountChain>();
-            Services.AddSingleton<IChain, ShowExistingAccountsChain>();
-            Services.AddSingleton<IChain, ShowExistingCoursesChain>();
-            Services.AddSingleton<IChain, ShowExistingMaterialsChain>();
-            Services.AddSingleton<IChain, ShowExistingSkillsChain>();
-            Services.AddSingleton<IChain, DeauthorizeAccountChain>();
-            Services.AddSingleton<IChain, ChangeCourseVisibilityChain>();
+            services.AddSingleton<IChain, CreateAccountChain>();
+            services.AddSingleton<IChain, CreateCourseChain>();
+            services.AddSingleton<IChain, AuthorizeAccountChain>();
+            services.AddSingleton<IChain, ErrorChain>();
+            services.AddSingleton<IChain, AddExistingCourseToAccountChain>();
+            services.AddSingleton<IChain, AddExistingMaterialToCourseChain>();
+            services.AddSingleton<IChain, AddExistingSkillToCourseChain>();
+            services.AddSingleton<IChain, CreateMaterialChain>();
+            services.AddSingleton<IChain, CreateSkillChain>();
+            services.AddSingleton<IChain, MoveCourseToPassedInAccountChain>();
+            services.AddSingleton<IChain, ShowExistingAccountsChain>();
+            services.AddSingleton<IChain, ShowExistingCoursesChain>();
+            services.AddSingleton<IChain, ShowExistingMaterialsChain>();
+            services.AddSingleton<IChain, ShowExistingSkillsChain>();
+            services.AddSingleton<IChain, DeauthorizeAccountChain>();
+            services.AddSingleton<IChain, ChangeCourseVisibilityChain>();
 
-            Services.AddTransient<ICommandHandler, CommandHandler>();
-            Services.AddTransient<IConsoleHandler, ConsoleHandler>();
-            Services.AddTransient<IChainHandler, ChainHandler>();
+            services.AddTransient<ICommandHandler, CommandHandler>();
+            services.AddTransient<IConsoleHandler, ConsoleHandler>();
+            services.AddTransient<IChainHandler, ChainHandler>();
 
-            Services.AddSingleton<AccountSectionHandler>();
-            Services.AddSingleton<CourseSectionHandler>();
-            Services.AddSingleton<SkillSectionHandler>();
-            Services.AddSingleton<MaterialSectionHandler>();
+            services.AddSingleton<AccountSectionHandler>();
+            services.AddSingleton<CourseSectionHandler>();
+            services.AddSingleton<SkillSectionHandler>();
+            services.AddSingleton<MaterialSectionHandler>();
         }
 
         static void Main(string[] args)

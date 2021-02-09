@@ -14,7 +14,7 @@ namespace ADODataContext.DataSets
 {
     public class BaseDbSet<T> : IDbSet<T> where T : BaseEntity
     {
-        private LabdaConverter<T> converter;
+        private LambdaConverter<T> converter;
 
         private string connectionString {get; set;}
 
@@ -22,13 +22,19 @@ namespace ADODataContext.DataSets
 
         private Queue<SqlCommand> commands = new Queue<SqlCommand>();
 
-        public BaseDbSet(string dbConnectionString, LabdaConverter<T> adoAdapter)
+        public BaseDbSet(string dbConnectionString, LambdaConverter<T> adoAdapter)
         {
             connectionString = dbConnectionString;
 
             converter = adoAdapter;
 
-            currentId = this.Get().Select(p => p.Id).Max();
+            currentId = 1;
+
+            var elements = this.Get().Select(p => p.Id);
+            if(elements.Any())
+            {
+                currentId = elements.Max() + 1;
+            }
         }
 
         public int CurrentId => ++currentId;
@@ -86,29 +92,37 @@ namespace ADODataContext.DataSets
 
             string sqlQuery = $"SELECT * FROM {typeof(T).Name}";
 
-            SqlCommand command = new SqlCommand();
-
-            string whereCondition = converter.DeconvertData(condition, command.Parameters);
-
-            if(String.IsNullOrEmpty(whereCondition) == false)
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                sqlQuery += " WHERE " + whereCondition;
-            }
+                connection.Open();
 
-            command.CommandText = whereCondition;
+                SqlCommand command = new SqlCommand();
 
-            foreach (DbDataRecord row in command.ExecuteReader())
-            {
-                T newEnitiy = (T)Activator.CreateInstance(typeof(T));
+                command.Connection = connection;
 
-                foreach (var property in typeof(T).GetProperties())
+                string whereCondition = converter.DeconvertData(condition, command.Parameters);
+
+                if (String.IsNullOrEmpty(whereCondition) == false)
                 {
-                    property.SetValue(newEnitiy, row[property.Name] is DBNull ? null : row[property.Name]);
+                    sqlQuery += " WHERE " + whereCondition;
                 }
 
-                result = result.Append(newEnitiy);
-            }
+                command.CommandText = sqlQuery;
 
+                foreach (DbDataRecord row in command.ExecuteReader())
+                {
+                    T newEnitiy = (T)Activator.CreateInstance(typeof(T));
+
+                    foreach (var property in typeof(T).GetProperties())
+                    {
+                        property.SetValue(newEnitiy, row[property.Name] is DBNull ? null : row[property.Name]);
+                    }
+
+                    result = result.Append(newEnitiy);
+                }
+
+                connection.Close();
+            }
             return result;
         }
 
@@ -138,12 +152,14 @@ namespace ADODataContext.DataSets
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
+                connection.Open();
                 while (commands.TryDequeue(out command) == true)
                 {
                     command.Connection = connection;
 
                     command.ExecuteNonQuery();
                 }
+                connection.Close();
             }
         }
 

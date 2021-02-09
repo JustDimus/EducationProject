@@ -16,6 +16,7 @@ using ConsoleInterface.Interfaces;
 using ConsoleInterface.Realizations;
 using Infrastructure.BLL.Chains;
 using System.Configuration;
+using ADODataContext.DataContext;
 
 namespace ConsoleInterface
 {
@@ -26,8 +27,11 @@ namespace ConsoleInterface
         static void ConfigureServices(IServiceCollection services)
         {
             string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
+            string connectionString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+
 
             services.AddSingleton<XMLContext>(x => new XMLContext(xmlFileName));
+            services.AddSingleton<ADOContext>(x => new ADOContext(connectionString));
             services.AddSingleton<UnitOfWork>();
 
             services.AddSingleton<IMapping<AccountBO>, AccountMapping>();

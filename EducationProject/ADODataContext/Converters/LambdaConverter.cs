@@ -8,7 +8,7 @@ using System.Data.SqlClient;
 
 namespace ADODataContext.Converters
 {
-    public class LabdaConverter<T>
+    public class LambdaConverter<T>
     {
 
         public string DeconvertData(Expression<Func<T, bool>> condition, SqlParameterCollection parameters)
@@ -32,9 +32,9 @@ namespace ADODataContext.Converters
             switch (expression)
             {
                 case BinaryExpression binary:
-                    return "(" + Deconvert(binary.Left, head)
+                    return "(" + Deconvert(binary.Left, head, parameters)
                         + GenerateOperator(binary.NodeType)
-                        + Deconvert(binary.Right, head) + ")";
+                        + Deconvert(binary.Right, head, parameters) + ")";
                 case ConstantExpression constant:
                     string constResult = $"@constant{parameters.Count}";
                     parameters.Add(new SqlParameter(constResult, constant.Value));

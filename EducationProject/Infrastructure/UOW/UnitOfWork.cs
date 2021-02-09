@@ -6,24 +6,23 @@ using System.Collections.Generic;
 using System.Text;
 using XMLDataContext.DataContext;
 using EducationProject.Core.DAL;
-using XMLDataContext.Interfaces;
+//using XMLDataContext.Interfaces;
+using ADODataContext.DataContext;
 using System.Linq;
-
+using ADODataContext.Interfaces;
 
 namespace Infrastructure.UOW
 {
     public class UnitOfWork
     {
-        private XMLContext _dataContext; 
+        private ADOContext _dataContext; 
 
-        public UnitOfWork(XMLContext dataContext)
+        public UnitOfWork(ADOContext dataContext)
         {
             _dataContext = dataContext;
         }
 
         private Dictionary<Type, object> _reposes = new Dictionary<Type, object>();
-
-        private IEnumerable<IDbSet> _dbSets;
 
         public IDbSet<T> Repository<T>() where T: BaseEntity
         {

@@ -26,6 +26,14 @@ namespace EducationProject.EFCore
             connectionString = dbConnectionString;
         }
 
+        public DbSet<AccountDBO> Accounts { get; set; }
+
+        public DbSet<CourseDBO> Courses { get; set; }
+
+        public DbSet<SkillDBO> Skills { get; set; }
+
+        public DbSet<BaseMaterialDBO> Materials { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

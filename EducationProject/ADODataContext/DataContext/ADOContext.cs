@@ -27,7 +27,7 @@ namespace ADODataContext.DataContext
 
             if(entityDictionary.TryGetValue(typeof(T), out result) == false)
             {
-                result = new BaseDbSet<T>(connectionString, new Converters.LabdaConverter<T>());
+                result = new BaseDbSet<T>(connectionString, new Converters.LambdaConverter<T>());
                 entityDictionary.Add(typeof(T), result);
             }
 

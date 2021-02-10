@@ -1,27 +1,26 @@
 ﻿using EducationProject.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace EducationProject.DAL.Mappings
 {
     public interface IMapping<T>
     {
-        void Create(T Entity);
+        void Create(T entity);
 
-        IEnumerable<T> Get(Predicate<T> Condition);
+        IEnumerable<T> Get(Expression<Func<T, bool>> condition);
 
-        T Get(int Id);
+        T Get(int id);
 
-        void Update(T Entity);
+        void Update(T entity);
 
-        void Update(T Entity, Predicate<T> Condition);
+        void Delete(T entity);
 
-        void Delete(T Entity);
+        void Delete(Expression<Func<T, bool>> condition);
 
-        void Delete(Predicate<T> Condition);
-
-        void Delete(int Id);
+        void Delete(int id);
 
         void Save();
     }

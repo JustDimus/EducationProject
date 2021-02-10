@@ -8,6 +8,7 @@
     <ProjectReference Include="..\ADODataContext\ADODataContext.csproj" />
     <ProjectReference Include="..\EducationProject.BLL\EducationProject.BLL.csproj" />
     <ProjectReference Include="..\EducationProject.DAL\EducationProject.DAL.csproj" />
+    <ProjectReference Include="..\EducationProject.EFCore\EducationProject.EFCore.csproj" />
     <ProjectReference Include="..\XMLDataContext\XMLDataContext.csproj" />
   </ItemGroup>
 

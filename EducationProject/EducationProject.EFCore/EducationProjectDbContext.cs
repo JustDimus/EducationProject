@@ -22,6 +22,7 @@ namespace EducationProject.EFCore
         }
 
         public EducationProjectDbContext(string dbConnectionString)
+            :base()
         {
             connectionString = dbConnectionString;
         }

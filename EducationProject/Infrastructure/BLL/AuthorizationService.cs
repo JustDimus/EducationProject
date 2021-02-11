@@ -1,5 +1,5 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -12,13 +12,13 @@ namespace Infrastructure.BLL
     {
         private List<string> _authorizedAccounts;
         
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> accounts;
 
         private AccountConverterService _converter;
 
-        public AuthorizationService(IMapping<AccountBO> AccMapping, AccountConverterService converter)
+        public AuthorizationService(IMapping<AccountDBO> accountMapping, AccountConverterService converter)
         {
-            _accounts = AccMapping;
+            accounts = accountMapping;
 
             _authorizedAccounts = new List<string>();
 
@@ -27,7 +27,7 @@ namespace Infrastructure.BLL
 
         public IOperationResult AuthorizeAccount(string Login, string Password)
         {
-            AccountBO account = _accounts.Get(a => a.Email == Login && a.Password == Password)
+            AccountDBO account = accounts.Get(a => a.Email == Login && a.Password == Password)
                 .FirstOrDefault();
 
             if(account is null)

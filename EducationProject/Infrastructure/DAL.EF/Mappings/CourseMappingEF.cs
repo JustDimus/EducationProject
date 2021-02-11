@@ -43,7 +43,18 @@ namespace Infrastructure.DAL.EF.Mappings
 
         public IEnumerable<CourseDBO> Get(Expression<Func<CourseDBO, bool>> condition)
         {
-            return this.context.Courses.Where(condition);
+            return this.context.Courses.Where(condition)
+                .Include(c => c.CourseSkills)
+                .ThenInclude(cs => cs.Skill)
+                .Include(c => c.CourseMaterials)
+                .ThenInclude(cm => cm.Material)
+                .ThenInclude(m => m.Article)
+                .Include(c => c.CourseMaterials)
+                .ThenInclude(cm => cm.Material)
+                .ThenInclude(m => m.Book)
+                .Include(c => c.CourseMaterials)
+                .ThenInclude(cm => cm.Material)
+                .ThenInclude(m => m.Video);
         }
 
         public CourseDBO Get(int id)

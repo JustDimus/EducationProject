@@ -1,4 +1,4 @@
-﻿using EducationProject.Core.BLL;
+﻿using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -10,20 +10,20 @@ namespace Infrastructure.BLL
 {
     public class AccountConverterService
     {
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> accounts;
 
-        public AccountConverterService(IMapping<AccountBO> accounts)
+        public AccountConverterService(IMapping<AccountDBO> accountMapping)
         {
-            _accounts = accounts;
+            accounts = accountMapping;
         }
 
-        public AccountPL ConvertBLLToPL(AccountBO account)
+        public AccountPL ConvertBLLToPL(AccountDBO account)
         {
             return new AccountPL()
             {
                 Id = account.Id,
                 RegistrationDate = account.RegistrationDate,
-                CoursesInProgress = account.CoursesInProgress,
+                CoursesInProgress = account.
                 Email = account.Email,
                 FirstName = account.FirstName,
                 PassedCourses = account.PassedCourses,

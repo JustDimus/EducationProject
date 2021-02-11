@@ -10,11 +10,11 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.DAL.EF.Mappings
 {
-    public class AccountMapping : IMapping<AccountDBO>
+    public class AccountMappingEF : IMapping<AccountDBO>
     {
         private EducationProjectDbContext context;
 
-        public AccountMapping(EducationProjectDbContext dbContext)
+        public AccountMappingEF(EducationProjectDbContext dbContext)
         {
             this.context = dbContext;
         }
@@ -41,16 +41,26 @@ namespace Infrastructure.DAL.EF.Mappings
 
         public IEnumerable<AccountDBO> Get(Expression<Func<AccountDBO, bool>> condition)
         {
-            return this.context.Accounts.Where(condition);
-            /*
+            return this.context.Accounts.Where(condition)
                 .Include(a => a.AccountCourses)
                 .ThenInclude(ac => ac.Course)
                 .ThenInclude(c => c.CourseSkills)
                 .ThenInclude(cs => cs.Skill)
+                .Include(a => a.AccountCourses) //
+                .ThenInclude(ac => ac.Course)
+                .ThenInclude(c => c.CourseMaterials)
+                .ThenInclude(cm => cm.Material)
+                .ThenInclude(m => m.Video)
                 .Include(a => a.AccountCourses)
                 .ThenInclude(ac => ac.Course)
                 .ThenInclude(c => c.CourseMaterials)
-                .ThenInclude(cm => cm.Material);*/
+                .ThenInclude(cm => cm.Material)
+                .ThenInclude(m => m.Article)
+                .Include(a => a.AccountCourses)
+                .ThenInclude(ac => ac.Course)
+                .ThenInclude(c => c.CourseMaterials)
+                .ThenInclude(cm => cm.Material)
+                .ThenInclude(m => m.Book);  //
         }
 
         public AccountDBO Get(int id)

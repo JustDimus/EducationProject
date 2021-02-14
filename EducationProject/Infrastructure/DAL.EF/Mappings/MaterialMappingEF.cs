@@ -40,6 +40,11 @@ namespace Infrastructure.DAL.EF.Mappings
                 .Remove(this.context.Materials.Find(id));
         }
 
+        public void Delete(Predicate<BaseMaterialDBO> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<BaseMaterialDBO> Get(Expression<Func<BaseMaterialDBO, bool>> condition)
         {
             return this.context.Materials.Where(condition);
@@ -48,6 +53,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public BaseMaterialDBO Get(int id)
         {
             return this.context.Materials.Find(id);
+        }
+
+        public IEnumerable<BaseMaterialDBO> Get(Predicate<BaseMaterialDBO> condition)
+        {
+            throw new NotImplementedException();
         }
 
         public void Save()

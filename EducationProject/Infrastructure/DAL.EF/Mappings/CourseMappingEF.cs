@@ -41,6 +41,11 @@ namespace Infrastructure.DAL.EF.Mappings
                 .Remove(this.context.Courses.Find(id));
         }
 
+        public void Delete(Predicate<CourseDBO> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<CourseDBO> Get(Expression<Func<CourseDBO, bool>> condition)
         {
             return this.context.Courses.Where(condition)
@@ -60,6 +65,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public CourseDBO Get(int id)
         {
             return this.context.Courses.Find(id);
+        }
+
+        public IEnumerable<CourseDBO> Get(Predicate<CourseDBO> condition)
+        {
+            throw new NotImplementedException();
         }
 
         public void Save()

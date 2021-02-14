@@ -5,6 +5,7 @@ using Infrastructure.UOW;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Infrastructure.DAL.Mappings
@@ -74,25 +75,32 @@ namespace Infrastructure.DAL.Mappings
             Delete(c => c.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<CourseBO> Condition)
-        {
-            foreach(var course in Get(Condition))
-            {
-                _uow.Repository<CourseDBO>().Delete(course.Id);
-
-                _uow.Repository<CourseMaterialDBO>().Delete(m => m.CourseId == course.Id);
-
-                _uow.Repository<AccountCourse>().Delete(m => m.CourseId == course.Id);  
-            }
-        }
-
         public void Delete(int Id)
         {
             Delete(c => c.Id == Id);
         }
 
-        public IEnumerable<CourseBO> Get(Predicate<CourseBO> Condition)
+        public void Delete(Expression<Func<CourseBO, bool>> condition)
         {
+            foreach (var course in Get(condition))
+            {
+                _uow.Repository<CourseDBO>().Delete(course.Id);
+
+                _uow.Repository<CourseMaterialDBO>().Delete(m => m.CourseId == course.Id);
+
+                _uow.Repository<AccountCourse>().Delete(m => m.CourseId == course.Id);
+            }
+        }
+
+        public CourseBO Get(int Id)
+        {
+            return Get(c => c.Id == Id).FirstOrDefault();
+        }
+
+        public IEnumerable<CourseBO> Get(Expression<Func<CourseBO, bool>> condition)
+        {
+            var predicate = condition.Compile();
+
             return _uow.Repository<EducationProject.Core.DAL.CourseDBO>().Get(t => true)
                 .Select(c => new CourseBO()
                 {
@@ -102,8 +110,8 @@ namespace Infrastructure.DAL.Mappings
                     Title = c.Title,
                     Id = c.Id,
                     Materials = _uow.Repository<EducationProject.Core.DAL.CourseMaterialDBO>()
-                    .Get(b => b.CourseId == c.Id).Select(b => new CourseMaterialBO 
-                    { 
+                    .Get(b => b.CourseId == c.Id).Select(b => new CourseMaterialBO
+                    {
                         Material = _materials.Get(b.MaterialId),
                         Position = b.Position
                     }),
@@ -113,12 +121,7 @@ namespace Infrastructure.DAL.Mappings
                         Skill = _skills.Get(b.SkillId),
                         SkillChange = b.SkillChange
                     })
-                }).Where(c => Condition(c) == true);
-        }
-
-        public CourseBO Get(int Id)
-        {
-            return Get(c => c.Id == Id).FirstOrDefault();
+                }).Where(c => predicate(c) == true);
         }
 
         public void Save()
@@ -131,7 +134,7 @@ namespace Infrastructure.DAL.Mappings
             Update(Entity, e => e.Id == Entity.Id);
         }
 
-        public void Update(CourseBO Entity, Predicate<CourseBO> Condition)
+        public void Update(CourseBO Entity, Expression<Func<CourseBO, bool>> Condition)
         {
             foreach(var i in Get(Condition))
             {

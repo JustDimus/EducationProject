@@ -48,7 +48,6 @@ namespace Infrastructure.BLL
                 Status = ResultType.Success,
                 Result = new EducationProject.Core.PL.AccountAuthenticationData()
                 {
-                    AccountData = _converter.ConvertBLLToPL(account),
                     Login = account.Email,
                     Token = token
                 }

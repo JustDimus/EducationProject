@@ -4,6 +4,7 @@ using Infrastructure.UOW;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Infrastructure.DAL.Mappings
@@ -35,33 +36,38 @@ namespace Infrastructure.DAL.Mappings
             Delete(e => e.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<SkillBO> Condition)
-        {
-            foreach (var element in Get(Condition))
-            {
-                _uow.Repository<EducationProject.Core.DAL.SkillDBO>().Delete(element.Id);
-            }
-        }
-
         public void Delete(int Id)
         {
             Delete(e => e.Id == Id);
         }
 
-        public IEnumerable<SkillBO> Get(Predicate<SkillBO> Condition)
+        public void Delete(Expression<Func<SkillBO, bool>> condition)
         {
+
+            foreach (var element in Get(condition))
+            {
+                _uow.Repository<EducationProject.Core.DAL.SkillDBO>().Delete(element.Id);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public SkillBO Get(int Id)
+        {
+            return Get(e => e.Id == Id).FirstOrDefault();
+        }
+
+        public IEnumerable<SkillBO> Get(Expression<Func<SkillBO, bool>> condition)
+        {
+            var predicate = condition.Compile();
+
             return _uow.Repository<EducationProject.Core.DAL.SkillDBO>().Get(t => true)
                 .Select(e => new SkillBO()
                 {
                     MaxValue = e.MaxValue,
                     Id = e.Id,
                     Title = e.Title,
-                }).Where(e => Condition(e) == true);
-        }
-
-        public SkillBO Get(int Id)
-        {
-            return Get(e => e.Id == Id).FirstOrDefault();
+                }).Where(p => predicate(p) == true);
         }
 
         public void Save()
@@ -74,9 +80,9 @@ namespace Infrastructure.DAL.Mappings
             Update(Entity, e => e.Id == Entity.Id);
         }
 
-        public void Update(SkillBO Entity, Predicate<SkillBO> Condition)
+        public void Update(SkillBO Entity, Expression<Func<SkillBO, bool>> condition)
         {
-            foreach (var element in Get(Condition))
+            foreach (var element in Get(condition))
             {
                 _uow.Repository<EducationProject.Core.DAL.SkillDBO>()
                     .Update(new EducationProject.Core.DAL.SkillDBO()

@@ -39,6 +39,11 @@ namespace Infrastructure.DAL.EF.Mappings
             throw new NotImplementedException();
         }
 
+        public void Delete(Predicate<AccountDBO> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<AccountDBO> Get(Expression<Func<AccountDBO, bool>> condition)
         {
             return this.context.Accounts.Where(condition)
@@ -66,6 +71,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public AccountDBO Get(int id)
         {
             return this.context.Accounts.Find(id);
+        }
+
+        public IEnumerable<AccountDBO> Get(Predicate<AccountDBO> condition)
+        {
+            throw new NotImplementedException();
         }
 
         public void Save()

@@ -28,7 +28,8 @@ namespace Infrastructure.BLL.Commands
         {
             Predicate<AccountPL> condition = Params[0] as Predicate<AccountPL>;
 
-            var accountData = _converter.ConvertBLLToPL(_accounts.Get(t => true));
+            var accountData = new List<AccountPL>();
+               // _converter.ConvertBLLToPL(_accounts.Get(t => true));
 
             return new OperationResult()
             {

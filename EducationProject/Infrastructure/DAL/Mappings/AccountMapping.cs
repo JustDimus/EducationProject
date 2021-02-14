@@ -5,6 +5,7 @@ using System.Text;
 using EducationProject.Core.BLL;
 using Infrastructure.UOW;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Infrastructure.DAL.Mappings
 {
@@ -70,9 +71,14 @@ namespace Infrastructure.DAL.Mappings
             Delete(a => a.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<AccountBO> Condition)
+        public void Delete(int Id)
         {
-            foreach (var entity in Get(Condition))
+            Delete(a => a.Id == Id);
+        }
+
+        public void Delete(Expression<Func<AccountBO, bool>> condition)
+        {
+            foreach (var entity in Get(condition))
             {
                 _uow.Repository<EducationProject.Core.DAL.AccountCourse>().Delete(t => t.AccountId == entity.Id);
 
@@ -80,44 +86,41 @@ namespace Infrastructure.DAL.Mappings
             }
         }
 
-        public void Delete(int Id)
-        {
-            Delete(a => a.Id == Id);
-        }
-
-        public IEnumerable<AccountBO> Get(Predicate<AccountBO> Condition)
-        {
-            return _uow.Repository<EducationProject.Core.DAL.AccountDBO>().Get(t => true)
-                .Select(a => 
-                {
-                    var passed = _courses.Get(c => _uow.Repository<EducationProject.Core.DAL.AccountCourse>()
-                    .Get(c => c.AccountId == a.Id && c.Status == "Passed").Select(c => c.CourseId).Contains(c.Id));
-
-                    return new AccountBO()
-                    {
-                        RegistrationDate = a.RegistrationDate,
-                        Email = a.Email,
-                        FirstName = a.FirstName,
-                        Id = a.Id,
-                        Password = a.Password,
-                        PhoneNumber = a.PhoneNumber,
-                        SecondName = a.SecondName,
-                        PassedCourses = passed,
-                        CoursesInProgress = _courses.Get(c => _uow.Repository<EducationProject.Core.DAL.AccountCourse>()
-                        .Get(c => c.AccountId == a.Id && c.Status == "InProgress").Select(c => c.CourseId).Contains(c.Id)),
-                        SkillResults = passed.SelectMany(c => c.Skills).GroupBy(c => c.Skill.Id).Select(c => new AccountSkillBO()
-                        {
-                            Skill = c.FirstOrDefault().Skill,
-                            CurrentResult = c.Select(f => f.SkillChange).Sum() % c.FirstOrDefault().Skill.MaxValue,
-                            Level = c.Select(f => f.SkillChange).Sum() / c.FirstOrDefault().Skill.MaxValue
-                        })
-                    };
-                }).Where(a => Condition(a) == true);
-        }
-
         public AccountBO Get(int Id)
         {
             return Get(a => a.Id == Id).FirstOrDefault();
+        }
+
+        public IEnumerable<AccountBO> Get(Expression<Func<AccountBO, bool>> condition)
+        {
+            var prediate = condition.Compile();
+
+            return _uow.Repository<EducationProject.Core.DAL.AccountDBO>().Get(t => true)
+               .Select(a =>
+               {
+                   var passed = _courses.Get(c => _uow.Repository<EducationProject.Core.DAL.AccountCourse>()
+                   .Get(c => c.AccountId == a.Id && c.Status == "Passed").Select(c => c.CourseId).Contains(c.Id));
+
+                   return new AccountBO()
+                   {
+                       RegistrationDate = a.RegistrationDate,
+                       Email = a.Email,
+                       FirstName = a.FirstName,
+                       Id = a.Id,
+                       Password = a.Password,
+                       PhoneNumber = a.PhoneNumber,
+                       SecondName = a.SecondName,
+                       PassedCourses = passed,
+                       CoursesInProgress = _courses.Get(c => _uow.Repository<EducationProject.Core.DAL.AccountCourse>()
+                       .Get(c => c.AccountId == a.Id && c.Status == "InProgress").Select(c => c.CourseId).Contains(c.Id)),
+                       SkillResults = passed.SelectMany(c => c.Skills).GroupBy(c => c.Skill.Id).Select(c => new AccountSkillBO()
+                       {
+                           Skill = c.FirstOrDefault().Skill,
+                           CurrentResult = c.Select(f => f.SkillChange).Sum() % c.FirstOrDefault().Skill.MaxValue,
+                           Level = c.Select(f => f.SkillChange).Sum() / c.FirstOrDefault().Skill.MaxValue
+                       })
+                   };
+               }).Where(a => prediate(a) == true);
         }
 
         public void Save()
@@ -130,7 +133,7 @@ namespace Infrastructure.DAL.Mappings
             Update(Entity, a => a.Id == Entity.Id);
         }
 
-        public void Update(AccountBO Entity, Predicate<AccountBO> Condition)
+        public void Update(AccountBO Entity, Expression<Func<AccountBO, bool>> Condition)
         {
             foreach (var entity in Get(Condition))
             {

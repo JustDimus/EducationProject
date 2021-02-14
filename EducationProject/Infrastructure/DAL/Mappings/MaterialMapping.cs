@@ -4,6 +4,7 @@ using Infrastructure.UOW;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 
@@ -59,30 +60,54 @@ namespace Infrastructure.DAL.Mappings
             Delete(e => e.Id == Entity.Id);
         }
 
-        public void Delete(Predicate<BaseMaterial> Condition)
-        {
-            foreach(var element in Get(Condition))
-            {
-                _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Delete(element.Id);
-            }
-        }
-
         public void Delete(int Id)
         {
             Delete(e => e.Id == Id);
         }
 
-        public IEnumerable<BaseMaterial> Get(Predicate<BaseMaterial> Condition)
+        public BaseMaterial Get(int Id)
         {
+            return Get(e => e.Id == Id).FirstOrDefault();
+        }
+
+        public void Save()
+        {
+            _uow.Save();
+        }
+
+        public void Update(BaseMaterial Entity)
+        {
+            Update(Entity, e => e.Id == Entity.Id);
+        }
+
+        public void Update(BaseMaterial Entity, Expression<Func<BaseMaterial, bool>> Condition)
+        {
+            foreach(var element in Get(Condition))
+            {
+                _uow.Repository<EducationProject.Core.DAL.MaterialDBO>()
+                    .Update(new EducationProject.Core.DAL.MaterialDBO()
+                    {
+                        Data = GetSerializedData(element),
+                        Description = Entity.Description,
+                        Title = Entity.Title,
+                        Type = Entity.Type,
+                        Id = element.Id
+                    });
+            }
+        }
+
+        public IEnumerable<BaseMaterial> Get(Expression<Func<BaseMaterial, bool>> condition)
+        {
+            var predicate = condition.Compile();
             return _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Get(t => true)
-                .Select(e => 
+                .Select(e =>
                 {
                     BaseMaterial material = null;
-                    switch(e.Type)
+                    switch (e.Type)
                     {
                         case "Video":
                             material = new VideoMaterial()
-                            { 
+                            {
                                 Id = e.Id,
                                 Description = e.Description,
                                 Title = e.Title,
@@ -112,37 +137,14 @@ namespace Infrastructure.DAL.Mappings
                             break;
                     }
                     return material;
-                }).Where(e => Condition(e) == true);
+                }).Where(c => predicate(c) == true);
         }
 
-        public BaseMaterial Get(int Id)
+        public void Delete(Expression<Func<BaseMaterial, bool>> condition)
         {
-            return Get(e => e.Id == Id).FirstOrDefault();
-        }
-
-        public void Save()
-        {
-            _uow.Save();
-        }
-
-        public void Update(BaseMaterial Entity)
-        {
-            Update(Entity, e => e.Id == Entity.Id);
-        }
-
-        public void Update(BaseMaterial Entity, Predicate<BaseMaterial> Condition)
-        {
-            foreach(var element in Get(Condition))
+            foreach (var element in Get(condition))
             {
-                _uow.Repository<EducationProject.Core.DAL.MaterialDBO>()
-                    .Update(new EducationProject.Core.DAL.MaterialDBO()
-                    {
-                        Data = GetSerializedData(element),
-                        Description = Entity.Description,
-                        Title = Entity.Title,
-                        Type = Entity.Type,
-                        Id = element.Id
-                    });
+                _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Delete(element.Id);
             }
         }
     }

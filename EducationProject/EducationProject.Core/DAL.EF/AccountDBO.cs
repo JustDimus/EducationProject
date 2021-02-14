@@ -21,5 +21,7 @@ namespace EducationProject.Core.DAL.EF
         public List<AccountCourseDBO> AccountCourses { get; set; }
 
         public List<AccountMaterialDBO> AccountMaterials { get; set; }
+
+        public List<CourseDBO> CreatedCourses { get; set; }
     }
 }

@@ -65,6 +65,14 @@ namespace EducationProject.EFCore
             {
                 entity.ToTable("Courses");
                 entity.HasKey(c => c.Id);
+
+                entity.Property(c => c.CreatorId)
+                .IsRequired(false);
+
+                entity.HasOne(c => c.CreatorAccount)
+                .WithMany(a => a.CreatedCourses)
+                .HasForeignKey(c => c.CreatorId)
+                .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<CourseSkillDBO>(entity =>

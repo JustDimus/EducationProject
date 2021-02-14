@@ -12,12 +12,14 @@ namespace EducationProject.Core.DAL.EF
 
         public bool IsVisible { get; set; }
 
-        public int CreatorId { get; set; }
+        public int? CreatorId { get; set; }
 
         public List<AccountCourseDBO> AccountCourses { get; set; }
 
         public List<CourseMaterialDBO> CourseMaterials { get; set; }
 
         public List<CourseSkillDBO> CourseSkills { get; set; }
+
+        public AccountDBO CreatorAccount { get; set; }
     }
 }

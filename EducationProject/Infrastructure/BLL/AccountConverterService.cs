@@ -1,5 +1,7 @@
-﻿using EducationProject.Core.DAL.EF;
+﻿using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
+using EducationProject.Core.PL.EF;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -23,17 +25,18 @@ namespace Infrastructure.BLL
             {
                 Id = account.Id,
                 RegistrationDate = account.RegistrationDate,
-                CoursesInProgress = account.
+                //CoursesInProgress = account.CoursesInProgress,
                 Email = account.Email,
                 FirstName = account.FirstName,
-                PassedCourses = account.PassedCourses,
+                //PassedCourses = account.PassedCourses,
                 PhoneNumber = account.PhoneNumber,
                 SecondName = account.SecondName,
-                SkillResults = account.SkillResults
+                //SkillResults = account.SkillResults
             };
         }
 
-        public IEnumerable<AccountPL> ConvertBLLToPL(IEnumerable<AccountBO> accounts)
+
+        public IEnumerable<AccountPL> ConvertBLLToPL(IEnumerable<AccountDBO> accounts)
         {
             return accounts.Select(a => ConvertBLLToPL(a));
         }

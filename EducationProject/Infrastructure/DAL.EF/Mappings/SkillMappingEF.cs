@@ -40,6 +40,11 @@ namespace Infrastructure.DAL.EF.Mappings
                 .Remove(this.context.Skills.Find(id));
         }
 
+        public void Delete(Predicate<SkillDBO> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<SkillDBO> Get(Expression<Func<SkillDBO, bool>> condition)
         {
             return this.context.Skills.Where(condition);
@@ -48,6 +53,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public SkillDBO Get(int id)
         {
             return this.context.Skills.Find(id);
+        }
+
+        public IEnumerable<SkillDBO> Get(Predicate<SkillDBO> condition)
+        {
+            throw new NotImplementedException();
         }
 
         public void Save()

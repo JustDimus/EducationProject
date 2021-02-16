@@ -1,5 +1,5 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -13,26 +13,26 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "AddExistingCourseToAccount";
 
-        private IMapping<CourseBO> _courses;
+        private IMapping<CourseDBO> courses;
 
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> accounts;
 
-        public AddExistingCourseToAccountCommand(IMapping<CourseBO> courses, IMapping<AccountBO> accounts)
+        public AddExistingCourseToAccountCommand(IMapping<CourseDBO> courseMapping, IMapping<AccountDBO> accountMapping)
         {
-            _accounts = accounts;
+            this.courses = courseMapping;
 
-            _courses = courses;
+            this.accounts = accountMapping;
         }
 
         public IOperationResult Handle(object[] Params)
         {
-            AccountAuthenticationData account = Params[0] as AccountAuthenticationData;
+            AccountAuthenticationData authData = Params[0] as AccountAuthenticationData;
 
             int? accountId = Params[1] as int?;
 
             int? courseId = Params[2] as int?;
 
-            if(account is null || accountId is null || courseId is null)
+            if(authData is null || accountId is null || courseId is null)
             {
                 return new OperationResult()
                 {
@@ -41,7 +41,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if(account.AccountData.Id != accountId)
+            if(authData.AccountId != accountId)
             {
                 return new OperationResult()
                 {
@@ -50,11 +50,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            var acc = _accounts.Get(accountId.GetValueOrDefault());
-
-            var course = _courses.Get(courseId.GetValueOrDefault());
-
-            if(acc.CoursesInProgress.Any(c => c.Id == course.Id) || acc.PassedCourses.Any(c => c.Id == course.Id))
+            if (accounts.Any(a => a.AccountCourses.Any(ac => ac.AccountId == accountId && ac.CourseId == courseId)))
             {
                 return new OperationResult()
                 {
@@ -63,16 +59,19 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            acc.CoursesInProgress = acc.CoursesInProgress.Append(course);
+            accounts.Get(accountId.GetValueOrDefault()).AccountCourses.Add(new AccountCourseDBO()
+            { 
+                AccountId = accountId.GetValueOrDefault(),
+                CourseId = courseId.GetValueOrDefault(),
+                Status = EducationProject.Core.DAL.EF.Enums.ProgressStatus.InProgress
+            });
 
-            _accounts.Update(acc);
-
-            _accounts.Save();
+            accounts.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"Added course '{course.Title}' to account '{acc.Email}'"
+                Result = $"Added course '{courseId}' to account '{authData.Login}'"
             };
         }
     }

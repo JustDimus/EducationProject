@@ -1,5 +1,7 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
+using EducationProject.Core.DAL.EF.Enums;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,11 +14,11 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "CreateMaterial";
 
-        IMapping<BaseMaterial> _materials;
+        IMapping<BaseMaterialDBO> materials;
 
-        public CreateMaterialCommand(IMapping<BaseMaterial> materials)
+        public CreateMaterialCommand(IMapping<BaseMaterialDBO> materialMapping)
         {
-            _materials = materials;
+            materials = materialMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -27,9 +29,9 @@ namespace Infrastructure.BLL.Commands
 
             string description = Params[2] as string;
 
-            string type = Params[3] as string;
+            MaterialType? type = Params[3] as MaterialType?;
 
-            if (String.IsNullOrEmpty(title) || String.IsNullOrEmpty(type))
+            if (String.IsNullOrEmpty(title) || type.HasValue == false || account is null)
             {
                 return new OperationResult()
                 {
@@ -38,7 +40,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if (type == "Video" && Params.Length < 7)
+            if (type == MaterialType.VideoMaterial && Params.Length < 7)
             {
                 return new OperationResult()
                 {
@@ -47,49 +49,39 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            BaseMaterial material = null;
+            BaseMaterialDBO material = new BaseMaterialDBO()
+            {
+                Title = title,
+                Description = description,
+                Type = type.Value
+            };
 
             switch (type)
             {
-                case "Video":
-                    material = new VideoMaterial()
+                case MaterialType.VideoMaterial:
+                    material.Video = new VideoMaterialDBO()
                     {
-                        Title = title,
-                        Description = description,
-                        Type = type,
-                        VideoData = new VideoData()
-                        {
-                            URI = Params[4] as string,
-                            Duration = (int)Params[5],
-                            Quality = (int)Params[6]
-                        }
+                        URI = Params[4] as string,
+                        Duration = (int)Params[5],
+                        Quality = (int)Params[6]
                     };
+
                     break;
-                case "Article":
-                    material = new ArticleMaterial()
+                case MaterialType.ArticleMaterial:
+                    material.Article = new ArticleMaterialDBO()
                     {
-                        Title = title,
-                        Description = description,
-                        Type = type,
-                        ArticleData = new ArticleData()
-                        {
-                            URI = Params[4] as string,
-                            PublicationDate = (DateTime)Params[5]
-                        }
+                        URI = Params[4] as string,
+                        PublicationDate = (DateTime)Params[5]
                     };
+
                     break;
-                case "Book":
-                    material = new BookMaterial()
+                case MaterialType.BookMaterial:
+                    material.Book = new BookMaterialDBO()
                     {
-                        Title = title,
-                        Description = description,
-                        Type = type,
-                        BookData = new BookData()
-                        { 
-                            Author = Params[4] as string,
-                            Pages = (int)Params[5]
-                        }
+                        Author = Params[4] as string,
+                        Pages = (int)Params[5]
                     };
+
                     break;
                 default:
                     return new OperationResult()
@@ -99,14 +91,14 @@ namespace Infrastructure.BLL.Commands
                     };
             }
 
-            _materials.Create(material);
+            materials.Create(material);
 
-            _materials.Save();
+            materials.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"Created material by account {account.AccountData.Id} with name {material.Title}. Id: {material.Id}"
+                Result = $"Created material by account {account.AccountId} with name {material.Title}. Id: {material.Id}"
             };
         }
     }

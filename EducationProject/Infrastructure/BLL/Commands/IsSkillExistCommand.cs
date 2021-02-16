@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,11 +13,11 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "IsSkillExist";
 
-        private IMapping<SkillBO> _skills;
+        private IMapping<SkillDBO> skills;
 
-        public IsSkillExistCommand(IMapping<SkillBO> skills)
+        public IsSkillExistCommand(IMapping<SkillDBO> skillMapping)
         {
-            _skills = skills;
+            skills = skillMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -32,7 +33,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if (_skills.Get(skillId.GetValueOrDefault()) == null)
+            if (skills.Any(s => s.Id == skillId) == false)
             {
                 return new OperationResult()
                 {

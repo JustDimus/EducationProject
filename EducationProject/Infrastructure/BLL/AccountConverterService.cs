@@ -35,7 +35,6 @@ namespace Infrastructure.BLL
             };
         }
 
-
         public IEnumerable<AccountPL> ConvertBLLToPL(IEnumerable<AccountDBO> accounts)
         {
             return accounts.Select(a => ConvertBLLToPL(a));

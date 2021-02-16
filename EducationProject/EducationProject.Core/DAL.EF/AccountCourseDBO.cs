@@ -7,7 +7,7 @@ namespace EducationProject.Core.DAL.EF
 {
     public class AccountCourseDBO
     {
-        public int AccountID { get; set; }
+        public int AccountId { get; set; }
 
         public AccountDBO Account { get; set; }
 

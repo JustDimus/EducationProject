@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,11 +13,11 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "IsCourseExist";
 
-        private IMapping<CourseBO> _courses;
+        private IMapping<CourseDBO> courses;
 
-        public IsCourseExistCommand(IMapping<CourseBO> courses)
+        public IsCourseExistCommand(IMapping<CourseDBO> courseMapping)
         {
-            _courses = courses;
+            courses = courseMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -32,7 +33,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if (_courses.Get(courseId.GetValueOrDefault()) == null)
+            if (courses.Any(c => c.Id == courseId) == false)
             {
                 return new OperationResult()
                 {

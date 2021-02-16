@@ -46,9 +46,9 @@ namespace Infrastructure.DAL.EF.Mappings
             throw new NotImplementedException();
         }
 
-        public IEnumerable<CourseDBO> Get(Expression<Func<CourseDBO, bool>> condition)
+        public IEnumerable<CourseDBO> Get(Expression<Func<CourseDBO, bool>> condition, int pageNumber, int pageSize)
         {
-            return this.context.Courses.Where(condition)
+            return this.context.Courses.Where(condition).Skip(pageNumber * pageSize).Take(pageSize)
                 .Include(c => c.CourseSkills)
                 .ThenInclude(cs => cs.Skill)
                 .Include(c => c.CourseMaterials)
@@ -70,6 +70,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public IEnumerable<CourseDBO> Get(Predicate<CourseDBO> condition)
         {
             throw new NotImplementedException();
+        }
+
+        public bool Any(Expression<Func<CourseDBO, bool>> condition)
+        {
+            return this.context.Courses.Any(condition);
         }
 
         public void Save()

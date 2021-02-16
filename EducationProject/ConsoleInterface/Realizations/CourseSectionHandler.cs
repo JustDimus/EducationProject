@@ -231,7 +231,7 @@ namespace ConsoleInterface.Realizations
                     Console.WriteLine("Please log in...");
                     return;
                 }
-                condition = new Predicate<CourseBO>(c => c.CreatorId == _currentAccount.AccountData.Id);
+                condition = new Predicate<CourseBO>(c => c.CreatorId == _currentAccount.AccountId);
             }
 
             var reqResult = _commands["ShowExistingCourses"].Handle(new object[] { condition });

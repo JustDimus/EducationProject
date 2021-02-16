@@ -17,6 +17,9 @@ using ConsoleInterface.Realizations;
 using Infrastructure.BLL.Chains;
 using System.Configuration;
 using ADODataContext.DataContext;
+using EducationProject.Core.DAL.EF;
+using Infrastructure.DAL.EF.Mappings;
+using EducationProject.EFCore;
 
 namespace ConsoleInterface
 {
@@ -29,6 +32,7 @@ namespace ConsoleInterface
             string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
             string connectionString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
+            services.AddSingleton<EducationProjectDbContext>(x => new EducationProjectDbContext(connectionString));
 
             services.AddSingleton<XMLContext>(x => new XMLContext(xmlFileName));
             services.AddSingleton<ADOContext>(x => new ADOContext(connectionString));
@@ -38,6 +42,11 @@ namespace ConsoleInterface
             services.AddSingleton<IMapping<CourseBO>, CourseMapping>();
             services.AddSingleton<IMapping<SkillBO>, SkillMapping>();
             services.AddSingleton<IMapping<BaseMaterial>, MaterialMapping>();
+
+            services.AddSingleton<IMapping<AccountDBO>, AccountMappingEF>();
+            services.AddSingleton<IMapping<SkillDBO>, SkillMappingEF>();
+            services.AddSingleton<IMapping<BaseMaterialDBO>, MaterialMappingEF>();
+            services.AddSingleton<IMapping<CourseDBO>, CourseMappingEF>();
 
             services.AddSingleton<ICommand, AuthorizeAccountCommand>();
             services.AddSingleton<ICommand, CreateAccountCommand>();

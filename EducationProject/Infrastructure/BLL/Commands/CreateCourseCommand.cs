@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,22 +13,22 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "CreateCourse";
 
-        private IMapping<CourseBO> _courses;
+        private IMapping<CourseDBO> courses;
 
-        public CreateCourseCommand(IMapping<CourseBO> AccMapping)
+        public CreateCourseCommand(IMapping<CourseDBO> courseMapping)
         {
-            _courses = AccMapping;
+            courses = courseMapping;
         }
 
         public IOperationResult Handle(object[] Params)
         {
-            AccountAuthenticationData account = Params[0] as AccountAuthenticationData;
+            AccountAuthenticationData authData = Params[0] as AccountAuthenticationData;
 
             string courseName = Params[1] as string;
 
             string courseDescription = Params[2] as string;
 
-            if(string.IsNullOrEmpty(courseName) || string.IsNullOrEmpty(courseDescription))
+            if(string.IsNullOrEmpty(courseName) || string.IsNullOrEmpty(courseDescription) || authData is null)
             {
                 return new OperationResult()
                 {
@@ -36,22 +37,22 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            var course = new CourseBO()
+            var course = new CourseDBO()
             {
-                CreatorId = account.AccountData.Id,
+                CreatorId = authData.AccountId,
                 Description = courseDescription,
                 IsVisible = false,
                 Title = courseName
             };
 
-            _courses.Create(course);
+            courses.Create(course);
 
-            _courses.Save();
+            courses.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"Created course by account {account.AccountData.Id} with name {course.Title}. Id: {course.Id}"
+                Result = $"Created course by account {authData.AccountId} with name {course.Title}. Id: {course.Id}"
             };
         }
     }

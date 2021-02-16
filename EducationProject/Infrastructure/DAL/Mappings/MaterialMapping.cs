@@ -67,7 +67,7 @@ namespace Infrastructure.DAL.Mappings
 
         public BaseMaterial Get(int Id)
         {
-            return Get(e => e.Id == Id).FirstOrDefault();
+            return Get(e => e.Id == Id, 0, 30).FirstOrDefault();
         }
 
         public void Save()
@@ -82,7 +82,7 @@ namespace Infrastructure.DAL.Mappings
 
         public void Update(BaseMaterial Entity, Expression<Func<BaseMaterial, bool>> Condition)
         {
-            foreach(var element in Get(Condition))
+            foreach(var element in Get(Condition, 0, 30))
             {
                 _uow.Repository<EducationProject.Core.DAL.MaterialDBO>()
                     .Update(new EducationProject.Core.DAL.MaterialDBO()
@@ -96,7 +96,7 @@ namespace Infrastructure.DAL.Mappings
             }
         }
 
-        public IEnumerable<BaseMaterial> Get(Expression<Func<BaseMaterial, bool>> condition)
+        public IEnumerable<BaseMaterial> Get(Expression<Func<BaseMaterial, bool>> condition, int pageNumber, int pageSize)
         {
             var predicate = condition.Compile();
             return _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Get(t => true)
@@ -142,10 +142,15 @@ namespace Infrastructure.DAL.Mappings
 
         public void Delete(Expression<Func<BaseMaterial, bool>> condition)
         {
-            foreach (var element in Get(condition))
+            foreach (var element in Get(condition, 0, 30))
             {
                 _uow.Repository<EducationProject.Core.DAL.MaterialDBO>().Delete(element.Id);
             }
+        }
+
+        public bool Any(Expression<Func<BaseMaterial, bool>> condition)
+        {
+            throw new NotImplementedException();
         }
     }
 }

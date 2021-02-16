@@ -18,6 +18,11 @@ namespace Infrastructure.DAL.Mappings
             _uow = UOW;
         }
 
+        public bool Any(Expression<Func<SkillBO, bool>> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Create(SkillBO Entity)
         {
             var material = new EducationProject.Core.DAL.SkillDBO()
@@ -57,7 +62,7 @@ namespace Infrastructure.DAL.Mappings
             return Get(e => e.Id == Id).FirstOrDefault();
         }
 
-        public IEnumerable<SkillBO> Get(Expression<Func<SkillBO, bool>> condition)
+        public IEnumerable<SkillBO> Get(Expression<Func<SkillBO, bool>> condition, int pageNumber = 0, int pageSize = 30)
         {
             var predicate = condition.Compile();
 

@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -12,20 +13,20 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "CreateAccount";
 
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> accounts;
 
-        public CreateAccountCommand(IMapping<AccountBO> AccMapping)
+        public CreateAccountCommand(IMapping<AccountDBO> accountMapping)
         {
-            _accounts = AccMapping;
+            accounts = accountMapping;
         }
 
         public IOperationResult Handle(object[] Params)
         {
-            string Login = Params[0] as string;
+            string login = Params[0] as string;
 
-            string Password = Params[1] as string;
+            string password = Params[1] as string;
 
-            if(String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
+            if(String.IsNullOrEmpty(login) || String.IsNullOrEmpty(password))
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
@@ -34,7 +35,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if(_accounts.Get(t => t.Email == Login).Any() == true)
+            if(accounts.Any(a => a.Email == login))
             {
                 return new EducationProject.Core.PL.OperationResult()
                 {
@@ -43,16 +44,16 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            AccountBO account = new AccountBO()
+            AccountDBO account = new AccountDBO()
             {
                 RegistrationDate = DateTime.Now,
-                Email = Login,
-                Password = Password
+                Email = login,
+                Password = password
             };
 
-            _accounts.Create(account);
+            accounts.Create(account);
 
-            _accounts.Save();
+            accounts.Save();
 
             return new EducationProject.Core.PL.OperationResult()
             {

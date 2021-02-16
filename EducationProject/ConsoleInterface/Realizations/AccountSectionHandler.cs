@@ -120,7 +120,7 @@ namespace ConsoleInterface.Realizations
             } while (Int32.TryParse(currentMessage, out courseId) == false);
            
             Console.WriteLine(_commands["AddExistingCourseToAccount"]
-                .Handle(new object[] { _currentAccount, _currentAccount.AccountData.Id, courseId }).Result);
+                .Handle(new object[] { _currentAccount, _currentAccount.AccountId, courseId }).Result);
         }
 
         private void LogOut()
@@ -147,6 +147,7 @@ namespace ConsoleInterface.Realizations
                 return;
             }
 
+            /*
             Console.WriteLine($"Email: {_currentAccount.AccountData.Email}\n" +
                 $"First name: {_currentAccount.AccountData.FirstName}\n" +
                 $"Second name: {_currentAccount.AccountData.SecondName}\n" +
@@ -157,6 +158,8 @@ namespace ConsoleInterface.Realizations
                 $"Passed courses: {_currentAccount.AccountData.PassedCourses.Count()}\n" +
                 $"\t{String.Join("\n\t", _currentAccount.AccountData.PassedCourses.Select(c => $"Id: {c.Id} '{c.Title}'"))}\n" +
                 $"Skills:\n\t{String.Join("\n\t", _currentAccount.AccountData.SkillResults.Select(s => $"{s.Skill.Title} Lvl: {s.Level} Current progress: {s.CurrentResult}"))}");
+        
+            */
         }
 
         private void PassCourse()
@@ -186,7 +189,7 @@ namespace ConsoleInterface.Realizations
             } while (Int32.TryParse(currentMessage, out courseId) == false);
 
             Console.WriteLine(_commands["MoveCourseToPassed"]
-                .Handle(new object[] { _currentAccount, _currentAccount.AccountData.Id, courseId }).Result);
+                .Handle(new object[] { _currentAccount, _currentAccount.AccountId, courseId }).Result);
         }
 
         private void Registration()

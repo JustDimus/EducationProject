@@ -18,6 +18,11 @@ namespace Infrastructure.DAL.EF.Mappings
             this.context = dbContext;
         }
 
+        public bool Any(Expression<Func<SkillDBO, bool>> condition)
+        {
+            return this.context.Skills.Any(condition);
+        }
+
         public void Create(SkillDBO entity)
         {
             this.context.Skills.Add(entity);
@@ -45,9 +50,9 @@ namespace Infrastructure.DAL.EF.Mappings
             throw new NotImplementedException();
         }
 
-        public IEnumerable<SkillDBO> Get(Expression<Func<SkillDBO, bool>> condition)
+        public IEnumerable<SkillDBO> Get(Expression<Func<SkillDBO, bool>> condition, int pageNumber = 0, int pageSize = 30)
         {
-            return this.context.Skills.Where(condition);
+            return this.context.Skills.Where(condition).Skip(pageNumber*pageSize).Take(pageSize);
         }
 
         public SkillDBO Get(int id)

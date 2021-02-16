@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,11 +13,11 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "CreateSkill";
 
-        private IMapping<SkillBO> _skills;
+        private IMapping<SkillDBO> skills;
 
-        public CreateSkillCommand(IMapping<SkillBO> skills)
+        public CreateSkillCommand(IMapping<SkillDBO> skillMapping)
         {
-            _skills = skills;
+            skills = skillMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -25,9 +26,9 @@ namespace Infrastructure.BLL.Commands
 
             string title = Params[1] as string;
 
-            int maxValue = Convert.ToInt32(Params[2]);
+            int? maxValue = Params[2] as int?;
             
-            if(maxValue == 0 || String.IsNullOrEmpty(title))
+            if(maxValue.HasValue == false || String.IsNullOrEmpty(title))
             {
                 return new OperationResult()
                 {
@@ -36,20 +37,20 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            SkillBO skill = new SkillBO()
+            SkillDBO skill = new SkillDBO()
             {
-                MaxValue = maxValue,
+                MaxValue = maxValue.Value,
                 Title = title
             };
 
-            _skills.Create(skill);
+            skills.Create(skill);
 
-            _skills.Save();
+            skills.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"Created skill by account {account.AccountData.Id} with name {skill.Title}. Id: {skill.Id}"
+                Result = $"Created skill by account {account.AccountId} with name {skill.Title}. Id: {skill.Id}"
             };
         }
     }

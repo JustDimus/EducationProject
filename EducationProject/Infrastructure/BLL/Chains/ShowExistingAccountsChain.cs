@@ -19,7 +19,7 @@ namespace Infrastructure.BLL.Chains
 
         public IOperationResult Handle(object[] Params)
         {
-            if(Params.Length < 1)
+            if(Params.Length < 2)
             {
                 return new OperationResult()
                 {

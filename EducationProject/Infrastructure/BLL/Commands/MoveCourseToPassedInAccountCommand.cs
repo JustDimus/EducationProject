@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -13,14 +14,14 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "MoveCourseToPassed";
 
-        private IMapping<CourseBO> _courses;
+        private IMapping<CourseDBO> courses;
 
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> accounts;
 
-        public MoveCourseToPassedInAccountCommand(IMapping<CourseBO> courses, IMapping<AccountBO> accounts)
+        public MoveCourseToPassedInAccountCommand(IMapping<CourseDBO> courseMapping, IMapping<AccountDBO> accountMapping)
         {
-            _courses = courses;
-            _accounts = accounts;
+            courses = courseMapping;
+            accounts = accountMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -31,7 +32,7 @@ namespace Infrastructure.BLL.Commands
 
             int? courseId = Params[2] as int?;
 
-            if (account is null || accountId is null || courseId is null)
+            if (account is null || accountId.HasValue == false || courseId.HasValue == false)
             {
                 return new OperationResult()
                 {
@@ -40,7 +41,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if (account.AccountData.Id != accountId)
+            if (account.AccountId != accountId)
             {
                 return new OperationResult()
                 {
@@ -49,12 +50,9 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            var acc = _accounts.Get(accountId.GetValueOrDefault());
-
-            var course = _courses.Get(courseId.GetValueOrDefault());
-
-            if(acc.CoursesInProgress.Any(c => c.Id == courseId) == false 
-                || acc.PassedCourses.Any(c => c.Id == course.Id))
+            if(accounts.Any(a => a.AccountCourses.Any(ac => ac.CourseId == courseId
+            && ac.AccountId == accountId
+            && ac.Status == EducationProject.Core.DAL.EF.Enums.ProgressStatus.InProgress)) == false)
             {
                 return new OperationResult()
                 {
@@ -63,18 +61,15 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            acc.CoursesInProgress = acc.CoursesInProgress.Where(p => p.Id != course.Id);
+            accounts.Get(accountId.Value).AccountCourses.Where(ac => ac.CourseId == courseId.Value)
+                .FirstOrDefault().Status = EducationProject.Core.DAL.EF.Enums.ProgressStatus.Passed;
 
-            acc.PassedCourses = acc.PassedCourses.Append(course);
-
-            _accounts.Update(acc);
-
-            _accounts.Save();
+            accounts.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"In account {account.AccountData.Email} course '{course.Title}' changed status to 'passed'"
+                Result = $"In account {account.AccountId} course 'Id: {courseId}' changed status to 'passed'"
             };
         }
     }

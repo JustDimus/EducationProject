@@ -21,6 +21,11 @@ namespace Infrastructure.DAL.Mappings
             _courses = Courses;
         }
 
+        public bool Any(Expression<Func<AccountBO, bool>> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Create(AccountBO Entity)
         {
             var account = new EducationProject.Core.DAL.AccountDBO()
@@ -91,7 +96,7 @@ namespace Infrastructure.DAL.Mappings
             return Get(a => a.Id == Id).FirstOrDefault();
         }
 
-        public IEnumerable<AccountBO> Get(Expression<Func<AccountBO, bool>> condition)
+        public IEnumerable<AccountBO> Get(Expression<Func<AccountBO, bool>> condition, int pageNumber = 0, int pageSize = 30)
         {
             var prediate = condition.Compile();
 

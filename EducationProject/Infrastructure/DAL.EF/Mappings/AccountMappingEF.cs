@@ -44,14 +44,14 @@ namespace Infrastructure.DAL.EF.Mappings
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AccountDBO> Get(Expression<Func<AccountDBO, bool>> condition)
+        public IEnumerable<AccountDBO> Get(Expression<Func<AccountDBO, bool>> condition, int pageNumber, int pageSize)
         {
-            return this.context.Accounts.Where(condition)
+            return this.context.Accounts.Where(condition).Skip(pageNumber * pageSize).Take(pageSize)
                 .Include(a => a.AccountCourses)
                 .ThenInclude(ac => ac.Course)
                 .ThenInclude(c => c.CourseSkills)
                 .ThenInclude(cs => cs.Skill)
-                .Include(a => a.AccountCourses) //
+                .Include(a => a.AccountCourses)
                 .ThenInclude(ac => ac.Course)
                 .ThenInclude(c => c.CourseMaterials)
                 .ThenInclude(cm => cm.Material)
@@ -76,6 +76,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public IEnumerable<AccountDBO> Get(Predicate<AccountDBO> condition)
         {
             throw new NotImplementedException();
+        }
+
+        public bool Any(Expression<Func<AccountDBO, bool>> condition)
+        {
+            return this.context.Accounts.Any(condition);
         }
 
         public void Save()

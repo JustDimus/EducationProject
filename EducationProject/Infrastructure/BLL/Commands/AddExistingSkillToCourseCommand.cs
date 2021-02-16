@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -13,60 +14,48 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "AddExistingSkillToCourse";
 
-        private IMapping<CourseBO> _courses;
+        private IMapping<CourseDBO> courses;
 
-        private IMapping<SkillBO> _skills;
+        private IMapping<SkillDBO> skills;
 
-        public AddExistingSkillToCourseCommand(IMapping<CourseBO> courses, IMapping<SkillBO> skills)
+        public AddExistingSkillToCourseCommand(IMapping<CourseDBO> courseMapping, IMapping<SkillDBO> skillMapping)
         {
-            _courses = courses;
+            this.courses = courseMapping;
 
-            _skills = skills;
+            this.skills = skillMapping;
         }
 
         public IOperationResult Handle(object[] Params)
         {
             var account = Params[0] as AccountAuthenticationData;
 
-            int courseId = Convert.ToInt32(Params[1]);
+            int? courseId = Params[1] as int?;
 
-            int skillId = Convert.ToInt32(Params[2]);
+            int? skillId = Params[2] as int?;
 
-            int skillChange = Convert.ToInt32(Params[3]);
+            int? skillChange = Params[3] as int?;
 
-            var course = _courses.Get(courseId);
-
-            var skill = _skills.Get(skillId);
-
-            if (course.Skills.Any(s => s.Skill.Id == skillId))
+            if(courses.Any(c => c.CourseSkills.Any(cs => cs.CourseId == courseId && cs.SkillId == skillId)))
             {
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Such skill '{skill.Title}' already exists in this course '{course.Title}'"
+                    Result = $"Such skill 'Id: {skillId}' already exists in this course 'Id: {courseId}'"
                 };
             }
-            else
+
+            courses.Get(courseId.Value).CourseSkills.Add(new CourseSkillDBO
             {
-                var rt = course.Skills.ToList();
-                course.Skills = course.Skills.Append(new CourseSkillBO()
-                {
-                    Skill = skill,
-                    SkillChange = skillChange
-                });
-                var ttytr = course.Skills.ToList();
+                CourseId = courseId.Value,
+                SkillId = skillId.Value
+            });
 
-                Console.WriteLine();
-            }
-
-            _courses.Update(course);
-
-            _courses.Save();
+            courses.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"Added skill '{skill.Title}' to course '{course.Title}'"
+                Result = $"Added skill 'Id: {skillId}' to course 'Id: {courseId}'"
             };
         }
     }

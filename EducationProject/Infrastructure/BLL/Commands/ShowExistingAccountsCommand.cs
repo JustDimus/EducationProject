@@ -1,10 +1,13 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
+using EducationProject.Core.PL.EF;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Infrastructure.BLL.Commands
@@ -26,7 +29,16 @@ namespace Infrastructure.BLL.Commands
 
         public IOperationResult Handle(object[] Params)
         {
-            Predicate<AccountPL> condition = Params[0] as Predicate<AccountPL>;
+            Expression<Func<AccountDBO, bool>> condition = Params[0] as Expression<Func<AccountDBO, bool>>;
+
+            int? startPage = Params[1] as int?;
+
+            int? pageSize = 30;
+
+            if(Params.Length > 2)
+            {
+                pageSize = Params[2] as int?;
+            }
 
             var accountData = new List<AccountPL>();
                // _converter.ConvertBLLToPL(_accounts.Get(t => true));
@@ -34,7 +46,7 @@ namespace Infrastructure.BLL.Commands
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = condition is null ? accountData : accountData.Where(c => condition(c) == true)
+                Result = null//TODO
             };
         }
     }

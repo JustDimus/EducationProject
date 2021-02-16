@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,11 +13,11 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "IsMaterialExist";
 
-        private IMapping<BaseMaterial> _materials;
+        private IMapping<BaseMaterialDBO> materials;
 
-        public IsMaterialExistCommand(IMapping<BaseMaterial> materials)
+        public IsMaterialExistCommand(IMapping<BaseMaterialDBO> materialMapping)
         {
-            _materials = materials;
+            materials = materialMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -32,7 +33,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if(_materials.Get(materialId.GetValueOrDefault()) == null)
+            if(materials.Any(m => m.Id == materialId) == false)
             {
                 return new OperationResult()
                 {

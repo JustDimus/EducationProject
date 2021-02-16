@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using EducationProject.Core.DAL.EF;
 
 namespace Infrastructure.BLL.Commands
 {
@@ -13,54 +14,55 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "AddExistingMaterialToCourse";
 
-        private IMapping<CourseBO> _courses;
+        private IMapping<CourseDBO> courses;
 
-        private IMapping<BaseMaterial> _materials;
+        private IMapping<BaseMaterialDBO> materials;
 
-        public AddExistingMaterialToCourseCommand(IMapping<CourseBO> courses, IMapping<BaseMaterial> materials)
+        public AddExistingMaterialToCourseCommand(IMapping<CourseDBO> courseMapping, IMapping<BaseMaterialDBO> materialMapping)
         {
-            _courses = courses;
+            this.courses = courseMapping;
 
-            _materials = materials;
+            this.materials = materialMapping;
         }
 
         public IOperationResult Handle(object[] Params)
         {
             var account = Params[0] as AccountAuthenticationData;
 
-            int courseId = Convert.ToInt32(Params[1]);
+            int? courseId = Params[1] as int?;
 
-            int materialId = Convert.ToInt32(Params[2]);
+            int? materialId = Params[2] as int?;
 
-            var course = _courses.Get(courseId);
-
-            var material = _materials.Get(materialId);
-
-            if(course.Materials.Any(s => s.Material.Id == materialId))
+            if(account is null || courseId.HasValue == false || materialId.HasValue == false)
             {
                 return new OperationResult()
                 {
                     Status = ResultType.Failed,
-                    Result = $"Such material '{material.Title}' already exists in this course '{course.Title}'"
+                    Result = $"Invalid data: AddExistingMaterialToCourseCommand"
                 };
             }
-            else
+
+            if(courses.Any(c => c.CourseMaterials.Any(cm => cm.CourseID == courseId && cm.MaterialId == materialId)))
             {
-                course.Materials = course.Materials.Append(new CourseMaterialBO()
-                { 
-                    Material = material,
-                    Position = course.Materials.Count()
-                });
+                return new OperationResult()
+                {
+                    Status = ResultType.Failed,
+                    Result = $"Such material 'Id: {materialId}' already exists in this course 'Id: {courseId}'"
+                };
             }
 
-            _courses.Update(course);
+            courses.Get(courseId.Value).CourseMaterials.Add(new CourseMaterialDBO()
+            { 
+                CourseID = courseId.Value,
+                MaterialId = materialId.Value
+            });
 
-            _courses.Save();
+            courses.Save();
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = $"Added material '{material.Title}' to course '{course.Title}'"
+                Result = $"Added material 'Id: {materialId}' to course 'Id: {courseId}'"
             };
         }
     }

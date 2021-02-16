@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
@@ -12,11 +13,11 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "IsAccountExist";
 
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> accounts;
 
-        public IsAccountExistCommand(IMapping<AccountBO> accounts)
+        public IsAccountExistCommand(IMapping<AccountDBO> accountMapping)
         {
-            _accounts = accounts;
+            accounts = accountMapping;
         }
 
         public IOperationResult Handle(object[] Params)
@@ -32,7 +33,7 @@ namespace Infrastructure.BLL.Commands
                 };
             }
 
-            if (_accounts.Get(accountId.GetValueOrDefault()) == null)
+            if (accounts.Any(a => a.Id == accountId) == false)
             {
                 return new OperationResult()
                 {

@@ -27,6 +27,11 @@ namespace Infrastructure.DAL.Mappings
             _skills = skills;
         }
 
+        public bool Any(Expression<Func<CourseBO, bool>> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Create(CourseBO Entity)
         {
             var course = new EducationProject.Core.DAL.CourseDBO()
@@ -97,7 +102,7 @@ namespace Infrastructure.DAL.Mappings
             return Get(c => c.Id == Id).FirstOrDefault();
         }
 
-        public IEnumerable<CourseBO> Get(Expression<Func<CourseBO, bool>> condition)
+        public IEnumerable<CourseBO> Get(Expression<Func<CourseBO, bool>> condition, int pageNumber = 0, int pageSize = 30)
         {
             var predicate = condition.Compile();
 

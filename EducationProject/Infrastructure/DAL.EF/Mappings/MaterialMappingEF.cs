@@ -18,6 +18,11 @@ namespace Infrastructure.DAL.EF.Mappings
             context = dbContext;
         }
 
+        public bool Any(Expression<Func<BaseMaterialDBO, bool>> condition)
+        {
+            return this.context.Materials.Any(condition);
+        }
+
         public void Create(BaseMaterialDBO entity)
         {
             this.context.Materials.Add(entity);
@@ -45,9 +50,9 @@ namespace Infrastructure.DAL.EF.Mappings
             throw new NotImplementedException();
         }
 
-        public IEnumerable<BaseMaterialDBO> Get(Expression<Func<BaseMaterialDBO, bool>> condition)
+        public IEnumerable<BaseMaterialDBO> Get(Expression<Func<BaseMaterialDBO, bool>> condition, int pageNumber, int pageSize)
         {
-            return this.context.Materials.Where(condition);
+            return this.context.Materials.Where(condition).Skip(pageNumber * pageSize).Take(pageSize);
         }
 
         public BaseMaterialDBO Get(int id)

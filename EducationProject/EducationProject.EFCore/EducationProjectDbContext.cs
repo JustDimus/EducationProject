@@ -44,17 +44,18 @@ namespace EducationProject.EFCore
                 entity.ToTable("Accounts");
                 entity.HasKey(a => a.Id);
                 entity.HasAlternateKey(a => a.Email);
-                entity.HasAlternateKey(a => a.PhoneNumber);
+                entity.HasIndex(a => a.PhoneNumber)
+                .IsUnique(true);
             });
 
             modelBuilder.Entity<AccountCourseDBO>(entity =>
             {
                 entity.ToTable("AccountCourses");
-                entity.HasKey(p => new { p.AccountID, p.CourseId });
+                entity.HasKey(p => new { p.AccountId, p.CourseId });
                 
                 entity.HasOne(ac => ac.Account)
                 .WithMany(a => a.AccountCourses)
-                .HasForeignKey(ac => ac.AccountID);
+                .HasForeignKey(ac => ac.AccountId);
                 entity.HasOne(ac => ac.Course)
                 .WithMany(c => c.AccountCourses)
                 .HasForeignKey(ac => ac.CourseId);

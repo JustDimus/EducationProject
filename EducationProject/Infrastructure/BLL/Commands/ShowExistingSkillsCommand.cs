@@ -1,10 +1,12 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Infrastructure.BLL.Commands
@@ -13,23 +15,49 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "ShowExistingSkills";
 
-        private IMapping<SkillBO> _skills;
+        private IMapping<SkillDBO> skills;
 
-        public ShowExistingSkillsCommand(IMapping<SkillBO> skills)
+        private IConverter<SkillDBO, SkillBO> converter;
+
+        public ShowExistingSkillsCommand(IMapping<SkillDBO> skillMapping,
+            IConverter<SkillDBO, SkillBO> skillConverter)
         {
-            _skills = skills;
+            this.skills = skillMapping;
+
+            this.converter = skillConverter;
         }
 
         public IOperationResult Handle(object[] Params)
         {
-            Predicate<SkillBO> condition = Params[0] as Predicate<SkillBO>;
+            Expression<Func<SkillDBO, bool>> condition = Params[0] as Expression<Func<SkillDBO, bool>>;
 
-            var skillsData = _skills.Get(t => true);
+            if (condition is null)
+            {
+                condition = a => true;
+            }
+
+            int? startPage = null;
+
+            int? pageSize = null;
+
+            if (Params.Length > 1)
+            {
+                startPage = Params[1] as int?;
+
+                pageSize = Params[2] as int?;
+            }
+
+            if (startPage.HasValue == false || pageSize.HasValue == false)
+            {
+                startPage = 0;
+
+                pageSize = 30;
+            }
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = condition is null ? skillsData : skillsData.Where(c => condition(c) == true)
+                Result = converter.Get(condition, startPage.Value, pageSize.Value)
             };
         }
     }

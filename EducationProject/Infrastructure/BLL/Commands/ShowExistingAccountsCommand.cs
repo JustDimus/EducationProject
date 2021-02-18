@@ -2,7 +2,6 @@
 using EducationProject.Core.BLL;
 using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
-using EducationProject.Core.PL.EF;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -16,37 +15,49 @@ namespace Infrastructure.BLL.Commands
     {
         public string Name => "ShowExistingAccounts";
 
-        private IMapping<AccountBO> _accounts;
+        private IMapping<AccountDBO> _accounts;
 
-        private AccountConverterService _converter;
+        private IConverter<AccountDBO, AccountPL> converter;
 
-        public ShowExistingAccountsCommand(IMapping<AccountBO> accounts, AccountConverterService converter)
+        public ShowExistingAccountsCommand(IMapping<AccountDBO> accounts, 
+            IConverter<AccountDBO, AccountPL> accountConverter)
         {
             _accounts = accounts;
 
-            _converter = converter;
+            converter = accountConverter;
         }
 
         public IOperationResult Handle(object[] Params)
         {
             Expression<Func<AccountDBO, bool>> condition = Params[0] as Expression<Func<AccountDBO, bool>>;
 
-            int? startPage = Params[1] as int?;
-
-            int? pageSize = 30;
-
-            if(Params.Length > 2)
+            if(condition is null)
             {
+                condition = a => true;
+            }
+
+            int? startPage = null;
+
+            int? pageSize = null;
+
+            if(Params.Length > 1)
+            {
+                startPage = Params[1] as int?;
+
                 pageSize = Params[2] as int?;
             }
 
-            var accountData = new List<AccountPL>();
-               // _converter.ConvertBLLToPL(_accounts.Get(t => true));
+            if (startPage.HasValue == false || pageSize.HasValue == false)
+            {
+                startPage = 0;
+
+                pageSize = 30;
+            }
 
             return new OperationResult()
             {
                 Status = ResultType.Success,
-                Result = null//TODO
+                Result = converter.Get(condition, startPage.Value, pageSize.Value)
             };
         }
     }

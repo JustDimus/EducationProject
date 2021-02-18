@@ -1,9 +1,11 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
+using EducationProject.Core.DAL.EF;
 using EducationProject.Core.PL;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace ConsoleInterface.Realizations
@@ -222,7 +224,7 @@ namespace ConsoleInterface.Realizations
 
         private void ShowAllCourses(bool onlyMine = false)
         {
-            Predicate<CourseBO> condition = new Predicate<CourseBO>(c => c.IsVisible == true);
+            Expression<Func<CourseDBO, bool>> condition = c => c.IsVisible == true;
 
             if(onlyMine == true)
             {
@@ -231,7 +233,7 @@ namespace ConsoleInterface.Realizations
                     Console.WriteLine("Please log in...");
                     return;
                 }
-                condition = new Predicate<CourseBO>(c => c.CreatorId == _currentAccount.AccountId);
+                condition = c => c.CreatorId == _currentAccount.AccountId;
             }
 
             var reqResult = _commands["ShowExistingCourses"].Handle(new object[] { condition });

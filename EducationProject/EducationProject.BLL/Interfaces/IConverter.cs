@@ -9,7 +9,7 @@ namespace EducationProject.BLL.Interfaces
     {
         TOut Get(TIn entity);
 
-        TOut Get(Expression<Func<TIn, bool>> condition);
+        IEnumerable<TOut> Get(Expression<Func<TIn, bool>> condition, int pageNumber = 0, int pageSize = 30);
 
         IEnumerable<TOut> Get(IEnumerable<TIn> collection);
     }

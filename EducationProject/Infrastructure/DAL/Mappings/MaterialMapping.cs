@@ -25,7 +25,7 @@ namespace Infrastructure.DAL.Mappings
             {
                 Description = Entity.Description,
                 Title = Entity.Title,
-                Type = Entity.Type
+                //Type = Entity.Type
             };
 
             material.Data = GetSerializedData(Entity);
@@ -90,7 +90,7 @@ namespace Infrastructure.DAL.Mappings
                         Data = GetSerializedData(element),
                         Description = Entity.Description,
                         Title = Entity.Title,
-                        Type = Entity.Type,
+                       //Type = Entity.Type,
                         Id = element.Id
                     });
             }
@@ -111,7 +111,7 @@ namespace Infrastructure.DAL.Mappings
                                 Id = e.Id,
                                 Description = e.Description,
                                 Title = e.Title,
-                                Type = e.Type,
+                                //Type = e.Type,
                                 VideoData = (VideoData)JsonSerializer.Deserialize(e.Data, typeof(VideoData))
                             };
                             break;
@@ -121,7 +121,7 @@ namespace Infrastructure.DAL.Mappings
                                 Id = e.Id,
                                 Description = e.Description,
                                 Title = e.Title,
-                                Type = e.Type,
+                                //Type = e.Type,
                                 ArticleData = (ArticleData)JsonSerializer.Deserialize(e.Data, typeof(ArticleData))
                             };
                             break;
@@ -131,7 +131,7 @@ namespace Infrastructure.DAL.Mappings
                                 Id = e.Id,
                                 Description = e.Description,
                                 Title = e.Title,
-                                Type = e.Type,
+                                //Type = e.Type,
                                 BookData = (BookData)JsonSerializer.Deserialize(e.Data, typeof(BookData))
                             };
                             break;

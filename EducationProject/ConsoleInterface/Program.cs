@@ -20,6 +20,8 @@ using ADODataContext.DataContext;
 using EducationProject.Core.DAL.EF;
 using Infrastructure.DAL.EF.Mappings;
 using EducationProject.EFCore;
+using EducationProject.Core.PL;
+using Infrastructure.BLL.EF;
 
 namespace ConsoleInterface
 {
@@ -47,6 +49,11 @@ namespace ConsoleInterface
             services.AddSingleton<IMapping<SkillDBO>, SkillMappingEF>();
             services.AddSingleton<IMapping<BaseMaterialDBO>, MaterialMappingEF>();
             services.AddSingleton<IMapping<CourseDBO>, CourseMappingEF>();
+
+            services.AddSingleton<IConverter<AccountDBO, AccountPL>, AccountConverter>();
+            services.AddSingleton<IConverter<CourseDBO, CourseBO>, CourseConverter>();
+            services.AddSingleton<IConverter<BaseMaterialDBO, BaseMaterial>, MaterialConverter>();
+            services.AddSingleton<IConverter<SkillDBO, SkillBO>, SkillConverter>();
 
             services.AddSingleton<ICommand, AuthorizeAccountCommand>();
             services.AddSingleton<ICommand, CreateAccountCommand>();

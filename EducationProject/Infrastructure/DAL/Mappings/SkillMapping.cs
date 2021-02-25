@@ -9,8 +9,10 @@ using System.Text;
 
 namespace Infrastructure.DAL.Mappings
 {
+    /*
     public class SkillMapping: IMapping<SkillBO>
     {
+        
         private UnitOfWork _uow;
 
         public SkillMapping(UnitOfWork UOW)
@@ -99,4 +101,5 @@ namespace Infrastructure.DAL.Mappings
             }
         }
     }
+    */
 }

@@ -27,6 +27,6 @@ namespace ADODataContext.Interfaces
 
         void Delete(Expression<Func<T, bool>> condition);
 
-        int CurrentId { get; }
+        int CurrentId();
     }
 }

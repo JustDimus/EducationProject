@@ -9,6 +9,7 @@ using System.Text;
 
 namespace Infrastructure.DAL.EF.Mappings
 {
+    /*
     public class MaterialMappingEF : IMapping<BaseMaterialDBO>
     {
         private EducationProjectDbContext context;
@@ -75,4 +76,6 @@ namespace Infrastructure.DAL.EF.Mappings
             this.context.Update(entity);
         }
     }
+
+    */
 }

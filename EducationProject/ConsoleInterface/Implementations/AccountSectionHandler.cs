@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConsoleInterface.Realizations
+namespace ConsoleInterface.Implementations
 {
     public class AccountSectionHandler : ISectionHandler
     {

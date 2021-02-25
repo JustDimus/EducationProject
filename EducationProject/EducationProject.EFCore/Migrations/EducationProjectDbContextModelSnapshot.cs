@@ -21,7 +21,7 @@ namespace EducationProject.EFCore.Migrations
 
             modelBuilder.Entity("EducationProject.Core.DAL.EF.AccountCourseDBO", b =>
                 {
-                    b.Property<int>("AccountID")
+                    b.Property<int>("AccountId")
                         .HasColumnType("int");
 
                     b.Property<int>("CourseId")
@@ -30,7 +30,7 @@ namespace EducationProject.EFCore.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasKey("AccountID", "CourseId");
+                    b.HasKey("AccountId", "CourseId");
 
                     b.HasIndex("CourseId");
 
@@ -248,7 +248,7 @@ namespace EducationProject.EFCore.Migrations
                 {
                     b.HasOne("EducationProject.Core.DAL.EF.AccountDBO", "Account")
                         .WithMany("AccountCourses")
-                        .HasForeignKey("AccountID")
+                        .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

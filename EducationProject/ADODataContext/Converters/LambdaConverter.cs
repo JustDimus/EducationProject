@@ -27,6 +27,22 @@ namespace ADODataContext.Converters
             return resultString;
         }
 
+        public string DeconvertData(Expression<Func<T, bool>> condition)
+        {
+            string resultString = String.Empty;
+
+            if (condition.Body is BinaryExpression expression)
+            {
+                ParameterExpression parameter = condition.Parameters.First();
+
+                resultString = Deconvert(expression.Left, parameter)
+                    + GenerateOperator(expression.NodeType)
+                    + Deconvert(expression.Right, parameter);
+            }
+
+            return resultString;
+        }
+
         private string Deconvert(Expression expression, ParameterExpression head, SqlParameterCollection parameters)
         {
             switch (expression)
@@ -54,22 +70,6 @@ namespace ADODataContext.Converters
                 default:
                     return String.Empty;
             }
-        }
-
-        public string DeconvertData(Expression<Func<T, bool>> condition)
-        {
-            string resultString = String.Empty;
-
-            if (condition.Body is BinaryExpression expression)
-            {
-                ParameterExpression parameter = condition.Parameters.First();
-
-                resultString = Deconvert(expression.Left, parameter)
-                    + GenerateOperator(expression.NodeType)
-                    + Deconvert(expression.Right, parameter);
-            }
-
-            return resultString;
         }
 
         private string GenerateOperator(ExpressionType type)

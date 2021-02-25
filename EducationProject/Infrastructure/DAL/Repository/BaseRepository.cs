@@ -9,6 +9,7 @@ using XMLDataContext.Interfaces;
 
 namespace Infrastructure.DAL.Repository
 {
+    /*
     public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         protected IDbSet<T> Elements;
@@ -68,4 +69,5 @@ namespace Infrastructure.DAL.Repository
             Elements.Update(Entity, Condition);
         }
     }
+    */
 }

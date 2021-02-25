@@ -10,6 +10,7 @@ using System.Text.Json;
 
 namespace Infrastructure.DAL.Mappings
 {
+    /*
     public class MaterialMapping : IMapping<BaseMaterial>
     {
         private UnitOfWork _uow;
@@ -153,4 +154,6 @@ namespace Infrastructure.DAL.Mappings
             throw new NotImplementedException();
         }
     }
+
+    */
 }

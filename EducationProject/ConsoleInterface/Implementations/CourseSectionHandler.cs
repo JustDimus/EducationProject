@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace ConsoleInterface.Realizations
+namespace ConsoleInterface.Implementations
 {
     public class CourseSectionHandler : ISectionHandler
     {

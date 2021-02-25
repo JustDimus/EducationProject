@@ -7,23 +7,32 @@ using System.Text;
 
 namespace EducationProject.DAL.Mappings
 {
-    public interface IMapping<T>
+    public interface IMapping<TEntity>
     {
-        void Create(T entity);
+        void Create(TEntity entity);
 
-        IEnumerable<T> Get(Expression<Func<T, bool>> condition, int pageNumber = 0, int pageSize = 30);
+        void Update(TEntity entity);
 
-        T Get(int id);
+        void Delete(TEntity entity);
 
-        void Update(T entity);
+        TEntity Get(Expression<Func<TEntity, bool>> condition);
 
-        void Delete(T entity);
+        TResult Get<TResult>(Expression<Func<TEntity, bool>> condition, 
+            Expression<Func<TEntity, TResult>> selector);
 
-        void Delete(Expression<Func<T, bool>> condition);
+        IEnumerable<TEntity> GetPage(Expression<Func<TEntity, bool>> condition, 
+            int pageNumber, int pageSize);
+
+        IEnumerable<TResult> GetPage<TResult>(Expression<Func<TEntity, bool>> condition,
+            Expression<Func<TEntity, TResult>> selector, int pageNumber, int pageSize);
+
+        //TOut Get<TOut>(int id, Expression<Func<T, TOut>> selector);
+
+        void Delete(Expression<Func<TEntity, bool>> condition);
 
         void Delete(int id);
 
-        bool Any(Expression<Func<T, bool>> condition);
+        bool Any(Expression<Func<TEntity, bool>> condition);
 
         void Save();
     }

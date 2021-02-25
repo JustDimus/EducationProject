@@ -10,6 +10,7 @@ using System.Text;
 
 namespace Infrastructure.DAL.Mappings
 {
+    /*
     public class CourseMapping : IMapping<CourseBO>
     {
         private UnitOfWork _uow;
@@ -181,4 +182,5 @@ namespace Infrastructure.DAL.Mappings
             }
         }
     }
+    */
 }

@@ -8,15 +8,12 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using WorkWithADO;
 
 namespace ADODataContext.DataSets
 {
     public class BaseDbSet<T> : IDbSet<T> where T : BaseEntity
     {
         private LambdaConverter<T> converter;
-
-        private string connectionString {get; set;}
 
         private int currentId;
 
@@ -37,11 +34,16 @@ namespace ADODataContext.DataSets
             }
         }
 
-        public int CurrentId => ++currentId;
+        private string connectionString { get; set; }
+
+        public int CurrentId()
+        {
+            return currentId++;
+        }
 
         public void Create(T entity)
         {
-            entity.Id = CurrentId;
+            entity.Id = CurrentId();
 
             var notNullProperties = typeof(T).GetProperties()
                 .ToDictionary(p => p.Name, p => p.GetValue(entity)).Where(p => p.Value != null);

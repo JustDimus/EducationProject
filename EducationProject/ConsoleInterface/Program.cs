@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.BLL.Commands;
 using Infrastructure.BLL;
 using ConsoleInterface.Interfaces;
-using ConsoleInterface.Realizations;
+using ConsoleInterface.Implementations;
 using Infrastructure.BLL.Chains;
 using System.Configuration;
 using ADODataContext.DataContext;
@@ -109,9 +109,28 @@ namespace ConsoleInterface
 
         static void Main(string[] args)
         {
+
             ConfigureServices(_services);
 
             _services.BuildServiceProvider().GetService<IConsoleHandler>().Run();
+
+            int value = 1556;
+
+            value.Pow(15);
+        }
+
+    }
+
+    public static class exit
+    {
+        public static Int32 Pow(this Int32 value, int pow)
+        {
+            int result = 1;
+            for(int i = 0; i < pow; i++)
+            {
+                result *= value;
+            }
+            return result;
         }
     }
 }

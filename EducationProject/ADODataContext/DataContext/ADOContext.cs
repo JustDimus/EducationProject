@@ -4,7 +4,6 @@ using EducationProject.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using WorkWithADO;
 
 namespace ADODataContext.DataContext
 {

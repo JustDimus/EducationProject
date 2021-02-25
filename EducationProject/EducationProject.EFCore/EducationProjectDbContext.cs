@@ -59,7 +59,6 @@ namespace EducationProject.EFCore
                 entity.HasOne(ac => ac.Course)
                 .WithMany(c => c.AccountCourses)
                 .HasForeignKey(ac => ac.CourseId);
-                
             });
 
             modelBuilder.Entity<CourseDBO>(entity =>

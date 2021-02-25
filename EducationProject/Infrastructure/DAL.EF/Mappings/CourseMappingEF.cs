@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DAL.EF.Mappings
 {
+    /*
     public class CourseMappingEF : IMapping<CourseDBO>
     {
         private EducationProjectDbContext context;
@@ -87,4 +88,5 @@ namespace Infrastructure.DAL.EF.Mappings
             this.context.Courses.Update(entity);
         }
     }
+    */
 }

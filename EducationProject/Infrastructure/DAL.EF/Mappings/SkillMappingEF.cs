@@ -7,8 +7,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
+
 namespace Infrastructure.DAL.EF.Mappings
 {
+    /*
     public class SkillMappingEF : IMapping<SkillDBO>
     {
         private EducationProjectDbContext context;
@@ -75,4 +77,5 @@ namespace Infrastructure.DAL.EF.Mappings
             this.context.Update(entity);
         }
     }
+    */
 }

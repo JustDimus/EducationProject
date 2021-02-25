@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EducationProject.EFCore.Migrations
 {
     [DbContext(typeof(EducationProjectDbContext))]
-    [Migration("20210210002256_CourseSkillRelationAdded")]
-    partial class CourseSkillRelationAdded
+    [Migration("20210224142626_RelationCreatedMigration")]
+    partial class RelationCreatedMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,7 +23,7 @@ namespace EducationProject.EFCore.Migrations
 
             modelBuilder.Entity("EducationProject.Core.DAL.EF.AccountCourseDBO", b =>
                 {
-                    b.Property<int>("AccountID")
+                    b.Property<int>("AccountId")
                         .HasColumnType("int");
 
                     b.Property<int>("CourseId")
@@ -32,7 +32,7 @@ namespace EducationProject.EFCore.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasKey("AccountID", "CourseId");
+                    b.HasKey("AccountId", "CourseId");
 
                     b.HasIndex("CourseId");
 
@@ -57,7 +57,6 @@ namespace EducationProject.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("RegistrationDate")
@@ -70,7 +69,9 @@ namespace EducationProject.EFCore.Migrations
 
                     b.HasAlternateKey("Email");
 
-                    b.HasAlternateKey("PhoneNumber");
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique()
+                        .HasFilter("[PhoneNumber] IS NOT NULL");
 
                     b.ToTable("Accounts");
                 });
@@ -153,7 +154,7 @@ namespace EducationProject.EFCore.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CreatorId")
+                    b.Property<int?>("CreatorId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -166,6 +167,8 @@ namespace EducationProject.EFCore.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Courses");
                 });
@@ -247,7 +250,7 @@ namespace EducationProject.EFCore.Migrations
                 {
                     b.HasOne("EducationProject.Core.DAL.EF.AccountDBO", "Account")
                         .WithMany("AccountCourses")
-                        .HasForeignKey("AccountID")
+                        .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -301,6 +304,16 @@ namespace EducationProject.EFCore.Migrations
                         .IsRequired();
 
                     b.Navigation("BaseMaterial");
+                });
+
+            modelBuilder.Entity("EducationProject.Core.DAL.EF.CourseDBO", b =>
+                {
+                    b.HasOne("EducationProject.Core.DAL.EF.AccountDBO", "CreatorAccount")
+                        .WithMany("CreatedCourses")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreatorAccount");
                 });
 
             modelBuilder.Entity("EducationProject.Core.DAL.EF.CourseMaterialDBO", b =>
@@ -357,6 +370,8 @@ namespace EducationProject.EFCore.Migrations
                     b.Navigation("AccountCourses");
 
                     b.Navigation("AccountMaterials");
+
+                    b.Navigation("CreatedCourses");
                 });
 
             modelBuilder.Entity("EducationProject.Core.DAL.EF.BaseMaterialDBO", b =>

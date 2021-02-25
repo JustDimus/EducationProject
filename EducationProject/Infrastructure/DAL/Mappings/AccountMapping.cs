@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.DAL.Mappings
 {
+    /*
     public class AccountMapping : IMapping<AccountBO>
     {
         private UnitOfWork _uow;
@@ -180,4 +181,5 @@ namespace Infrastructure.DAL.Mappings
             }
         }
     }
+    */
 }

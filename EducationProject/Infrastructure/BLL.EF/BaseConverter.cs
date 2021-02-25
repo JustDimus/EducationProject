@@ -11,7 +11,6 @@ namespace Infrastructure.BLL.EF
     public abstract class BaseConverter<TIn, TOut> : IConverter<TIn, TOut>
     {
         private IMapping<TIn> mapping;
-        
 
         public BaseConverter(IMapping<TIn> baseMapping)
         {

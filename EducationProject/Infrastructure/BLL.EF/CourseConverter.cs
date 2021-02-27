@@ -9,6 +9,7 @@ using System.Text;
 
 namespace Infrastructure.BLL.EF
 {
+    /*
     public class CourseConverter : BaseConverter<CourseDBO, CourseBO>
     {
         private IMapper<BaseMaterialDBO, BaseMaterial> materials;
@@ -45,4 +46,5 @@ namespace Infrastructure.BLL.EF
             };
         }
     }
+    */
 }

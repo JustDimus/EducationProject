@@ -1,6 +1,5 @@
 ﻿using EducationProject.Core.BLL;
 using EducationProject.Core.DAL.EF;
-using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Text;
 
 namespace Infrastructure.BLL
 {
+    /*
     public class AccountConverterService
     {
         private IRepository<AccountDBO> accounts;
@@ -39,4 +39,5 @@ namespace Infrastructure.BLL
             return accounts.Select(a => ConvertBLLToPL(a));
         }
     }
+    */
 }

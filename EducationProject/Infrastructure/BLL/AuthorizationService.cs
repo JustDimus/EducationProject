@@ -1,6 +1,5 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.DAL.EF;
-using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Text;
 
 namespace Infrastructure.BLL
 {
+    
     public class AuthorizationService
     {
         private Dictionary<string, int> authorizedAccounts;

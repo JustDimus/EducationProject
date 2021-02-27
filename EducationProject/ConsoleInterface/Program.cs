@@ -7,39 +7,30 @@ using XMLDataContext.DataContext;
 using XMLDataContext.DataSets;
 using EducationProject.Core.BLL;
 using EducationProject.BLL.Interfaces;
-using EducationProject.DAL.Mappings;
-using Infrastructure.DAL.Mappings;
 using Microsoft.Extensions.DependencyInjection;
-using Infrastructure.BLL.Commands;
 using Infrastructure.BLL;
 using ConsoleInterface.Interfaces;
-using ConsoleInterface.Implementations;
-using Infrastructure.BLL.Chains;
 using System.Configuration;
 using ADODataContext.DataContext;
-using EducationProject.Core.DAL.EF;
-using Infrastructure.DAL.EF.Mappings;
-using EducationProject.EFCore;
-using EducationProject.Core.PL;
-using Infrastructure.BLL.EF;
 
 namespace ConsoleInterface
 {
     class Program
     {
-        static IServiceCollection _services = new ServiceCollection();
+        //static IServiceCollection _services = new ServiceCollection();
 
         static void ConfigureServices(IServiceCollection services)
         {
             string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
             string connectionString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-
+            /*
             services.AddSingleton<EducationProjectDbContext>(x => new EducationProjectDbContext(connectionString));
 
             services.AddSingleton<XMLContext>(x => new XMLContext(xmlFileName));
             services.AddSingleton<ADOContext>(x => new ADOContext(connectionString));
             services.AddSingleton<UnitOfWork>();
 
+            
             services.AddSingleton<IRepository<AccountBO>, AccountMapping>();
             services.AddSingleton<IRepository<CourseBO>, CourseMapping>();
             services.AddSingleton<IRepository<SkillBO>, SkillMapping>();
@@ -105,32 +96,17 @@ namespace ConsoleInterface
             services.AddSingleton<CourseSectionHandler>();
             services.AddSingleton<SkillSectionHandler>();
             services.AddSingleton<MaterialSectionHandler>();
+            */
         }
 
         static void Main(string[] args)
         {
+            return;
 
-            ConfigureServices(_services);
+            //ConfigureServices(_services);
 
-            _services.BuildServiceProvider().GetService<IConsoleHandler>().Run();
-
-            int value = 1556;
-
-            value.Pow(15);
+            //_services.BuildServiceProvider().GetService<IConsoleHandler>().Run();
         }
 
-    }
-
-    public static class exit
-    {
-        public static Int32 Pow(this Int32 value, int pow)
-        {
-            int result = 1;
-            for(int i = 0; i < pow; i++)
-            {
-                result *= value;
-            }
-            return result;
-        }
     }
 }

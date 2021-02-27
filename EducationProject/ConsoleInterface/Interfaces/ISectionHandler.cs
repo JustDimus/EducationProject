@@ -1,5 +1,4 @@
-﻿using EducationProject.Core.PL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,6 +9,6 @@ namespace ConsoleInterface.Interfaces
     {
         object ResultData { get; }
 
-        void Run(AccountAuthenticationData data = null);
+       // void Run(AccountAuthenticationData data = null);
     }
 }

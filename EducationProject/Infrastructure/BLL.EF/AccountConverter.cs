@@ -1,6 +1,5 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.DAL.EF;
-using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using EducationProject.Core.DAL.EF.Enums;
 
 namespace Infrastructure.BLL.EF
 {
+    /*
     public class AccountConverter : BaseConverter<AccountDBO, AccountPL>
     {
         private IMapper<CourseDBO, CourseBO> courses;
@@ -52,4 +52,5 @@ namespace Infrastructure.BLL.EF
             };
         }
     }
+    */
 }

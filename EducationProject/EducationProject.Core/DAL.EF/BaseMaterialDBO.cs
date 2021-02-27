@@ -6,7 +6,7 @@ using System.Text;
 
 namespace EducationProject.Core.DAL.EF
 {
-    public class BaseMaterialDBO: BaseEntity
+    public abstract class BaseMaterialDBO: BaseEntity
     {
         public string Title { get; set; }
 

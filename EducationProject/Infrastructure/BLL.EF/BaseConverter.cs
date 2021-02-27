@@ -8,6 +8,7 @@ using System.Text;
 
 namespace Infrastructure.BLL.EF
 {
+    /*
     public abstract class BaseConverter<TIn, TOut> : IMapper<TIn, TOut>
     {
         private IRepository<TIn> mapping;
@@ -29,4 +30,5 @@ namespace Infrastructure.BLL.EF
             return collection.Select(bm => Get(bm));
         }
     }
+    */
 }

@@ -13,15 +13,46 @@ namespace Infrastructure.BLL.Services
 {
     public class MaterialService : BaseService<BaseMaterialDBO, MaterialDTO>, IMaterialService
     {
-        public MaterialService(BaseRepository<BaseMaterialDBO> baseEntityRepository, 
-            AuthorizationService authorisztionService) 
+        public MaterialService(BaseRepository<BaseMaterialDBO> baseEntityRepository,
+            AuthorizationService authorisztionService)
             : base(baseEntityRepository, authorisztionService)
         {
             
         }
 
-        protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FromBOMapping => throw new NotFiniteNumberException();
-        
+        protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FromBOMapping
+        {
+            get => bm => bm.Type == MaterialType.ArticleMaterial ? (MaterialDTO)new ArticleMaterialDTO()
+            {
+                Id = bm.Id,
+                Description = bm.Description,
+                Title = bm.Title,
+                Type = bm.Type,
+                URI = ((ArticleMaterialDBO)bm).URI,
+                PublicationDate = ((ArticleMaterialDBO)bm).PublicationDate
+            } :
+            bm.Type == MaterialType.BookMaterial ? (MaterialDTO)new BookMaterialDTO()
+            {
+                Id = bm.Id,
+                Description = bm.Description,
+                Title = bm.Title,
+                Type = bm.Type,
+                Author = ((BookMaterialDBO)bm).Author,
+                Pages = ((BookMaterialDBO)bm).Pages
+            } :
+            bm.Type == MaterialType.VideoMaterial ? (MaterialDTO)new VideoMaterialDTO()
+            {
+                Id = bm.Id,
+                Description = bm.Description,
+                Title = bm.Title,
+                Type = bm.Type,
+                URI = ((VideoMaterialDBO)bm).URI,
+                Duration = ((VideoMaterialDBO)bm).Duration,
+                Quality = ((VideoMaterialDBO)bm).Quality
+            } :
+            null;
+        }
+      
         protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FullMap => FromBOMapping;
 
         protected override Func<MaterialDTO, Expression<Func<BaseMaterialDBO, bool>>> getObjectInfoCondition
@@ -31,40 +62,44 @@ namespace Infrastructure.BLL.Services
 
         protected override BaseMaterialDBO Map(MaterialDTO entity)
         {
-            BaseMaterialDBO material = new BaseMaterialDBO()
-            {
-                Id = entity.Id,
-                Description = entity.Description,
-                Title = entity.Title,
-                Type = entity.Type
-            };
+            BaseMaterialDBO material = null;
 
             switch(entity)
             {
                 case ArticleMaterialDTO article:
-                    material.Article = new ArticleMaterialDBO()
+                    material = new ArticleMaterialDBO()
                     {
+                        Id = article.Id,
+                        Description = article.Description,
+                        Title = article.Title,
+                        Type = article.Type,
                         URI = article.URI,
                         PublicationDate = article.PublicationDate
                     };
                     break;
                 case BookMaterialDTO book:
-                    material.Book = new BookMaterialDBO()
+                    material = new BookMaterialDBO()
                     {
+                        Id = book.Id,
+                        Description = book.Description,
+                        Title = book.Title,
+                        Type = book.Type,
                         Author = book.Author,
                         Pages = book.Pages
                     };
                     break;
                 case VideoMaterialDTO video:
-                    material.Video = new VideoMaterialDBO()
+                    material = new VideoMaterialDBO()
                     {
+                        Id = video.Id,
+                        Description = video.Description,
+                        Title = video.Title,
+                        Type = video.Type,
                         URI = video.URI,
                         Duration = video.Duration,
                         Quality = video.Quality
                     };
                     break;
-                default:
-                    return null;
             }
 
             return material;

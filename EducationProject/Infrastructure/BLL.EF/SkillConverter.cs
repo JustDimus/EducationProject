@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Infrastructure.BLL.EF
 {
+    /*
     public class SkillConverter : BaseConverter<SkillDBO, SkillBO>
     {
         public SkillConverter(IRepository<SkillDBO> mapping)
@@ -25,4 +26,5 @@ namespace Infrastructure.BLL.EF
             };
         }
     }
+    */
 }

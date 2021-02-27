@@ -10,6 +10,7 @@ using System.Text;
 
 namespace Infrastructure.BLL.EF
 {
+    /*
     public class MaterialConverter : BaseConverter<BaseMaterialDBO, BaseMaterial>
     {
 
@@ -68,4 +69,5 @@ namespace Infrastructure.BLL.EF
             }
         }
     }
+    */
 }

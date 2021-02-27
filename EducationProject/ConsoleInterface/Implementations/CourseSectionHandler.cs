@@ -2,7 +2,6 @@
 using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
 using EducationProject.Core.DAL.EF;
-using EducationProject.Core.PL;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -10,6 +9,7 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations
 {
+    /*
     public class CourseSectionHandler : ISectionHandler
     {
         public object ResultData => throw new NotImplementedException();
@@ -274,4 +274,5 @@ namespace ConsoleInterface.Implementations
             Console.WriteLine("Returning...");
         }
     }
+    */
 }

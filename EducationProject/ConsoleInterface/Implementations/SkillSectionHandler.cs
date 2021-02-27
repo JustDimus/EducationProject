@@ -1,13 +1,13 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
-using EducationProject.Core.PL;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ConsoleInterface.Implementations
 {
+    /*
     public class SkillSectionHandler : ISectionHandler
     {
         public object ResultData => throw new NotImplementedException();
@@ -119,4 +119,5 @@ namespace ConsoleInterface.Implementations
             }
         }
     }
+    */
 }

@@ -1,7 +1,6 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
 using EducationProject.Core.BLL;
-using EducationProject.Core.PL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +8,7 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations
 {
+    /*
     public class AccountSectionHandler : ISectionHandler
     {
         public object ResultData => null;
@@ -159,7 +159,7 @@ namespace ConsoleInterface.Implementations
                 $"\t{String.Join("\n\t", _currentAccount.AccountData.PassedCourses.Select(c => $"Id: {c.Id} '{c.Title}'"))}\n" +
                 $"Skills:\n\t{String.Join("\n\t", _currentAccount.AccountData.SkillResults.Select(s => $"{s.Skill.Title} Lvl: {s.Level} Current progress: {s.CurrentResult}"))}");
         
-            */
+            
         }
 
         private void PassCourse()
@@ -272,4 +272,5 @@ namespace ConsoleInterface.Implementations
             Console.WriteLine("Successfully logged in");
         }
     }
+    */
 }

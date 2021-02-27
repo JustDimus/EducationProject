@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core.DAL.EF
+namespace EducationProject.BLL.Models
 {
-    public class VideoMaterialDBO: BaseMaterialDBO
+    public class VideoMaterialDTO : MaterialDTO
     {
         public string URI { get; set; }
 

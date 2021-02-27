@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.DAL.EF;
+using EducationProject.Core.PL;
 using EducationProject.DAL.Mappings;
 using System;
 using System.Collections.Generic;
@@ -10,91 +11,41 @@ namespace Infrastructure.BLL
 {
     public class AuthorizationService
     {
-        private List<string> _authorizedAccounts;
+        private Dictionary<string, int> authorizedAccounts;
         
-        private IMapping<AccountDBO> accounts;
+        private IRepository<AccountDBO> accounts;
 
-        private AccountConverterService _converter;
-
-        public AuthorizationService(IMapping<AccountDBO> accountMapping, AccountConverterService converter)
+        public AuthorizationService(IRepository<AccountDBO> accountMapping)
         {
             accounts = accountMapping;
 
-            _authorizedAccounts = new List<string>();
-
-            _converter = converter;
+            authorizedAccounts = new Dictionary<string, int>();
         }
 
-        public IOperationResult AuthorizeAccount(string Login, string Password)
+        public string AuthorizeAccount(string login, string password)
         {
-            AccountDBO account = accounts.Get(a => a.Email == Login && a.Password == Password)
-                .FirstOrDefault();
+            var accountId = accounts.Get(a => a.Email == login && a.Password == password, a => a.Id);
 
-            if(account is null)
+            if(accountId == 0)
             {
-                return new EducationProject.Core.PL.OperationResult()
-                {
-                    Status = ResultType.Failed,
-                    Result = "Invalid login or password"
-                };
+                return null;
             }
 
-            string token = $"{DateTime.Now}/{account.Email}";
+            string token = $"{DateTime.Now}/{login}";
 
-            _authorizedAccounts.Add(token);
+            authorizedAccounts.Add(token, accountId);
 
-            return new EducationProject.Core.PL.OperationResult()
-            {
-                Status = ResultType.Success,
-                Result = new EducationProject.Core.PL.AccountAuthenticationData()
-                {
-                    AccountId = account.Id,
-                    Login = account.Email,
-                    Token = token
-                }
-            };
+            return token;
         }
 
-        public IOperationResult AuthenticateAccount(string Token)
+        public int AuthenticateAccount(string token)
         {
-            if(_authorizedAccounts.Contains(Token))
-            {
-                return new EducationProject.Core.PL.OperationResult()
-                {
-                    Status = ResultType.Success,
-                    Result = true
-                };
-            }
-            else
-            {
-                return new EducationProject.Core.PL.OperationResult()
-                {
-                    Status = ResultType.Failed,
-                    Result = "Account not authorized"
-                };
-            }
+            return authorizedAccounts.GetValueOrDefault(token);
         }
 
-        public IOperationResult DeauthorizeAccount(string Token)
+        public bool DeauthorizeAccount(string token)
         {
-            if(_authorizedAccounts.Contains(Token))
-            {
-                _authorizedAccounts.Remove(Token);
-
-                return new EducationProject.Core.PL.OperationResult()
-                {
-                    Status = ResultType.Success,
-                    Result = true
-                };
-            }
-            else
-            {
-                return new EducationProject.Core.PL.OperationResult()
-                {
-                    Status = ResultType.Success,
-                    Result = false
-                };
-            }
+            return authorizedAccounts.Remove(token);
         }
     }
 }

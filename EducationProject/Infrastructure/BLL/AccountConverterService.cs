@@ -11,9 +11,9 @@ namespace Infrastructure.BLL
 {
     public class AccountConverterService
     {
-        private IMapping<AccountDBO> accounts;
+        private IRepository<AccountDBO> accounts;
 
-        public AccountConverterService(IMapping<AccountDBO> accountMapping)
+        public AccountConverterService(IRepository<AccountDBO> accountMapping)
         {
             accounts = accountMapping;
         }

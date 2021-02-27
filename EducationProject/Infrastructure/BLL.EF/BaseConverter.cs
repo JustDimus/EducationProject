@@ -8,11 +8,11 @@ using System.Text;
 
 namespace Infrastructure.BLL.EF
 {
-    public abstract class BaseConverter<TIn, TOut> : IConverter<TIn, TOut>
+    public abstract class BaseConverter<TIn, TOut> : IMapper<TIn, TOut>
     {
-        private IMapping<TIn> mapping;
+        private IRepository<TIn> mapping;
 
-        public BaseConverter(IMapping<TIn> baseMapping)
+        public BaseConverter(IRepository<TIn> baseMapping)
         {
             this.mapping = baseMapping;
         }

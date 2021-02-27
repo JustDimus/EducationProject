@@ -14,13 +14,13 @@ namespace Infrastructure.BLL.EF
 {
     public class AccountConverter : BaseConverter<AccountDBO, AccountPL>
     {
-        private IConverter<CourseDBO, CourseBO> courses;
+        private IMapper<CourseDBO, CourseBO> courses;
 
-        private IConverter<BaseMaterialDBO, BaseMaterial> materials;
+        private IMapper<BaseMaterialDBO, BaseMaterial> materials;
 
-        public AccountConverter(IMapping<AccountDBO> mapping,
-            IConverter<CourseDBO, CourseBO> courseConverter,
-            IConverter<BaseMaterialDBO, BaseMaterial> materialConverter)
+        public AccountConverter(IRepository<AccountDBO> mapping,
+            IMapper<CourseDBO, CourseBO> courseConverter,
+            IMapper<BaseMaterialDBO, BaseMaterial> materialConverter)
             : base(mapping)
         {
             this.courses = courseConverter;

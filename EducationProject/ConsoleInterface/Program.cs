@@ -40,20 +40,20 @@ namespace ConsoleInterface
             services.AddSingleton<ADOContext>(x => new ADOContext(connectionString));
             services.AddSingleton<UnitOfWork>();
 
-            services.AddSingleton<IMapping<AccountBO>, AccountMapping>();
-            services.AddSingleton<IMapping<CourseBO>, CourseMapping>();
-            services.AddSingleton<IMapping<SkillBO>, SkillMapping>();
-            services.AddSingleton<IMapping<BaseMaterial>, MaterialMapping>();
+            services.AddSingleton<IRepository<AccountBO>, AccountMapping>();
+            services.AddSingleton<IRepository<CourseBO>, CourseMapping>();
+            services.AddSingleton<IRepository<SkillBO>, SkillMapping>();
+            services.AddSingleton<IRepository<BaseMaterial>, MaterialMapping>();
 
-            services.AddSingleton<IMapping<AccountDBO>, AccountMappingEF>();
-            services.AddSingleton<IMapping<SkillDBO>, SkillMappingEF>();
-            services.AddSingleton<IMapping<BaseMaterialDBO>, MaterialMappingEF>();
-            services.AddSingleton<IMapping<CourseDBO>, CourseMappingEF>();
+            services.AddSingleton<IRepository<AccountDBO>, AccountMappingEF>();
+            services.AddSingleton<IRepository<SkillDBO>, SkillMappingEF>();
+            services.AddSingleton<IRepository<BaseMaterialDBO>, MaterialMappingEF>();
+            services.AddSingleton<IRepository<CourseDBO>, CourseMappingEF>();
 
-            services.AddSingleton<IConverter<AccountDBO, AccountPL>, AccountConverter>();
-            services.AddSingleton<IConverter<CourseDBO, CourseBO>, CourseConverter>();
-            services.AddSingleton<IConverter<BaseMaterialDBO, BaseMaterial>, MaterialConverter>();
-            services.AddSingleton<IConverter<SkillDBO, SkillBO>, SkillConverter>();
+            services.AddSingleton<IMapper<AccountDBO, AccountPL>, AccountConverter>();
+            services.AddSingleton<IMapper<CourseDBO, CourseBO>, CourseConverter>();
+            services.AddSingleton<IMapper<BaseMaterialDBO, BaseMaterial>, MaterialConverter>();
+            services.AddSingleton<IMapper<SkillDBO, SkillBO>, SkillConverter>();
 
             services.AddSingleton<ICommand, AuthorizeAccountCommand>();
             services.AddSingleton<ICommand, CreateAccountCommand>();

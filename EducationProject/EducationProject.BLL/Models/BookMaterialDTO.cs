@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core.DAL.EF
+namespace EducationProject.BLL.Models
 {
-    public class BookMaterialDBO: BaseMaterialDBO
+    public class BookMaterialDTO : MaterialDTO
     {
         public string Author { get; set; }
 

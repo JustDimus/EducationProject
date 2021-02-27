@@ -132,34 +132,16 @@ namespace EducationProject.EFCore
             modelBuilder.Entity<BookMaterialDBO>(entity =>
             {
                 entity.ToTable("BookMaterials");
-                entity.HasKey(bm => bm.Id);
-                
-                entity.HasOne(bm => bm.BaseMaterial)
-                .WithOne(bm => bm.Book)
-                .HasForeignKey<BookMaterialDBO>(bm => bm.Id);
-                
             });
 
             modelBuilder.Entity<ArticleMaterialDBO>(entity =>
             {
-                entity.ToTable("ArticleMaterials");
-                entity.HasKey(am => am.Id);
-                
-                entity.HasOne(am => am.BaseMaterial)
-                .WithOne(bm => bm.Article)
-                .HasForeignKey<ArticleMaterialDBO>(am => am.Id);
-                
+                entity.ToTable("ArticleMaterials");                
             });
 
             modelBuilder.Entity<VideoMaterialDBO>(entity =>
             {
                 entity.ToTable("VideoMaterials");
-                entity.HasKey(vm => vm.Id);
-                
-                entity.HasOne(vm => vm.BaseMaterial)
-                .WithOne(bm => bm.Video)
-                .HasForeignKey<VideoMaterialDBO>(vm => vm.Id);
-                
             });
         }
 

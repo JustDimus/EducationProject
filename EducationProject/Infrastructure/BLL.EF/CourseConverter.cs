@@ -11,13 +11,13 @@ namespace Infrastructure.BLL.EF
 {
     public class CourseConverter : BaseConverter<CourseDBO, CourseBO>
     {
-        private IConverter<BaseMaterialDBO, BaseMaterial> materials;
+        private IMapper<BaseMaterialDBO, BaseMaterial> materials;
 
-        private IConverter<SkillDBO, SkillBO> skills;
+        private IMapper<SkillDBO, SkillBO> skills;
 
-        public CourseConverter(IMapping<CourseDBO> mapping, 
-            IConverter<BaseMaterialDBO, BaseMaterial> materialConverter,
-            IConverter<SkillDBO, SkillBO> skillConverter)
+        public CourseConverter(IRepository<CourseDBO> mapping, 
+            IMapper<BaseMaterialDBO, BaseMaterial> materialConverter,
+            IMapper<SkillDBO, SkillBO> skillConverter)
             :base(mapping)
         {
             this.materials = materialConverter;

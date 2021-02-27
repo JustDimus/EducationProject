@@ -9,7 +9,7 @@ namespace Infrastructure.BLL.EF
 {
     public class SkillConverter : BaseConverter<SkillDBO, SkillBO>
     {
-        public SkillConverter(IMapping<SkillDBO> mapping)
+        public SkillConverter(IRepository<SkillDBO> mapping)
             :base(mapping)
         {
 

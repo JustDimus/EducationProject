@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core.DAL.EF
+namespace EducationProject.BLL.Models
 {
-    public class ArticleMaterialDBO: BaseMaterialDBO
+    public class ArticleMaterialDTO : MaterialDTO
     {
         public string URI { get; set; }
 

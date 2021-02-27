@@ -13,7 +13,7 @@ namespace Infrastructure.BLL.EF
     public class MaterialConverter : BaseConverter<BaseMaterialDBO, BaseMaterial>
     {
 
-        public MaterialConverter(IMapping<BaseMaterialDBO> materialMapping)
+        public MaterialConverter(IRepository<BaseMaterialDBO> materialMapping)
             :base(materialMapping)
         {
 

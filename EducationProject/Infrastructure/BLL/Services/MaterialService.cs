@@ -17,7 +17,7 @@ namespace Infrastructure.BLL.Services
             AuthorizationService authorisztionService) 
             : base(baseEntityRepository, authorisztionService)
         {
-
+            
         }
 
         protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FromBOMapping => throw new NotFiniteNumberException();

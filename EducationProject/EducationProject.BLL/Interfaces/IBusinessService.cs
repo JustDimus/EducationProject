@@ -1,6 +1,7 @@
 ﻿using EducationProject.BLL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace EducationProject.BLL.Interfaces
@@ -13,8 +14,8 @@ namespace EducationProject.BLL.Interfaces
 
         bool Delete(ChangeEntityDTO<TEntity> deleteEntity);
 
-        IEnumerable<TEntity> Get(PageInfoDTO pageInfo);
+        bool IsExist(TEntity checkEntity);
 
-        TEntity GetInfo(TEntity entity);
+        IEnumerable<TEntity> Get(PageInfoDTO pageInfo);
     }
 }

@@ -20,6 +20,11 @@ namespace Infrastructure.BLL.Services
             
         }
 
+        public MaterialDTO Get(int id)
+        {
+            return entity.Get<MaterialDTO>(m => m.Id == id, FromBOMapping);
+        }
+
         protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FromBOMapping
         {
             get => bm => bm.Type == MaterialType.ArticleMaterial ? (MaterialDTO)new ArticleMaterialDTO()
@@ -51,13 +56,6 @@ namespace Infrastructure.BLL.Services
                 Quality = ((VideoMaterialDBO)bm).Quality
             } :
             null;
-        }
-      
-        protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FullMap => FromBOMapping;
-
-        protected override Func<MaterialDTO, Expression<Func<BaseMaterialDBO, bool>>> getObjectInfoCondition
-        {
-            get => GetExpression;
         }
 
         protected override BaseMaterialDBO Map(MaterialDTO entity)
@@ -158,11 +156,6 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
-        }
-
-        private Expression<Func<BaseMaterialDBO, bool>> GetExpression(MaterialDTO material)
-        {
-            return m => m.Id == material.Id;
         }
     }
 }

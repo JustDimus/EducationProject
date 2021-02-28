@@ -7,5 +7,6 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface ISkillService : IBusinessService<SkillDTO>
     {
+
     }
 }

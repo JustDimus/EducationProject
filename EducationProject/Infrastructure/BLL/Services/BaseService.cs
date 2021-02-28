@@ -28,15 +28,17 @@ namespace Infrastructure.BLL.Services
 
         protected virtual bool deleteCheckAuth { get => true; }
 
+        protected virtual int defaultGetCount { get => 30; }
+
+        protected virtual Expression<Func<TEntity, bool>> defaultGetCondition { get => e => true; }
+
         protected abstract bool ValidateEntity(TOut entity);
 
         protected abstract Expression<Func<TEntity, TOut>> FromBOMapping { get; }
 
         protected abstract TEntity Map(TOut entity);
 
-        protected abstract Expression<Func<TEntity, TOut>> FullMap { get; }
-
-        protected abstract Func<TOut, Expression<Func<TEntity, bool>>> getObjectInfoCondition { get; }
+        protected abstract Expression<Func<TEntity, bool>> IsExistExpression(TOut entity);
 
         public bool Create(ChangeEntityDTO<TOut> createEntity)
         {
@@ -53,7 +55,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            entity.Create(Map(createEntity.Entity)); 
+            entity.Create(Map(createEntity.Entity));
 
             entity.Save();
 
@@ -79,24 +81,24 @@ namespace Infrastructure.BLL.Services
 
         public IEnumerable<TOut> Get(PageInfoDTO pageInfo)
         {
-            if(ValidatePageInfo(pageInfo) == false)
+            if (ValidatePageInfo(pageInfo) == false)
             {
                 return null;
             }
 
-            return entity.GetPage<TOut>(e => true, FromBOMapping, pageInfo.PageNumber, pageInfo.PageSize);
+            return entity.GetPage<TOut>(defaultGetCondition, FromBOMapping, pageInfo.PageNumber, pageInfo.PageSize);
         }
 
-        public TOut GetInfo(TOut information)
+        public bool IsExist(TOut entity)
         {
-            return this.entity.Get(getObjectInfoCondition(information), FullMap);
+            return this.IsExist(IsExistExpression(entity));
         }
 
         public bool IsExist(Expression<Func<TEntity, bool>> condition)
         {
             return entity.Any(condition);
         }
-        
+
         public string LogIn(string login, string password)
         {
             return authService.AuthorizeAccount(login, password);
@@ -109,15 +111,15 @@ namespace Infrastructure.BLL.Services
 
         public bool Update(ChangeEntityDTO<TOut> updateEntity)
         {
-            if(updateCheckAuth)
+            if (updateCheckAuth)
             {
-                if(Authenticate(updateEntity.Token) == 0)
+                if (Authenticate(updateEntity.Token) == 0)
                 {
                     return false;
                 }
             }
 
-            if(ValidateEntity(updateEntity.Entity) == false)
+            if (ValidateEntity(updateEntity.Entity) == false)
             {
                 return false;
             }

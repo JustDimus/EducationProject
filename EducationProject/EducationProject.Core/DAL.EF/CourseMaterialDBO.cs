@@ -6,7 +6,7 @@ namespace EducationProject.Core.DAL.EF
 {
     public class CourseMaterialDBO
     {
-        public int CourseID { get; set; }
+        public int CourseId { get; set; }
 
         public CourseDBO Course { get; set; }
 

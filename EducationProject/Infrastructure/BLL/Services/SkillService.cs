@@ -30,13 +30,6 @@ namespace Infrastructure.BLL.Services
             };
         }
 
-        protected override Expression<Func<SkillDBO, SkillDTO>> FullMap => FromBOMapping;
-
-        protected override Func<SkillDTO, Expression<Func<SkillDBO, bool>>> getObjectInfoCondition
-        {
-            get => GetExpression;
-        }
-
         protected override SkillDBO Map(SkillDTO entity)
         {
             return new SkillDBO()

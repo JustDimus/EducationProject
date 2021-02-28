@@ -7,111 +7,81 @@ using System.Linq;
 using System.Text;
 using EducationProject.BLL.Models;
 using CourseStatus = EducationProject.Core.DAL.EF.Enums.ProgressStatus;
+using System.Linq.Expressions;
+using EducationProject.DAL.Interfaces;
 
 namespace Infrastructure.BLL.Services
 {
-    /*
-    public class AccountService : BaseService<AccountDBO>
+    public class AccountService : BaseService<AccountDBO, ShortAccountInfoDTO>, IAccountService
     {
-        
-        public AccountService(BaseRepository<AccountDBO> accounts, 
-            AuthorizationService authService)
-            : base(accounts, authService)
+        public AccountService(IRepository<AccountDBO> baseEntityRepository, 
+            AuthorizationService authorisztionService) 
+            : base(baseEntityRepository, authorisztionService)
         {
 
         }
 
-        public bool Create(CreateAccountDTO accountData)
+        protected override Expression<Func<AccountDBO, ShortAccountInfoDTO>> FromBOMapping
         {
-            if (String.IsNullOrEmpty(accountData.Email) || String.IsNullOrEmpty(accountData.Password))
-            {
-                return false;
-            }
-
-            if(entity.Any(a => a.Email == accountData.Email))
-            {
-                return false;
-            }
-
-            AccountDBO account = new AccountDBO()
-            {
-                Email = accountData.Email,
-                Password = accountData.Password,
-                RegistrationDate = DateTime.Now
-            };
-
-            entity.Create(account);
-
-            entity.Save();
-
-            return true;
-        }
-
-        public AccountPL Get(int id)
-        {
-            throw new Exception();
-            /*
-            return entity.Get(a => a.Id == id, a => new AccountPL()
+            get => a => new ShortAccountInfoDTO()
             {
                 Email = a.Email,
-                Id = a.Id,
-                FirstName = a.FirstName,
-                PhoneNumber = a.PhoneNumber,
                 RegistrationDate = a.RegistrationDate,
-                SecondName = a.SecondName,
-                CoursesInProgress = a.AccountCourses.Where(ac => ac.Status == CourseStatus.InProgress)
-                .Select(ac => ac.Course).Skip(0).Take(10).Select(c => new EducationProject.Core.BLL.CourseBO()
-                {
-                    Id = c.Id,
-                    Description = c.Description,
-                    CreatorId
-                })
-            });
-            
+                FirstName = a.FirstName,
+                Password = a.Password,
+                PhoneNumber = a.PhoneNumber,
+                SecondName = a.SecondName
+            };
         }
 
-        public bool Update(UpdateAccountDTO accountData)
+        protected override Expression<Func<AccountDBO, bool>> IsExistExpression(ShortAccountInfoDTO entity)
         {
-            int accountId = authService.AuthenticateAccount(accountData.Token);
+            return a => a.Id == entity.Id;
+        }
 
-            if(accountId == 0 || accountData.Id != accountId)
+        protected override AccountDBO Map(ShortAccountInfoDTO entity)
+        {
+            return new AccountDBO()
+            {
+                Email = entity.Email,
+                RegistrationDate = entity.RegistrationDate,
+                FirstName = entity.FirstName,
+                Id = entity.Id,
+                Password = entity.Password,
+                PhoneNumber = entity.PhoneNumber,
+                SecondName = entity.SecondName
+            };
+        }
+
+        protected override bool ValidateEntity(ShortAccountInfoDTO entity)
+        {
+            if(String.IsNullOrEmpty(entity.Email))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public override bool Create(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
+        {
+            if(ValidateEntity(createEntity.Entity) == false || String.IsNullOrEmpty(createEntity.Entity.Password))
             {
                 return false;
             }
 
-            AccountDBO account = entity.Get(a => a.Id == accountId);
-
-            account.FirstName = accountData.FirstName;
-            account.SecondName = accountData.SecondName;
-            account.PhoneNumber = accountData.PhoneNumber;
-
-            entity.Save();
-
-            return true;
-        }
-
-        public bool Delete(string token)
-        {
-            int accountId = authService.AuthenticateAccount(token);
-
-            if(accountId == 0)
+            if(entity.Any(a => a.Email == createEntity.Entity.Email) == true)
             {
                 return false;
             }
 
-            entity.Delete(accountId);
+            entity.Create(Map(createEntity.Entity));
 
             entity.Save();
 
-            authService.DeauthorizeAccount(token);
-
             return true;
-        }
-
-        public bool AddNewCourseToAccount(string token, int accountId, int courseId)
-        {
-            throw new Exception();
         }
     }
-*/
 }

@@ -1,29 +1,41 @@
 ﻿using EducationProject.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
 
-namespace EducationProject.DAL
+namespace EducationProject.DAL.Interfaces
 {
-    public interface IRepository<T> where T: BaseEntity
+    public interface IRepository<TEntity>
     {
-        void Create(T Entity);
+        void Create(TEntity entity);
 
-        IEnumerable<T> Get(Predicate<T> Condition);
+        void Update(TEntity entity);
 
-        T Get(int Id);
+        void Delete(TEntity entity);
 
-        T Get(T Entity);
+        int Count(Expression<Func<TEntity, bool>> condition);
 
-        void Update(T Entity);
+        TEntity Get(Expression<Func<TEntity, bool>> condition);
 
-        void Update(T Entity, Predicate<T> Condition);
+        TResult Get<TResult>(Expression<Func<TEntity, bool>> condition, 
+            Expression<Func<TEntity, TResult>> selector);
 
-        void Delete(T Entity);
+        IEnumerable<TEntity> GetPage(Expression<Func<TEntity, bool>> condition, 
+            int pageNumber, int pageSize);
 
-        void Delete(Predicate<T> Condition);
+        IEnumerable<TResult> GetPage<TResult>(Expression<Func<TEntity, bool>> condition,
+            Expression<Func<TEntity, TResult>> selector, int pageNumber, int pageSize);
 
-        void Delete(int Id);
+        //TOut Get<TOut>(int id, Expression<Func<T, TOut>> selector);
 
-        //void Save();
+        void Delete(Expression<Func<TEntity, bool>> condition);
+
+        void Delete(int id);
+
+        bool Any(Expression<Func<TEntity, bool>> condition);
+
+        void Save();
     }
 }

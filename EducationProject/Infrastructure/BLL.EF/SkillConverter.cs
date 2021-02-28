@@ -1,6 +1,6 @@
 ﻿using EducationProject.Core.BLL;
 using EducationProject.Core.DAL.EF;
-using EducationProject.DAL.Mappings;
+using EducationProject.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;

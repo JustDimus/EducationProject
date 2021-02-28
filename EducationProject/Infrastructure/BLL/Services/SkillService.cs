@@ -1,6 +1,7 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.Models;
 using EducationProject.Core.DAL.EF;
+using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.EF.Mappings;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Infrastructure.BLL.Services
 {
     public class SkillService : BaseService<SkillDBO, SkillDTO>, ISkillService
     {
-        public SkillService(BaseRepository<SkillDBO> baseEntityRepository,
+        public SkillService(IRepository<SkillDBO> baseEntityRepository,
             AuthorizationService authorisztionService)
             : base(baseEntityRepository, authorisztionService)
         {
@@ -28,6 +29,11 @@ namespace Infrastructure.BLL.Services
                 MaxValue = s.MaxValue,
                 Title = s.Title
             };
+        }
+
+        protected override Expression<Func<SkillDBO, bool>> IsExistExpression(SkillDTO entity)
+        {
+            return s => s.Id == entity.Id;
         }
 
         protected override SkillDBO Map(SkillDTO entity)
@@ -49,11 +55,6 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
-        }
-
-        private Expression<Func<SkillDBO, bool>> GetExpression(SkillDTO skill)
-        {
-            return c => c.Id == skill.Id;
         }
     }
 }

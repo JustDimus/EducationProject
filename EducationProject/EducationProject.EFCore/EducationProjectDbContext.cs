@@ -98,11 +98,11 @@ namespace EducationProject.EFCore
             modelBuilder.Entity<CourseMaterialDBO>(entity =>
             {
                 entity.ToTable("CourseMaterials");
-                entity.HasKey(cm => new { cm.CourseID, cm.MaterialId });
+                entity.HasKey(cm => new { cm.CourseId, cm.MaterialId });
                 
                 entity.HasOne(cm => cm.Course)
                 .WithMany(c => c.CourseMaterials)
-                .HasForeignKey(cm => cm.CourseID);
+                .HasForeignKey(cm => cm.CourseId);
                 entity.HasOne(cm => cm.Material)
                 .WithMany(m => m.CourseMaterials)
                 .HasForeignKey(cm => cm.MaterialId);

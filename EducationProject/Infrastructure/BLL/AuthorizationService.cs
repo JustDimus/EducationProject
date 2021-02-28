@@ -1,6 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.DAL.EF;
-using EducationProject.DAL.Mappings;
+using EducationProject.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +40,11 @@ namespace Infrastructure.BLL
 
         public int AuthenticateAccount(string token)
         {
+            if(token is null)
+            {
+                return 0;
+            }
+
             return authorizedAccounts.GetValueOrDefault(token);
         }
 

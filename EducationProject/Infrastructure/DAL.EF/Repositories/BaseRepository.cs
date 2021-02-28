@@ -1,4 +1,4 @@
-﻿using EducationProject.DAL.Mappings;
+﻿using EducationProject.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,6 +20,11 @@ namespace Infrastructure.DAL.EF.Mappings
         public bool Any(Expression<Func<TEntity, bool>> condition)
         {
             return this.context.Set<TEntity>().Any(condition);
+        }
+
+        public int Count(Expression<Func<TEntity, bool>> condition)
+        {
+            return this.context.Set<TEntity>().Count(condition);
         }
 
         public void Create(TEntity entity)

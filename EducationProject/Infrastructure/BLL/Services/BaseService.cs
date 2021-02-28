@@ -1,5 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.Models;
+using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.EF.Mappings;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ namespace Infrastructure.BLL.Services
 {
     public abstract class BaseService<TEntity, TOut> : IBusinessService<TOut> where TEntity : class
     {
-        protected BaseRepository<TEntity> entity;
+        protected IRepository<TEntity> entity;
 
         protected AuthorizationService authService;
 
-        public BaseService(BaseRepository<TEntity> baseEntityRepository,
+        public BaseService(IRepository<TEntity> baseEntityRepository,
             AuthorizationService authorisztionService)
         {
             entity = baseEntityRepository;
@@ -40,7 +41,7 @@ namespace Infrastructure.BLL.Services
 
         protected abstract Expression<Func<TEntity, bool>> IsExistExpression(TOut entity);
 
-        public bool Create(ChangeEntityDTO<TOut> createEntity)
+        public virtual bool Create(ChangeEntityDTO<TOut> createEntity)
         {
             if (this.createCheckAuth == true)
             {
@@ -62,7 +63,7 @@ namespace Infrastructure.BLL.Services
             return true;
         }
 
-        public bool Delete(ChangeEntityDTO<TOut> deleteEntity)
+        public virtual bool Delete(ChangeEntityDTO<TOut> deleteEntity)
         {
             if (deleteCheckAuth == true)
             {
@@ -79,7 +80,7 @@ namespace Infrastructure.BLL.Services
             return true;
         }
 
-        public IEnumerable<TOut> Get(PageInfoDTO pageInfo)
+        public virtual IEnumerable<TOut> Get(PageInfoDTO pageInfo)
         {
             if (ValidatePageInfo(pageInfo) == false)
             {
@@ -94,14 +95,20 @@ namespace Infrastructure.BLL.Services
             return this.IsExist(IsExistExpression(entity));
         }
 
-        public bool IsExist(Expression<Func<TEntity, bool>> condition)
+        protected bool IsExist(Expression<Func<TEntity, bool>> condition)
         {
             return entity.Any(condition);
         }
 
-        public string LogIn(string login, string password)
+        public string LogIn(AccountAuthorizationDataDTO accountData)
         {
-            return authService.AuthorizeAccount(login, password);
+            if(String.IsNullOrEmpty(accountData.Password) == true 
+                || String.IsNullOrEmpty(accountData.Email) == true)
+            {
+                return null;
+            }
+
+            return authService.AuthorizeAccount(accountData.Email, accountData.Password);
         }
 
         public bool LogOut(string token)
@@ -109,7 +116,7 @@ namespace Infrastructure.BLL.Services
             return authService.DeauthorizeAccount(token);
         }
 
-        public bool Update(ChangeEntityDTO<TOut> updateEntity)
+        public virtual bool Update(ChangeEntityDTO<TOut> updateEntity)
         {
             if (updateCheckAuth)
             {

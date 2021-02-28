@@ -1,6 +1,7 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.Models;
 using EducationProject.Core.DAL.EF;
+using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.EF.Mappings;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Infrastructure.BLL.Services
 {
     public class MaterialService : BaseService<BaseMaterialDBO, MaterialDTO>, IMaterialService
     {
-        public MaterialService(BaseRepository<BaseMaterialDBO> baseEntityRepository,
+        public MaterialService(IRepository<BaseMaterialDBO> baseEntityRepository,
             AuthorizationService authorisztionService)
             : base(baseEntityRepository, authorisztionService)
         {
@@ -156,6 +157,11 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
+        }
+
+        protected override Expression<Func<BaseMaterialDBO, bool>> IsExistExpression(MaterialDTO entity)
+        {
+            return m => m.Id == entity.Id;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using EducationProject.Core.BLL;
-using EducationProject.DAL.Mappings;
+using EducationProject.DAL.Interfaces;
 using Infrastructure.UOW;
 using System;
 using System.Collections.Generic;

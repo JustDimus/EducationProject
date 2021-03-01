@@ -14,11 +14,28 @@ namespace Infrastructure.BLL.Services
 {
     public class AccountService : BaseService<AccountDBO, ShortAccountInfoDTO>, IAccountService
     {
+        private IRepository<AccountCourseDBO> accountCourses { get; set; }
+
+        private IRepository<AccountMaterialDBO> accountMaterials { get; set; }
+
+
+        private ICourseService courses;
+
+        private IMaterialService materials;
+
         public AccountService(IRepository<AccountDBO> baseEntityRepository, 
-            AuthorizationService authorisztionService) 
+            AuthorizationService authorisztionService,
+            IRepository<AccountCourseDBO> accountCoursesRepository,
+            IRepository<AccountMaterialDBO> accountMaterialsRepository,
+            ICourseService courseService,
+            IMaterialService materialService) 
             : base(baseEntityRepository, authorisztionService)
         {
+            accountCourses = accountCoursesRepository;
+            accountMaterials = accountMaterialsRepository;
 
+            courses = courseService;
+            materials = materialService;
         }
 
         protected override Expression<Func<AccountDBO, ShortAccountInfoDTO>> FromBOMapping
@@ -37,6 +54,241 @@ namespace Infrastructure.BLL.Services
         protected override Expression<Func<AccountDBO, bool>> IsExistExpression(ShortAccountInfoDTO entity)
         {
             return a => a.Id == entity.Id;
+        }
+
+        public bool AddAccountCourse(ChangeAccountCourseDTO accountCourseChange)
+        {
+            int accountId = this.Authenticate(accountCourseChange.Token);
+
+            if(accountId == 0 || accountId != accountCourseChange.AccountId)
+            {
+                return false;
+            }
+
+            if(ValidateAccountCourse(accountCourseChange) == false)
+            {
+                return false;
+            }
+
+            if(accountCourseChange.Status is null)
+            {
+                return false;
+            }
+
+            if(accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId 
+            && ac.CourseId == accountCourseChange.CourseId) == true)
+            {
+                return false;
+            }
+
+            this.accountCourses.Create(new AccountCourseDBO()
+            {
+                AccountId = accountCourseChange.AccountId,
+                CourseId = accountCourseChange.CourseId,
+                Status = CourseStatus.InProgress
+            });
+
+            this.accountCourses.Save();
+
+            return true;
+        }
+
+        public bool RemoveAccountCourse(ChangeAccountCourseDTO accountCourseChange)
+        {
+            int accountId = this.Authenticate(accountCourseChange.Token);
+
+            if (accountId == 0 || accountId != accountCourseChange.AccountId)
+            {
+                return false;
+            }
+
+
+            if (ValidateAccountCourse(accountCourseChange) == false)
+            {
+                return false;
+            }
+
+            this.accountCourses.Delete(ac => ac.AccountId == accountCourseChange.AccountId
+            && ac.CourseId == accountCourseChange.CourseId);
+
+            this.accountCourses.Save();
+
+            return true;
+        }
+
+        public bool ChangeAccountCourseStatus(ChangeAccountCourseDTO accountCourseChange)
+        {
+            int accountId = this.Authenticate(accountCourseChange.Token);
+
+            if (accountId == 0 
+                || accountId != accountCourseChange.AccountId
+                || accountCourseChange.Status is null)
+            {
+                return false;
+            }
+
+            if (accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId
+             && ac.CourseId == accountCourseChange.CourseId) == false)
+            {
+                return false;
+            }
+
+            if (accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId
+             && ac.CourseId == accountCourseChange.CourseId && ac.Status == accountCourseChange.Status.Value) == true)
+            {
+                return false;
+            }
+
+            if (accountCourseChange.Status == CourseStatus.Passed)
+            {
+                foreach(var materialId in this.courses.GetAllCourseMaterialsId(accountCourseChange.CourseId))
+                {
+                    if(this.accountMaterials.Any(am => am.AccountId == accountCourseChange.AccountId
+                    && am.MaterialId == materialId) == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            this.accountCourses.Update(new AccountCourseDBO()
+            {
+                AccountId = accountCourseChange.AccountId,
+                CourseId = accountCourseChange.CourseId,
+                Status = accountCourseChange.Status.Value
+            });
+
+            this.accountCourses.Save();
+
+            return true;
+        }
+
+        public bool AddAccountMaterial(ChangeAccountMaterialDTO accountMaterialChange)
+        {
+            int accountId = this.Authenticate(accountMaterialChange.Token);
+
+            if (accountId == 0 || accountId != accountMaterialChange.AccountId)
+            {
+                return false;
+            }
+
+            if (ValidateAccountMaterial(accountMaterialChange) == false)
+            {
+                return false;
+            }
+
+            if(this.accountMaterials.Any(am => am.AccountId == accountMaterialChange.AccountId
+            && am.MaterialId == accountMaterialChange.MaterialId) == true)
+            {
+                return false;
+            }
+
+            this.accountMaterials.Create(new AccountMaterialDBO()
+            {
+                AccountId = accountMaterialChange.AccountId,
+                MaterialId = accountMaterialChange.MaterialId
+            });
+
+            this.accountMaterials.Save();
+
+            return true;
+        }
+
+        public bool RemoveAccountMaterial(ChangeAccountMaterialDTO accountMaterialChange)
+        {
+            int accountId = this.Authenticate(accountMaterialChange.Token);
+
+            if (accountId == 0 || accountId != accountMaterialChange.AccountId)
+            {
+                return false;
+            }
+
+
+            if (ValidateAccountMaterial(accountMaterialChange) == false)
+            {
+                return false;
+            }
+
+            this.accountMaterials.Delete(am => am.AccountId == accountMaterialChange.AccountId
+            && am.MaterialId == accountMaterialChange.MaterialId);
+
+            this.accountCourses.Save();
+
+            return true;
+        }
+
+        public override bool Create(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
+        {
+            if (ValidateEntity(createEntity.Entity) == false || String.IsNullOrEmpty(createEntity.Entity.Password))
+            {
+                return false;
+            }
+
+            if (entity.Any(a => a.Email == createEntity.Entity.Email) == true)
+            {
+                return false;
+            }
+
+            entity.Create(Map(createEntity.Entity));
+
+            entity.Save();
+
+            return true;
+        }
+
+        public FullAccountInfoDTO GetAccountInfo(int id)
+        {
+            return entity.Get<FullAccountInfoDTO>(a => a.Id == id, a => new FullAccountInfoDTO()
+            {
+                Id = a.Id,
+                RegistrationDate = a.RegistrationDate,
+                Email = a.Email,
+                Password = null,
+                SecondName = a.SecondName,
+                FirstName = a.FirstName,
+                PhoneNumber = a.PhoneNumber,
+                PassedCourses = a.AccountCourses.Where(ac => ac.AccountId == a.Id && ac.Status == CourseStatus.Passed)
+                .Take(defaultGetCount)
+                .Select(ac => new AccountCourseDTO()
+                {
+                    CourseId = ac.CourseId,
+                    Status = ac.Status,
+                    Title = ac.Course.Title
+                }),
+                CoursesInProgress = a.AccountCourses.Where(ac => ac.AccountId == a.Id && ac.Status == CourseStatus.InProgress)
+                .Take(defaultGetCount)
+                .Select(ac => new AccountCourseDTO()
+                {
+                    CourseId = ac.CourseId,
+                    Status = ac.Status,
+                    Title = ac.Course.Title
+                }),
+                AccountSkills = a.AccountCourses.Where(ac => ac.AccountId == a.Id && ac.Status == CourseStatus.Passed)
+                .SelectMany(ac => ac.Course.CourseSkills.Where(cs => cs.CourseId == ac.CourseId)
+                .Select(cs => new { Id = cs.SkillId, Title = cs.Skill.Title, Change = cs.Change, MaxValue = cs.Skill.MaxValue })
+                .GroupBy(s => new { s.Id, s.Title, s.MaxValue }).Select(s => new AccountSkillDTO()
+                {
+                    SkillId = s.Key.Id,
+                    Title = s.Key.Title,
+                    Level = s.Sum(s => s.Change) / s.Key.MaxValue,
+                    CurrentResult = s.Sum(s => s.Change) % s.Key.MaxValue
+                }))
+            });
+        }
+
+
+        public FullAccountInfoDTO GetAccountInfo(string token)
+        {
+            int accountId = Authenticate(token);
+
+            if(accountId == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return this.GetAccountInfo(accountId);
+            }
         }
 
         protected override AccountDBO Map(ShortAccountInfoDTO entity)
@@ -65,21 +317,36 @@ namespace Infrastructure.BLL.Services
             }
         }
 
-        public override bool Create(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
+        private bool ValidateAccountMaterial(ChangeAccountMaterialDTO changeAccountMaterial)
         {
-            if(ValidateEntity(createEntity.Entity) == false || String.IsNullOrEmpty(createEntity.Entity.Password))
+            if (changeAccountMaterial.MaterialId == 0
+                || changeAccountMaterial.AccountId == 0)
             {
                 return false;
             }
 
-            if(entity.Any(a => a.Email == createEntity.Entity.Email) == true)
+            if (this.IsExist(a => a.Id == changeAccountMaterial.AccountId) == false
+                || materials.IsExist(new MaterialDTO() { Id = changeAccountMaterial.MaterialId }) == false)
             {
                 return false;
             }
 
-            entity.Create(Map(createEntity.Entity));
+            return true;
+        }
 
-            entity.Save();
+        private bool ValidateAccountCourse(ChangeAccountCourseDTO changeAccountCourse)
+        {
+            if(changeAccountCourse.CourseId == 0
+                || changeAccountCourse.AccountId == 0)
+            {
+                return false;
+            }
+
+            if(this.IsExist(a => a.Id == changeAccountCourse.AccountId) == false
+                || courses.IsExist(new ShortCourseInfoDTO() { Id = changeAccountCourse.CourseId }) == false)
+            {
+                return false;
+            }
 
             return true;
         }

@@ -288,6 +288,39 @@ namespace Infrastructure.BLL.Services
                 });
         }
 
+        public bool IsCourseContainsMaterial(ChangeCourseMaterialDTO courseMaterial)
+        {
+            if (courseMaterial.CourseId == 0 || courseMaterial.MaterialId == 0)
+            {
+                return false;
+            }
+
+            return this.courseMaterials.Contains(new CourseMaterialDBO()
+            {
+                CourseId = courseMaterial.CourseId,
+                MaterialId = courseMaterial.MaterialId
+            });
+        }
+
+        public bool IsCourseContainsMaterial(IEnumerable<ChangeCourseMaterialDTO> courseMaterials)
+        {
+            foreach (var entity in courseMaterials)
+            {
+                if (IsCourseContainsMaterial(entity) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public IEnumerable<int> GetAllCourseMaterialsId(int courseId)
+        {
+            return this.courseMaterials.GetPage<int>(cm => cm.CourseId == courseId, cm => cm.MaterialId, 0,
+                this.courseMaterials.Count(cm => cm.CourseId == courseId));
+        }
+
         protected override CourseDBO Map(ShortCourseInfoDTO entity)
         {
             return new CourseDBO()
@@ -355,5 +388,6 @@ namespace Infrastructure.BLL.Services
         {
             return c => c.Id == entity.Id;
         }
+
     }
 }

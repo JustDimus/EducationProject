@@ -22,6 +22,11 @@ namespace Infrastructure.DAL.EF.Mappings
             return this.context.Set<TEntity>().Any(condition);
         }
 
+        public bool Contains(TEntity entity)
+        {
+            return this.context.Set<TEntity>().Contains(entity);
+        }
+
         public int Count(Expression<Func<TEntity, bool>> condition)
         {
             return this.context.Set<TEntity>().Count(condition);
@@ -44,6 +49,7 @@ namespace Infrastructure.DAL.EF.Mappings
 
         public void Delete(int id)
         {
+
             this.context.Set<TEntity>().Remove(this.context.Set<TEntity>().Find(id));
         }
 

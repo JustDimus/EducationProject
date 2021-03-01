@@ -6,19 +6,34 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations
 {
-    /*
+    
     public class ConsoleHandler: IConsoleHandler
     {
-        private AccountSectionHandler _accountHandler;
+        private ICommandHandler commands;
 
-        public ConsoleHandler(AccountSectionHandler accountHandler)
+        private string token = null;
+
+        public ConsoleHandler(ICommandHandler commandList)
         {
-            _accountHandler = accountHandler;
+            commands = commandList;
         }
+
         public void Run()
         {
-            _accountHandler.Run();
+            string currentCommand = null;
+
+            while(true)
+            {
+                currentCommand = Console.ReadLine();
+
+                if(currentCommand == ConsoleCommands.ExitCommand)
+                {
+                    break;
+                }
+
+                commands[currentCommand]
+            };
         }
     }
-    */
+    
 }

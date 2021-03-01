@@ -14,8 +14,6 @@ namespace EducationProject.BLL.Interfaces
 
         bool Delete(ChangeEntityDTO<TEntity> deleteEntity);
 
-        //bool IsExist(int id);
-
         bool IsExist(TEntity checkEntity);
 
         IEnumerable<TEntity> Get(PageInfoDTO pageInfo);

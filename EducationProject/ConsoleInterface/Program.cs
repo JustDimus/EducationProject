@@ -13,6 +13,8 @@ using Infrastructure.DAL.EF.Mappings;
 using EducationProject.BLL.Interfaces;
 using Infrastructure.BLL.Services;
 using Infrastructure.BLL;
+using ConsoleInterface.Interfaces;
+using ConsoleInterface.Implementations;
 
 namespace ConsoleInterface
 {
@@ -33,8 +35,8 @@ namespace ConsoleInterface
             services.AddSingleton<IRepository<BaseMaterialDBO>, BaseRepository<BaseMaterialDBO>>();
             services.AddSingleton<IRepository<CourseSkillDBO>, BaseRepository<CourseSkillDBO>>();
             services.AddSingleton<IRepository<CourseMaterialDBO>, BaseRepository<CourseMaterialDBO>>();
-
-
+            services.AddSingleton<IRepository<AccountCourseDBO>, BaseRepository<AccountCourseDBO>>();
+            services.AddSingleton<IRepository<AccountMaterialDBO>, BaseRepository<AccountMaterialDBO>>();
 
             services.AddSingleton<AuthorizationService>();
 
@@ -42,6 +44,10 @@ namespace ConsoleInterface
             services.AddSingleton<ICourseService, CourseService>();
             services.AddSingleton<IMaterialService, MaterialService>();
             services.AddSingleton<IAccountService, AccountService>();
+
+
+
+            services.AddSingleton<ICommandHandler, CommandHandler>();
         }
 
         static void Main(string[] args)

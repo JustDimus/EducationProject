@@ -20,5 +20,11 @@ namespace EducationProject.BLL.Interfaces
         bool RemoveCourseSkill(ChangeCourseSkillDTO courseSkillChange);
 
         bool ChangeCourseSkill(ChangeCourseSkillDTO courseSkillChange);
+
+        bool IsCourseContainsMaterial(ChangeCourseMaterialDTO courseMaterial);
+
+        bool IsCourseContainsMaterial(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
+
+        IEnumerable<int> GetAllCourseMaterialsId(int courseId);
     }
 }

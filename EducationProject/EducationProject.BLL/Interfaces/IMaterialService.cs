@@ -7,6 +7,6 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface IMaterialService : IBusinessService<MaterialDTO>
     {
-        MaterialDTO Get(int id);
+        MaterialDTO GetMaterialInfo(int id);
     }
 }

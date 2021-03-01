@@ -28,13 +28,13 @@ namespace EducationProject.DAL.Interfaces
         IEnumerable<TResult> GetPage<TResult>(Expression<Func<TEntity, bool>> condition,
             Expression<Func<TEntity, TResult>> selector, int pageNumber, int pageSize);
 
-        //TOut Get<TOut>(int id, Expression<Func<T, TOut>> selector);
-
         void Delete(Expression<Func<TEntity, bool>> condition);
 
         void Delete(int id);
 
         bool Any(Expression<Func<TEntity, bool>> condition);
+
+        bool Contains(TEntity entity);
 
         void Save();
     }

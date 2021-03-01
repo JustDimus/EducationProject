@@ -21,7 +21,7 @@ namespace Infrastructure.BLL.Services
             
         }
 
-        public MaterialDTO Get(int id)
+        public MaterialDTO GetMaterialInfo(int id)
         {
             return entity.Get<MaterialDTO>(m => m.Id == id, FromBOMapping);
         }

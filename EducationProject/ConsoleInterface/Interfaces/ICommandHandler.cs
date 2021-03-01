@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.BLL.Interfaces
+namespace ConsoleInterface.Interfaces
 {
     public interface ICommandHandler
     {
-        ICommand this[string Command]
+        ICommand this[string value]
         {
             get;
         }

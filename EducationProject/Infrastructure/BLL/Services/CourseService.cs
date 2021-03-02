@@ -21,14 +21,15 @@ namespace Infrastructure.BLL.Services
 
         private IRepository<CourseMaterialDBO> courseMaterials;
 
-        private int defaultPageSize = 30;
+        private int defaultPageSize;
 
         public CourseService(IRepository<CourseDBO> baseEntityRepository, 
             AuthorizationService authorisztionService,
             IMaterialService materialService,
             ISkillService skillService,
             IRepository<CourseSkillDBO> courseSkillsRepository,
-            IRepository<CourseMaterialDBO> courseMaterialsRepository) 
+            IRepository<CourseMaterialDBO> courseMaterialsRepository,
+            int defaultPageSize) 
             : base(baseEntityRepository, authorisztionService)
         {
             materials = materialService;
@@ -37,6 +38,8 @@ namespace Infrastructure.BLL.Services
             this.courseSkills = courseSkillsRepository;
 
             this.courseMaterials = courseMaterialsRepository;
+
+            this.defaultPageSize = defaultPageSize;
         }
 
         protected override Expression<Func<CourseDBO, ShortCourseInfoDTO>> FromBOMapping

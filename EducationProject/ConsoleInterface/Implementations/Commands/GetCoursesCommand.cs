@@ -13,11 +13,13 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ICourseService courses;
 
-        private int pageSize = 30;
+        private int pageSize;
 
-        public GetCoursesCommand(ICourseService courseService)
+        public GetCoursesCommand(ICourseService courseService, int defaultPageSize)
         {
-            courses = courseService;
+            this.courses = courseService;
+
+            this.pageSize = defaultPageSize;
         }
 
         public void Run(ref string token)

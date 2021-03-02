@@ -13,11 +13,13 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ISkillService skills;
 
-        private int pageSize = 30;
+        private int pageSize;
 
-        public GetSkillsCommand(ISkillService skillService)
+        public GetSkillsCommand(ISkillService skillService, int defaultPageSize)
         {
-            skills = skillService;
+            this.skills = skillService;
+
+            this.pageSize = defaultPageSize;
         }
 
         public void Run(ref string token)

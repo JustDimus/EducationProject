@@ -27,6 +27,8 @@ namespace ConsoleInterface
         {
             string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
             string connectionString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+            int defaultPageSize = Int32.Parse(ConfigurationManager.AppSettings.Get("DefaultPageSize"));
+
 
             services.AddSingleton<DbContext, EducationProjectDbContext>(c => new EducationProjectDbContext(connectionString));
 
@@ -43,7 +45,14 @@ namespace ConsoleInterface
             services.AddSingleton<AuthorizationService>();
 
             services.AddSingleton<ISkillService, SkillService>();
-            services.AddSingleton<ICourseService, CourseService>();
+            services.AddSingleton<ICourseService, CourseService>(c => 
+                new CourseService(c.GetRequiredService<IRepository<CourseDBO>>(),
+                c.GetRequiredService<AuthorizationService>(),
+                c.GetRequiredService<IMaterialService>(),
+                c.GetRequiredService<ISkillService>(),
+                c.GetRequiredService<IRepository<CourseSkillDBO>>(),
+                c.GetRequiredService<IRepository<CourseMaterialDBO>>(),
+                defaultPageSize));
             services.AddSingleton<IMaterialService, MaterialService>();
             services.AddSingleton<IAccountService, AccountService>();
 
@@ -56,10 +65,14 @@ namespace ConsoleInterface
             services.AddSingleton<ICommand, CreateCourseCommand>();
             services.AddSingleton<ICommand, CreateSkillCommand>();
             services.AddSingleton<ICommand, CreateMaterialCommand>();
-            services.AddSingleton<ICommand, GetSkillsCommand>();
-            services.AddSingleton<ICommand, GetMaterialsCommand>();
-            services.AddSingleton<ICommand, GetCoursesCommand>();
-            services.AddSingleton<ICommand, GetAccountCourses>();
+            services.AddSingleton<ICommand, GetSkillsCommand>(c =>
+                new GetSkillsCommand(c.GetRequiredService<ISkillService>(), defaultPageSize));
+            services.AddSingleton<ICommand, GetMaterialsCommand>(c =>
+                new GetMaterialsCommand(c.GetRequiredService<IMaterialService>(), defaultPageSize));
+            services.AddSingleton<ICommand, GetCoursesCommand>(c =>
+                new GetCoursesCommand(c.GetRequiredService<ICourseService>(), defaultPageSize));
+            services.AddSingleton<ICommand, GetAccountCourses>(c => 
+                new GetAccountCourses(c.GetRequiredService<ICourseService>(), defaultPageSize));
             services.AddSingleton<ICommand, AddSkillToCourseCommand>();
             services.AddSingleton<ICommand, AddMaterialToCourseCommand>();
             services.AddSingleton<ICommand, AddCourseToAccountCommand>();

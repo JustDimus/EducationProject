@@ -13,8 +13,6 @@ namespace ConsoleInterface.Implementations.Commands
 
         private IAccountService accounts;
 
-        private int dataLimit = 3;
-
         public ShowAccountInfoCommand(IAccountService accountService)
         {
             this.accounts = accountService;
@@ -40,13 +38,13 @@ namespace ConsoleInterface.Implementations.Commands
             builder.Append($"Name: {account.FirstName} {account.SecondName}\n");
             builder.Append($"Passed courses({account.PassedCoursesCount}):\n\t");
             builder.Append(String.Join("\n\t", account.PassedCourses
-                .Take(dataLimit).Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
+                .Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
             builder.Append($"\nCourses in progress({account.CoursesInProgressCount}):\n\t");
             builder.Append(String.Join("\n\t", account.CoursesInProgress
-                .Take(dataLimit).Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
+                .Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
             builder.Append("\nSkills:\n\t");
             builder.Append(String.Join("\n\t", account.AccountSkills
-                .Take(dataLimit).Select(s => $"Id: {s.SkillId}. Title: {s.Title}. Results: Lvl {s.Level}, value {s.CurrentResult}")));
+                .Select(s => $"Id: {s.SkillId}. Title: {s.Title}. Results: Lvl {s.Level}, value {s.CurrentResult}")));
 
             Console.WriteLine(builder);
             Console.WriteLine();

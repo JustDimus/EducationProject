@@ -13,11 +13,13 @@ namespace ConsoleInterface.Implementations.Commands
 
         private IMaterialService materials;
 
-        private int pageSize = 30;
+        private int pageSize;
 
-        public GetMaterialsCommand(IMaterialService materialService)
+        public GetMaterialsCommand(IMaterialService materialService, int defaultPageSize)
         {
-            materials = materialService;
+            this.materials = materialService;
+
+            this.pageSize = defaultPageSize;
         }
 
         public void Run(ref string token)

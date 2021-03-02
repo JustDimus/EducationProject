@@ -29,23 +29,22 @@ namespace ConsoleInterface
             string connectionString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
             int defaultPageSize = Int32.Parse(ConfigurationManager.AppSettings.Get("DefaultPageSize"));
 
+            services.AddTransient<DbContext, EducationProjectDbContext>(c => new EducationProjectDbContext(connectionString));
 
-            services.AddSingleton<DbContext, EducationProjectDbContext>(c => new EducationProjectDbContext(connectionString));
-
-            services.AddSingleton<IRepository<CourseDBO>, BaseRepository<CourseDBO>>();
-            services.AddSingleton<IRepository<AccountDBO>, BaseRepository<AccountDBO>>();
-            services.AddSingleton<IRepository<SkillDBO>, BaseRepository<SkillDBO>>();
-            services.AddSingleton<IRepository<BaseMaterialDBO>, BaseRepository<BaseMaterialDBO>>();
-            services.AddSingleton<IRepository<CourseSkillDBO>, BaseRepository<CourseSkillDBO>>();
-            services.AddSingleton<IRepository<CourseMaterialDBO>, BaseRepository<CourseMaterialDBO>>();
-            services.AddSingleton<IRepository<AccountCourseDBO>, BaseRepository<AccountCourseDBO>>();
-            services.AddSingleton<IRepository<AccountMaterialDBO>, BaseRepository<AccountMaterialDBO>>();
-            services.AddSingleton<IRepository<AccountSkillDBO>, BaseRepository<AccountSkillDBO>>();
+            services.AddTransient<IRepository<CourseDBO>, BaseRepository<CourseDBO>>();
+            services.AddTransient<IRepository<AccountDBO>, BaseRepository<AccountDBO>>();
+            services.AddTransient<IRepository<SkillDBO>, BaseRepository<SkillDBO>>();
+            services.AddTransient<IRepository<BaseMaterialDBO>, BaseRepository<BaseMaterialDBO>>();
+            services.AddTransient<IRepository<CourseSkillDBO>, BaseRepository<CourseSkillDBO>>();
+            services.AddTransient<IRepository<CourseMaterialDBO>, BaseRepository<CourseMaterialDBO>>();
+            services.AddTransient<IRepository<AccountCourseDBO>, BaseRepository<AccountCourseDBO>>();
+            services.AddTransient<IRepository<AccountMaterialDBO>, BaseRepository<AccountMaterialDBO>>();
+            services.AddTransient<IRepository<AccountSkillDBO>, BaseRepository<AccountSkillDBO>>();
 
             services.AddSingleton<AuthorizationService>();
 
-            services.AddSingleton<ISkillService, SkillService>();
-            services.AddSingleton<ICourseService, CourseService>(c => 
+            services.AddTransient<ISkillService, SkillService>();
+            services.AddTransient<ICourseService, CourseService>(c => 
                 new CourseService(c.GetRequiredService<IRepository<CourseDBO>>(),
                 c.GetRequiredService<AuthorizationService>(),
                 c.GetRequiredService<IMaterialService>(),
@@ -53,37 +52,36 @@ namespace ConsoleInterface
                 c.GetRequiredService<IRepository<CourseSkillDBO>>(),
                 c.GetRequiredService<IRepository<CourseMaterialDBO>>(),
                 defaultPageSize));
-            services.AddSingleton<IMaterialService, MaterialService>();
-            services.AddSingleton<IAccountService, AccountService>();
+            services.AddTransient<IMaterialService, MaterialService>();
+            services.AddTransient<IAccountService, AccountService>();
 
             services.AddSingleton<ICommandHandler, CommandHandler>();
 
-            services.AddSingleton<ICommand, InvalidCommand>();
-            services.AddSingleton<ICommand, CreateAccountCommand>();
-            services.AddSingleton<ICommand, LogInCommand>();
-            services.AddSingleton<ICommand, LogOutCommand>();
-            services.AddSingleton<ICommand, CreateCourseCommand>();
-            services.AddSingleton<ICommand, CreateSkillCommand>();
-            services.AddSingleton<ICommand, CreateMaterialCommand>();
-            services.AddSingleton<ICommand, GetSkillsCommand>(c =>
+            services.AddTransient<ICommand, InvalidCommand>();
+            services.AddTransient<ICommand, CreateAccountCommand>();
+            services.AddTransient<ICommand, LogInCommand>();
+            services.AddTransient<ICommand, LogOutCommand>();
+            services.AddTransient<ICommand, CreateCourseCommand>();
+            services.AddTransient<ICommand, CreateSkillCommand>();
+            services.AddTransient<ICommand, CreateMaterialCommand>();
+            services.AddTransient<ICommand, GetSkillsCommand>(c =>
                 new GetSkillsCommand(c.GetRequiredService<ISkillService>(), defaultPageSize));
-            services.AddSingleton<ICommand, GetMaterialsCommand>(c =>
+            services.AddTransient<ICommand, GetMaterialsCommand>(c =>
                 new GetMaterialsCommand(c.GetRequiredService<IMaterialService>(), defaultPageSize));
-            services.AddSingleton<ICommand, GetCoursesCommand>(c =>
+            services.AddTransient<ICommand, GetCoursesCommand>(c =>
                 new GetCoursesCommand(c.GetRequiredService<ICourseService>(), defaultPageSize));
-            services.AddSingleton<ICommand, GetAccountCourses>(c => 
+            services.AddTransient<ICommand, GetAccountCourses>(c => 
                 new GetAccountCourses(c.GetRequiredService<ICourseService>(), defaultPageSize));
-            services.AddSingleton<ICommand, AddSkillToCourseCommand>();
-            services.AddSingleton<ICommand, AddMaterialToCourseCommand>();
-            services.AddSingleton<ICommand, AddCourseToAccountCommand>();
-            services.AddSingleton<ICommand, ShowAccountInfoCommand>();
-            services.AddSingleton<ICommand, ChangeCourseStateCommand>();
-            services.AddSingleton<ICommand, ShowCourseInfoCommand>();
-            services.AddSingleton<ICommand, ShowMaterialInfoCommand>();
-            services.AddSingleton<ICommand, PassMaterialCommand>();
-            services.AddSingleton<ICommand, PassCourseCommand>();
-            services.AddSingleton<ICommand, PublishCourseCommand>();
-
+            services.AddTransient<ICommand, AddSkillToCourseCommand>();
+            services.AddTransient<ICommand, AddMaterialToCourseCommand>();
+            services.AddTransient<ICommand, AddCourseToAccountCommand>();
+            services.AddTransient<ICommand, ShowAccountInfoCommand>();
+            services.AddTransient<ICommand, ChangeCourseStateCommand>();
+            services.AddTransient<ICommand, ShowCourseInfoCommand>();
+            services.AddTransient<ICommand, ShowMaterialInfoCommand>();
+            services.AddTransient<ICommand, PassMaterialCommand>();
+            services.AddTransient<ICommand, PassCourseCommand>();
+            services.AddTransient<ICommand, PublishCourseCommand>();
 
             services.AddSingleton<IConsoleHandler, ConsoleHandler>();
         }

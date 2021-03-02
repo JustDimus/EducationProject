@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.BLL.Models
 {
-    public class GetAccountSkillsDTO : TokenBasedDTO
+    public class GetAccountSkillsDTO
     {
         public int AccountId { get; set; }
 

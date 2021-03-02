@@ -2,7 +2,7 @@
 using EducationProject.BLL.Models;
 using EducationProject.Core.DAL.EF;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.EF.Mappings;
+using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +20,8 @@ namespace Infrastructure.BLL.Services
         private IRepository<CourseSkillDBO> courseSkills;
 
         private IRepository<CourseMaterialDBO> courseMaterials;
+
+        private int defaultPageSize = 30;
 
         public CourseService(IRepository<CourseDBO> baseEntityRepository, 
             AuthorizationService authorisztionService,
@@ -272,6 +274,11 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
+            if(this.entity.Any(c => c.Id == visibilityParams.CourseId && c.CreatorId == accountId) == false)
+            {
+                return false;
+            }
+
             if (courseMaterials.Count(cm => cm.CourseId == visibilityParams.CourseId) == 0)
             {
                 return false;
@@ -289,30 +296,37 @@ namespace Infrastructure.BLL.Services
 
         public FullCourseInfoDTO GetCourseInfo(int id)
         {
-            return entity.Get<FullCourseInfoDTO>(c => c.Id == id,
+            if(entity.Any(c => c.Id == id) == false)
+            {
+                return null;
+            }
+
+            var result = entity.Get<FullCourseInfoDTO>(c => c.Id == id,
                 c => new FullCourseInfoDTO()
                 {
                     Id = c.Id,
                     Description = c.Description,
                     Title = c.Title,
-                    CreatorId = c.CreatorId,
-                    Materials = c.CourseMaterials
-                    .Where(cm => cm.CourseId == c.Id)
-                    .Select(cm => new CourseMaterialDTO()
-                    {
-                        MaterialTitle = cm.Material.Title,
-                        MaterialType = cm.Material.Type
-                    })
-                    .Take(defaultGetCount),
-                    Skills = c.CourseSkills
-                    .Where(cs => cs.CourseId == c.Id)
-                    .Select(cs => new CourseSkillDTO()
-                    {
-                        SkillTitle = cs.Skill.Title,
-                        SkillChange = cs.Change
-                    })
-                    .Take(defaultGetCount)
+                    CreatorId = c.CreatorId
                 });
+
+            result.Materials = courseMaterials.GetPage<CourseMaterialDTO>(cm => cm.CourseId == id,
+                cm => new CourseMaterialDTO()
+                {
+                    MaterialTitle = cm.Material.Title,
+                    MaterialId = cm.Material.Id,
+                    MaterialType = cm.Material.Type
+                }, 0, defaultPageSize);
+
+            result.Skills = courseSkills.GetPage<CourseSkillDTO>(cs => cs.CourseId == id,
+                cs => new CourseSkillDTO()
+                {
+                    SkillId = cs.Skill.Id,
+                    SkillChange = cs.Change,
+                    SkillTitle = cs.Skill.Title
+                }, 0, defaultPageSize);
+
+            return result;
         }
 
         public bool IsCourseContainsMaterial(ChangeCourseMaterialDTO courseMaterial)
@@ -380,7 +394,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            if (this.IsExist(c => c.Id == courseMaterialChange.CourseId) == false
+            if (this.IsExist(c => c.Id == courseMaterialChange.CourseId && c.CreatorId == accountId) == false
                 || materials.IsExist(new MaterialDTO() { Id = courseMaterialChange.MaterialId }) == false)
             {
                 return false;

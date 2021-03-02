@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.Core.DAL
+namespace EducationProject.BLL.Models
 {
-    public class AccountCourse: BaseEntity
+    public class AddSkillsToAccountByCourseDTO
     {
         public int AccountId { get; set; }
-
+        
         public int CourseId { get; set; }
-
-        public string Status { get; set; }
     }
 }

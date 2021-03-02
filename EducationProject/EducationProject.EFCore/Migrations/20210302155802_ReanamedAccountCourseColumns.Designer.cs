@@ -4,14 +4,16 @@ using EducationProject.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EducationProject.EFCore.Migrations
 {
     [DbContext(typeof(EducationProjectDbContext))]
-    partial class EducationProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210302155802_ReanamedAccountCourseColumns")]
+    partial class ReanamedAccountCourseColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,9 +28,6 @@ namespace EducationProject.EFCore.Migrations
 
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("OncePassed")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -93,24 +92,6 @@ namespace EducationProject.EFCore.Migrations
                     b.HasIndex("MaterialId");
 
                     b.ToTable("AccountMaterials");
-                });
-
-            modelBuilder.Entity("EducationProject.Core.DAL.EF.AccountSkillDBO", b =>
-                {
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurrentResult")
-                        .HasColumnType("int");
-
-                    b.HasKey("AccountId", "SkillId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("AccountSkills");
                 });
 
             modelBuilder.Entity("EducationProject.Core.DAL.EF.BaseMaterialDBO", b =>
@@ -294,25 +275,6 @@ namespace EducationProject.EFCore.Migrations
                     b.Navigation("Material");
                 });
 
-            modelBuilder.Entity("EducationProject.Core.DAL.EF.AccountSkillDBO", b =>
-                {
-                    b.HasOne("EducationProject.Core.DAL.EF.AccountDBO", "Account")
-                        .WithMany("AccountSkills")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EducationProject.Core.DAL.EF.SkillDBO", "Skill")
-                        .WithMany("AccountSkills")
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Skill");
-                });
-
             modelBuilder.Entity("EducationProject.Core.DAL.EF.CourseDBO", b =>
                 {
                     b.HasOne("EducationProject.Core.DAL.EF.AccountDBO", "CreatorAccount")
@@ -394,8 +356,6 @@ namespace EducationProject.EFCore.Migrations
 
                     b.Navigation("AccountMaterials");
 
-                    b.Navigation("AccountSkills");
-
                     b.Navigation("CreatedCourses");
                 });
 
@@ -417,8 +377,6 @@ namespace EducationProject.EFCore.Migrations
 
             modelBuilder.Entity("EducationProject.Core.DAL.EF.SkillDBO", b =>
                 {
-                    b.Navigation("AccountSkills");
-
                     b.Navigation("CourseSkills");
                 });
 #pragma warning restore 612, 618

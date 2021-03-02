@@ -6,7 +6,11 @@ namespace EducationProject.BLL.Models
 {
     public class FullAccountInfoDTO : ShortAccountInfoDTO
     {
+        public int PassedCoursesCount { get; set; }
+
         public IEnumerable<AccountCourseDTO> PassedCourses { get; set; }
+
+        public int CoursesInProgressCount { get; set; }
 
         public IEnumerable<AccountCourseDTO> CoursesInProgress { get; set; }
 

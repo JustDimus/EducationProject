@@ -13,5 +13,7 @@ namespace EducationProject.Core.DAL.EF
         public int MaxValue { get; set; }
 
         public List<CourseSkillDBO> CourseSkills { get; set; }
+
+        public List<AccountSkillDBO> AccountSkills { get; set; }
     }
 }

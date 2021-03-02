@@ -1,6 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.DAL.EF;
-using Infrastructure.DAL.EF.Mappings;
+using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,24 +18,28 @@ namespace Infrastructure.BLL.Services
 
         private IRepository<AccountMaterialDBO> accountMaterials { get; set; }
 
-
         private ICourseService courses;
 
         private IMaterialService materials;
+
+        private ISkillService skills;
 
         public AccountService(IRepository<AccountDBO> baseEntityRepository, 
             AuthorizationService authorisztionService,
             IRepository<AccountCourseDBO> accountCoursesRepository,
             IRepository<AccountMaterialDBO> accountMaterialsRepository,
             ICourseService courseService,
-            IMaterialService materialService) 
+            IMaterialService materialService,
+            ISkillService skillService) 
             : base(baseEntityRepository, authorisztionService)
         {
-            accountCourses = accountCoursesRepository;
-            accountMaterials = accountMaterialsRepository;
+            this.accountCourses = accountCoursesRepository;
+            this.accountMaterials = accountMaterialsRepository;
 
-            courses = courseService;
-            materials = materialService;
+            this.courses = courseService;
+            this.skills = skillService;
+            this.materials = materialService;
+
         }
 
         protected override Expression<Func<AccountDBO, ShortAccountInfoDTO>> FromBOMapping
@@ -60,17 +64,14 @@ namespace Infrastructure.BLL.Services
         {
             int accountId = this.Authenticate(accountCourseChange.Token);
 
-            if(accountId == 0 || accountId != accountCourseChange.AccountId)
+            if(accountId == 0)
             {
                 return false;
             }
+
+            accountCourseChange.AccountId = accountId;
 
             if(ValidateAccountCourse(accountCourseChange) == false)
-            {
-                return false;
-            }
-
-            if(accountCourseChange.Status is null)
             {
                 return false;
             }
@@ -97,11 +98,12 @@ namespace Infrastructure.BLL.Services
         {
             int accountId = this.Authenticate(accountCourseChange.Token);
 
-            if (accountId == 0 || accountId != accountCourseChange.AccountId)
+            if (accountId == 0)
             {
                 return false;
             }
 
+            accountCourseChange.AccountId = accountId;
 
             if (ValidateAccountCourse(accountCourseChange) == false)
             {
@@ -120,12 +122,12 @@ namespace Infrastructure.BLL.Services
         {
             int accountId = this.Authenticate(accountCourseChange.Token);
 
-            if (accountId == 0 
-                || accountId != accountCourseChange.AccountId
-                || accountCourseChange.Status is null)
+            if (accountId == 0 || accountCourseChange.Status is null)
             {
                 return false;
             }
+
+            accountCourseChange.AccountId = accountId;
 
             if (accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId
              && ac.CourseId == accountCourseChange.CourseId) == false)
@@ -141,7 +143,8 @@ namespace Infrastructure.BLL.Services
 
             if (accountCourseChange.Status == CourseStatus.Passed)
             {
-                foreach(var materialId in this.courses.GetAllCourseMaterialsId(accountCourseChange.CourseId))
+                var idList = this.courses.GetAllCourseMaterialsId(accountCourseChange.CourseId).ToList();
+                foreach (var materialId in idList)
                 {
                     if(this.accountMaterials.Any(am => am.AccountId == accountCourseChange.AccountId
                     && am.MaterialId == materialId) == false)
@@ -151,12 +154,23 @@ namespace Infrastructure.BLL.Services
                 }
             }
 
-            this.accountCourses.Update(new AccountCourseDBO()
+            var accountCourse = this.accountCourses.Get(ac => ac.AccountId == accountCourseChange.AccountId
+            && ac.CourseId == accountCourseChange.CourseId);
+
+            if(accountCourse.OncePassed == false && accountCourseChange.Status == CourseStatus.Passed)
             {
-                AccountId = accountCourseChange.AccountId,
-                CourseId = accountCourseChange.CourseId,
-                Status = accountCourseChange.Status.Value
-            });
+                accountCourse.OncePassed = true;
+
+                skills.AddSkilsToAccountByCourseId(new AddSkillsToAccountByCourseDTO()
+                {
+                    AccountId = accountCourseChange.AccountId,
+                    CourseId = accountCourseChange.CourseId
+                });
+            }
+
+            accountCourse.Status = accountCourseChange.Status.Value;
+
+            this.accountCourses.Update(accountCourse);
 
             this.accountCourses.Save();
 
@@ -167,10 +181,12 @@ namespace Infrastructure.BLL.Services
         {
             int accountId = this.Authenticate(accountMaterialChange.Token);
 
-            if (accountId == 0 || accountId != accountMaterialChange.AccountId)
+            if (accountId == 0)
             {
                 return false;
             }
+
+            accountMaterialChange.AccountId = accountId;
 
             if (ValidateAccountMaterial(accountMaterialChange) == false)
             {
@@ -229,7 +245,11 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            entity.Create(Map(createEntity.Entity));
+            var account = Map(createEntity.Entity);
+
+            account.RegistrationDate = DateTime.Now;
+
+            entity.Create(account);
 
             entity.Save();
 
@@ -238,7 +258,7 @@ namespace Infrastructure.BLL.Services
 
         public FullAccountInfoDTO GetAccountInfo(int id)
         {
-            return entity.Get<FullAccountInfoDTO>(a => a.Id == id, a => new FullAccountInfoDTO()
+            var result = entity.Get<FullAccountInfoDTO>(a => a.Id == id, a => new FullAccountInfoDTO()
             {
                 Id = a.Id,
                 RegistrationDate = a.RegistrationDate,
@@ -246,36 +266,40 @@ namespace Infrastructure.BLL.Services
                 Password = null,
                 SecondName = a.SecondName,
                 FirstName = a.FirstName,
-                PhoneNumber = a.PhoneNumber,
-                PassedCourses = a.AccountCourses.Where(ac => ac.AccountId == a.Id && ac.Status == CourseStatus.Passed)
-                .Take(defaultGetCount)
-                .Select(ac => new AccountCourseDTO()
-                {
-                    CourseId = ac.CourseId,
-                    Status = ac.Status,
-                    Title = ac.Course.Title
-                }),
-                CoursesInProgress = a.AccountCourses.Where(ac => ac.AccountId == a.Id && ac.Status == CourseStatus.InProgress)
-                .Take(defaultGetCount)
-                .Select(ac => new AccountCourseDTO()
-                {
-                    CourseId = ac.CourseId,
-                    Status = ac.Status,
-                    Title = ac.Course.Title
-                }),
-                AccountSkills = a.AccountCourses.Where(ac => ac.AccountId == a.Id && ac.Status == CourseStatus.Passed)
-                .SelectMany(ac => ac.Course.CourseSkills.Where(cs => cs.CourseId == ac.CourseId)
-                .Select(cs => new { Id = cs.SkillId, Title = cs.Skill.Title, Change = cs.Change, MaxValue = cs.Skill.MaxValue })
-                .GroupBy(s => new { s.Id, s.Title, s.MaxValue }).Select(s => new AccountSkillDTO()
-                {
-                    SkillId = s.Key.Id,
-                    Title = s.Key.Title,
-                    Level = s.Sum(s => s.Change) / s.Key.MaxValue,
-                    CurrentResult = s.Sum(s => s.Change) % s.Key.MaxValue
-                }))
+                PhoneNumber = a.PhoneNumber
             });
-        }
 
+            result.PassedCoursesCount = accountCourses.Count(ac => ac.AccountId == id
+            && ac.Status == CourseStatus.Passed);
+
+            result.PassedCourses = accountCourses.GetPage<AccountCourseDTO>(ac => ac.AccountId == id
+            && ac.Status == CourseStatus.Passed, ac => new AccountCourseDTO()
+            {
+                Title = ac.Course.Title,
+                CourseId = ac.CourseId,
+                Status = CourseStatus.Passed
+            }, 0, defaultGetCount);
+
+            result.CoursesInProgressCount = accountCourses.Count(ac => ac.AccountId == id
+            && ac.Status == CourseStatus.InProgress);
+
+            result.CoursesInProgress = accountCourses.GetPage<AccountCourseDTO>(ac => ac.AccountId == id
+            && ac.Status == CourseStatus.InProgress, ac => new AccountCourseDTO()
+            {
+                Title = ac.Course.Title,
+                CourseId = ac.CourseId,
+                Status = CourseStatus.InProgress
+            }, 0, defaultGetCount);
+
+            result.AccountSkills = skills.GetAccountSkills(new GetAccountSkillsDTO()
+            {
+                AccountId = id,
+                PageNumber = 0,
+                PageSize = defaultGetCount
+            });
+
+            return result;
+        }
 
         public FullAccountInfoDTO GetAccountInfo(string token)
         {

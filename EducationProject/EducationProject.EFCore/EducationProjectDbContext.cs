@@ -51,6 +51,7 @@ namespace EducationProject.EFCore
             modelBuilder.Entity<AccountCourseDBO>(entity =>
             {
                 entity.ToTable("AccountCourses");
+
                 entity.HasKey(p => new { p.AccountId, p.CourseId });
                 
                 entity.HasOne(ac => ac.Account)
@@ -87,6 +88,19 @@ namespace EducationProject.EFCore
                 .WithMany(c => c.CourseSkills)
                 .HasForeignKey(cs => cs.CourseId);
                 
+            });
+            
+            modelBuilder.Entity<AccountSkillDBO>(entity =>
+            {
+                entity.ToTable("AccountSkills");
+                entity.HasKey(acs => new { acs.AccountId, acs.SkillId });
+                
+                entity.HasOne(cs => cs.Skill)
+                .WithMany(s => s.AccountSkills)
+                .HasForeignKey(cs => cs.SkillId);
+                entity.HasOne(cs => cs.Account)
+                .WithMany(a => a.AccountSkills)
+                .HasForeignKey(cs => cs.AccountId);
             });
 
             modelBuilder.Entity<SkillDBO>(entity =>

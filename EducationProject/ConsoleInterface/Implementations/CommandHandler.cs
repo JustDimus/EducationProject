@@ -9,6 +9,8 @@ namespace ConsoleInterface.Implementations
     {
         private Dictionary<string, ICommand> commandList;
 
+        private string helpCommand = "_help";
+
         public CommandHandler(IEnumerable<ICommand> commands)
         {
             commandList = new Dictionary<string, ICommand>();
@@ -23,6 +25,11 @@ namespace ConsoleInterface.Implementations
         {
             get
             {
+                if(value == helpCommand)
+                {
+                    Console.WriteLine(String.Join("\n", commandList.Keys));
+                }
+
                 if(commandList.ContainsKey(value) == true)
                 {
                     return commandList[value];

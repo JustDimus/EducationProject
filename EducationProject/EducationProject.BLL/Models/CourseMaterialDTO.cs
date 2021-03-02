@@ -7,6 +7,8 @@ namespace EducationProject.BLL.Models
 {
     public class CourseMaterialDTO
     {
+        public int MaterialId { get; set; }
+
         public string MaterialTitle { get; set; }
 
         public MaterialType MaterialType { get; set; }

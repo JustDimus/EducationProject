@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using EducationProject.EFCore;
 using EducationProject.Core.DAL.EF;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.EF.Mappings;
+using Infrastructure.DAL.Repositories;
 using EducationProject.BLL.Interfaces;
 using Infrastructure.BLL.Services;
 using Infrastructure.BLL;
@@ -38,6 +38,7 @@ namespace ConsoleInterface
             services.AddSingleton<IRepository<CourseMaterialDBO>, BaseRepository<CourseMaterialDBO>>();
             services.AddSingleton<IRepository<AccountCourseDBO>, BaseRepository<AccountCourseDBO>>();
             services.AddSingleton<IRepository<AccountMaterialDBO>, BaseRepository<AccountMaterialDBO>>();
+            services.AddSingleton<IRepository<AccountSkillDBO>, BaseRepository<AccountSkillDBO>>();
 
             services.AddSingleton<AuthorizationService>();
 
@@ -59,8 +60,17 @@ namespace ConsoleInterface
             services.AddSingleton<ICommand, GetMaterialsCommand>();
             services.AddSingleton<ICommand, GetCoursesCommand>();
             services.AddSingleton<ICommand, GetAccountCourses>();
+            services.AddSingleton<ICommand, AddSkillToCourseCommand>();
+            services.AddSingleton<ICommand, AddMaterialToCourseCommand>();
+            services.AddSingleton<ICommand, AddCourseToAccountCommand>();
+            services.AddSingleton<ICommand, ShowAccountInfoCommand>();
+            services.AddSingleton<ICommand, ChangeCourseStateCommand>();
+            services.AddSingleton<ICommand, ShowCourseInfoCommand>();
+            services.AddSingleton<ICommand, ShowMaterialInfoCommand>();
+            services.AddSingleton<ICommand, PassMaterialCommand>();
+            services.AddSingleton<ICommand, PassCourseCommand>();
+            services.AddSingleton<ICommand, PublishCourseCommand>();
 
-            //add skill and material to course. Add course to account. Show account full data. Publish/hide course
 
             services.AddSingleton<IConsoleHandler, ConsoleHandler>();
         }

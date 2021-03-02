@@ -2,7 +2,7 @@
 using EducationProject.BLL.Models;
 using EducationProject.Core.DAL.EF;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.EF.Mappings;
+using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;

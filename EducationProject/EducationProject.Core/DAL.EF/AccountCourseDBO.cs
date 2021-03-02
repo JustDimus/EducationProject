@@ -16,5 +16,7 @@ namespace EducationProject.Core.DAL.EF
         public CourseDBO Course { get; set; }
 
         public ProgressStatus Status { get; set; }
+
+        public bool OncePassed { get; set; }
     }
 }

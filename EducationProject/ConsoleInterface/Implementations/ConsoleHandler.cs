@@ -6,7 +6,6 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations
 {
-    
     public class ConsoleHandler: IConsoleHandler
     {
         private ICommandHandler commands;

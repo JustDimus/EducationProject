@@ -10,7 +10,6 @@ namespace ADODataContext.Converters
 {
     public class LambdaConverter<T>
     {
-
         public string DeconvertData(Expression<Func<T, bool>> condition, SqlParameterCollection parameters)
         {
             string resultString = String.Empty;

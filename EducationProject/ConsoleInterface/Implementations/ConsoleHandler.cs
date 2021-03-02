@@ -31,8 +31,8 @@ namespace ConsoleInterface.Implementations
                     break;
                 }
 
-                commands[currentCommand]
-            };
+                commands[currentCommand].Run(ref token);
+            }
         }
     }
     

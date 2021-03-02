@@ -15,6 +15,7 @@ using Infrastructure.BLL.Services;
 using Infrastructure.BLL;
 using ConsoleInterface.Interfaces;
 using ConsoleInterface.Implementations;
+using ConsoleInterface.Implementations.Commands;
 
 namespace ConsoleInterface
 {
@@ -45,52 +46,34 @@ namespace ConsoleInterface
             services.AddSingleton<IMaterialService, MaterialService>();
             services.AddSingleton<IAccountService, AccountService>();
 
-
-
             services.AddSingleton<ICommandHandler, CommandHandler>();
+
+            services.AddSingleton<ICommand, InvalidCommand>();
+            services.AddSingleton<ICommand, CreateAccountCommand>();
+            services.AddSingleton<ICommand, LogInCommand>();
+            services.AddSingleton<ICommand, LogOutCommand>();
+            services.AddSingleton<ICommand, CreateCourseCommand>();
+            services.AddSingleton<ICommand, CreateSkillCommand>();
+            services.AddSingleton<ICommand, CreateMaterialCommand>();
+            services.AddSingleton<ICommand, GetSkillsCommand>();
+            services.AddSingleton<ICommand, GetMaterialsCommand>();
+            services.AddSingleton<ICommand, GetCoursesCommand>();
+            services.AddSingleton<ICommand, GetAccountCourses>();
+
+            //add skill and material to course. Add course to account. Show account full data. Publish/hide course
+
+            services.AddSingleton<IConsoleHandler, ConsoleHandler>();
         }
 
         static void Main(string[] args)
         {
             ConfigureServices(serviceCollection);
 
-            var provider = serviceCollection.BuildServiceProvider();
-
-            var token = provider.GetService<IAccountService>()
-                .LogIn(new EducationProject.BLL.Models.AccountAuthorizationDataDTO()
-                {
-                    Email = "hello@gmail.com",
-                    Password = "user"
-                });
-
-            var materials = provider.GetService<IMaterialService>()
-                .Get(new EducationProject.BLL.Models.PageInfoDTO()
-                {
-                    PageNumber = 0,
-                    PageSize = 30
-                }).ToList();
-
-            var courses = provider.GetService<ICourseService>()
-                 .Get(new EducationProject.BLL.Models.PageInfoDTO()
-                 {
-                     PageNumber = 0,
-                     PageSize = 30
-                 }).ToList();
-
-            var isAdded = provider.GetService<ICourseService>()
-                .ChangeCourseVisibility(new EducationProject.BLL.Models.CourseVisibilityDTO()
-                {
-                    Token = token,
-                    CourseId = courses.First().Id,
-                    Visibility = false
-                });
+            serviceCollection.BuildServiceProvider()
+                .GetService<IConsoleHandler>()
+                .Run();
 
             return;
-
-            //ConfigureServices(_services);
-
-            //_services.BuildServiceProvider().GetService<IConsoleHandler>().Run();
         }
-
     }
 }

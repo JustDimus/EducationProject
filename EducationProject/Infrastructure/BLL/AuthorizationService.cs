@@ -50,6 +50,11 @@ namespace Infrastructure.BLL
 
         public bool DeauthorizeAccount(string token)
         {
+            if(token == null)
+            {
+                return false;
+            }
+
             return authorizedAccounts.Remove(token);
         }
     }

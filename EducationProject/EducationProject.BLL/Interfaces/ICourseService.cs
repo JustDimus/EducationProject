@@ -25,6 +25,10 @@ namespace EducationProject.BLL.Interfaces
 
         bool IsCourseContainsMaterial(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
 
+        IEnumerable<ShortCourseInfoDTO> GetCoursesByCreatorId(GetCoursesByCreator courseCreator);
+
+        IEnumerable<ShortCourseInfoDTO> GetMyCourses(GetCoursesByCreator courseCreator);
+
         IEnumerable<int> GetAllCourseMaterialsId(int courseId);
     }
 }

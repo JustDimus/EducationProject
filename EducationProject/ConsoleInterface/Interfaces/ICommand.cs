@@ -8,6 +8,6 @@ namespace ConsoleInterface.Interfaces
     {
         string Name { get; }
 
-        void Run(string token = null);
+        void Run(ref string token);
     }
 }

@@ -49,6 +49,33 @@ namespace Infrastructure.BLL.Services
 
         protected override Expression<Func<CourseDBO, bool>> defaultGetCondition => c => c.IsVisible == true;
 
+        public IEnumerable<ShortCourseInfoDTO> GetCoursesByCreatorId(GetCoursesByCreator courseCreator)
+        {
+            if(ValidatePageInfo(courseCreator.PageInfo) == false)
+            {
+                return null;
+            }
+
+            return entity.GetPage<ShortCourseInfoDTO>(c => c.CreatorId == courseCreator.AccountId,
+                FromBOMapping, courseCreator.PageInfo.PageNumber, courseCreator.PageInfo.PageSize);
+        }
+
+        public IEnumerable<ShortCourseInfoDTO> GetMyCourses(GetCoursesByCreator courseCreator)
+        {
+            int accountId = this.Authenticate(courseCreator.Token);
+
+            if(accountId == 0)
+            {
+                return null;
+            }
+            else
+            {
+                courseCreator.AccountId = accountId;
+
+                return GetCoursesByCreatorId(courseCreator);
+            }
+        }
+
         public override bool Create(ChangeEntityDTO<ShortCourseInfoDTO> createEntity)
         {
             int accountId = 0;
@@ -388,6 +415,5 @@ namespace Infrastructure.BLL.Services
         {
             return c => c.Id == entity.Id;
         }
-
     }
 }

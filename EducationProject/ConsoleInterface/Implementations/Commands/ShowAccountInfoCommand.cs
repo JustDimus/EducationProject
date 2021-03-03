@@ -24,7 +24,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             var account = this.accountService.GetAccountInfo(token);
 
-            if(account is null)
+            if(account == null)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();

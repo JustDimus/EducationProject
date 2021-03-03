@@ -3,6 +3,7 @@ using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
@@ -44,7 +45,7 @@ namespace ConsoleInterface.Implementations.Commands
                 }
             });
 
-            if(coursesData is null)
+            if(coursesData == null)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -53,12 +54,11 @@ namespace ConsoleInterface.Implementations.Commands
 
             StringBuilder builder = new StringBuilder();
 
-            foreach (var course in coursesData)
-            {
-                builder.Append($"{course.Id}: {course.Title}.\n\tDescription: {course.Description}\n");
-            }
+            builder.AppendJoin("\n",
+                coursesData.Select(c => $"{c.Id}: {c.Title}.\n\tDescription: {c.Description}"));
 
             Console.WriteLine(builder);
+            Console.WriteLine();
         }
     }
 }

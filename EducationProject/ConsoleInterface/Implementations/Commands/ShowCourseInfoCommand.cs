@@ -33,7 +33,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             var course = courseService.GetCourseInfo(courseId);
 
-            if(course is null)
+            if(course == null)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();

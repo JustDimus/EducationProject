@@ -36,7 +36,7 @@ namespace ConsoleInterface.Implementations.Commands
                 Password = password
             });
 
-            if(newToken is null)
+            if(newToken == null)
             {
                 Console.WriteLine("Error");
             }

@@ -3,6 +3,7 @@ using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
@@ -48,24 +49,23 @@ namespace ConsoleInterface.Implementations.Commands
 
             StringBuilder builder = new StringBuilder();
 
-            foreach(var material in materialsData)
-            {
-                switch(material)
+            builder.AppendJoin("\n",
+                materialsData.Select(m => m switch
                 {
-                    case ArticleMaterialDTO article:
-                        builder.Append($"{article.Id}: {article.Title}. Type: Article.\n");
-                        builder.Append($"\tURI: {article.URI}.\n");
-                        break;
-                    case BookMaterialDTO book:
-                        builder.Append($"{book.Id}: {book.Title}. Type: Book.\n");
-                        builder.Append($"\tAuthor: {book.Author}. Pages: {book.Pages}\n");
-                        break;
-                    case VideoMaterialDTO video:
-                        builder.Append($"{video.Id}: {video.Title}. Type: Video.\n");
-                        builder.Append($"\tURI: {video.URI}. Duration: {video.Duration}s.\n");
-                        break;
-                }
-            }
+                    ArticleMaterialDTO article => new StringBuilder()
+                    .Append($"{article.Id}: {article.Title}. Type: Article.\n")
+                    .Append($"\tURI: {article.URI}."),
+
+                    BookMaterialDTO book => new StringBuilder()
+                    .Append($"{book.Id}: {book.Title}. Type: Book.\n")
+                    .Append($"\tAuthor: {book.Author}. Pages: {book.Pages}"),
+
+                    VideoMaterialDTO video => new StringBuilder()
+                    .Append($"{video.Id}: {video.Title}. Type: Video.\n")
+                    .Append($"\tURI: {video.URI}. Duration: {video.Duration}s."),
+
+                    _ => null
+                }));
 
             Console.WriteLine(builder);
         }

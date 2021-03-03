@@ -23,7 +23,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             var actionResult = accountService.LogOut(token);
 
-            if (actionService == true)
+            if (actionResult == true)
             {
                 Console.WriteLine("Successful");
                 token = null;

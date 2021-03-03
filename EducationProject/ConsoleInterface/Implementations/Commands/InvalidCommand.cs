@@ -10,7 +10,6 @@ namespace ConsoleInterface.Implementations.Commands
         public InvalidCommand(string commandName)
             : base(commandName)
         {
-            
         }
 
         public override void Run(ref string token)

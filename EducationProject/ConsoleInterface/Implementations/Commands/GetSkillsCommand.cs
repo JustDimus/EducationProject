@@ -3,6 +3,7 @@ using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
@@ -48,10 +49,8 @@ namespace ConsoleInterface.Implementations.Commands
 
             StringBuilder builder = new StringBuilder();
 
-            foreach(var skill in skillsData)
-            {
-                builder.Append($"{skill.Id}: {skill.Title}. Max value: {skill.MaxValue}\n");
-            }
+            builder.AppendJoin("\n",
+                skillsData.Select(s => $"{s.Id}: {s.Title}. Max value: {s.MaxValue}\n"));
 
             Console.WriteLine(builder);
         }

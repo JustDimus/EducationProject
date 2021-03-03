@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Infrastructure.DAL.Repositories
 {
@@ -17,74 +18,73 @@ namespace Infrastructure.DAL.Repositories
             context = dbContext;
         }
 
-        public bool Any(Expression<Func<TEntity, bool>> condition)
+        public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> condition)
         {
-            return this.context.Set<TEntity>().Any(condition);
+            return this.context.Set<TEntity>().AnyAsync(condition);
         }
 
-        public bool Contains(TEntity entity)
+        public Task<bool> ContainsAsync(TEntity entity)
         {
-            return this.context.Set<TEntity>().Contains(entity);
+            return this.context.Set<TEntity>().ContainsAsync(entity);
         }
 
-        public int Count(Expression<Func<TEntity, bool>> condition)
+        public Task<int> CountAsync(Expression<Func<TEntity, bool>> condition)
         {
-            return this.context.Set<TEntity>().Count(condition);
+            return this.context.Set<TEntity>().CountAsync(condition);
         }
 
-        public void Create(TEntity entity)
+        public Task CreateAsync(TEntity entity)
         {
-            this.context.Set<TEntity>().Add(entity);
+            return this.context.Set<TEntity>().AddAsync(entity).AsTask();
         }
 
-        public void Delete(TEntity entity)
+        public Task DeleteAsync(TEntity entity)
         {
-            this.context.Set<TEntity>().Remove(entity);
+            return Task.Run(() =>
+                this.context.Set<TEntity>().Remove(entity));
         }
 
-        public void Delete(Expression<Func<TEntity, bool>> condition)
+        public Task DeleteAsync(Expression<Func<TEntity, bool>> condition)
         {
-            this.context.Set<TEntity>().RemoveRange(this.context.Set<TEntity>().Where(condition));
+            return Task.Run(() =>
+                this.context.Set<TEntity>().RemoveRange(this.context.Set<TEntity>().Where(condition)));
         }
 
-        public void Delete(int id)
+        public Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> condition)
         {
-
-            this.context.Set<TEntity>().Remove(this.context.Set<TEntity>().Find(id));
+            return this.context.Set<TEntity>().Where(condition).FirstOrDefaultAsync();
         }
 
-        public TEntity Get(Expression<Func<TEntity, bool>> condition)
+        public Task<TResult> GetAsync<TResult>(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, TResult>> selector)
         {
-            return this.context.Set<TEntity>().Where(condition).FirstOrDefault();
+            return this.context.Set<TEntity>().Where(condition).Select(selector).FirstOrDefaultAsync();
         }
 
-        public TResult Get<TResult>(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, TResult>> selector)
-        {
-            return this.context.Set<TEntity>().Where(condition).Select(selector).FirstOrDefault();
-        }
-
-        public IEnumerable<TEntity> GetPage(Expression<Func<TEntity, bool>> condition, int pageNumber, int pageSize)
+        public Task<IEnumerable<TEntity>> GetPageAsync(Expression<Func<TEntity, bool>> condition, int pageNumber, int pageSize)
         {
             int skipRows = pageNumber * pageSize;
 
-            return this.context.Set<TEntity>().Where(condition).Skip(skipRows).Take(pageSize);
+            return Task.Run<IEnumerable<TEntity>>(() => 
+                this.context.Set<TEntity>().Where(condition).Skip(skipRows).Take(pageSize));
         }
 
-        public IEnumerable<TResult> GetPage<TResult>(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, TResult>> selector, int pageNumber, int pageSize)
+        public Task<IEnumerable<TResult>> GetPageAsync<TResult>(Expression<Func<TEntity, bool>> condition, Expression<Func<TEntity, TResult>> selector, int pageNumber, int pageSize)
         {
             int skipRows = pageNumber * pageSize;
 
-            return this.context.Set<TEntity>().Where(condition).Select(selector).Skip(skipRows).Take(pageSize);
+            return Task.Run<IEnumerable<TResult>>(() =>
+                this.context.Set<TEntity>().Where(condition).Select(selector).Skip(skipRows).Take(pageSize));
         }
 
-        public void Save()
+        public Task SaveAsync()
         {
-            this.context.SaveChanges();
+            return this.context.SaveChangesAsync();
         }
 
-        public void Update(TEntity entity)
+        public Task UpdateAsync(TEntity entity)
         {
-            this.context.Set<TEntity>().Update(entity);
+            return Task.Run(() => 
+                this.context.Set<TEntity>().Update(entity));
         }
     }
 }

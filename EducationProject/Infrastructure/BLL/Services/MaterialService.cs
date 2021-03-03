@@ -1,6 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.DTO;
-using EducationProject.Core.DAL;
+using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-using MaterialType = EducationProject.Core.DAL.Enums.MaterialType;
+using MaterialType = EducationProject.Core.Models.Enums.MaterialType;
 
 namespace Infrastructure.BLL.Services
 {

@@ -1,12 +1,12 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.DAL;
+using EducationProject.Core.Models;
 using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using EducationProject.BLL.DTO;
-using CourseStatus = EducationProject.Core.DAL.Enums.ProgressStatus;
+using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
 using System.Linq.Expressions;
 using EducationProject.DAL.Interfaces;
 

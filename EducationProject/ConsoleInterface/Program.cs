@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using EducationProject.EFCore;
-using EducationProject.Core.DAL;
+using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using EducationProject.BLL.Interfaces;

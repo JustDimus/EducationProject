@@ -1,4 +1,4 @@
-﻿using EducationProject.Core.DAL;
+﻿using EducationProject.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

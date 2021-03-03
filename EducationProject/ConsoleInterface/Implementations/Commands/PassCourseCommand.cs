@@ -34,7 +34,7 @@ namespace ConsoleInterface.Implementations.Commands
             var actionResult = accountService.ChangeAccountCourseStatus(new ChangeAccountCourseDTO()
             {
                 Token = token,
-                Status = EducationProject.Core.DAL.Enums.ProgressStatus.Passed,
+                Status = EducationProject.Core.Models.Enums.ProgressStatus.Passed,
                 CourseId = courseId
             });
 

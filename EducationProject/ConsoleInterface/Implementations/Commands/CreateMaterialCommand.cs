@@ -101,7 +101,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.Enums.MaterialType.ArticleMaterial,
+                Type = EducationProject.Core.Models.Enums.MaterialType.ArticleMaterial,
                 URI = URI,
                 PublicationDate = publicationDate
             };
@@ -137,7 +137,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.Enums.MaterialType.BookMaterial,
+                Type = EducationProject.Core.Models.Enums.MaterialType.BookMaterial,
                 Author = Author,
                 Pages = pages
             };
@@ -180,7 +180,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.Enums.MaterialType.VideoMaterial,
+                Type = EducationProject.Core.Models.Enums.MaterialType.VideoMaterial,
                 URI = URI,
                 Duration = duration,
                 Quality = quality

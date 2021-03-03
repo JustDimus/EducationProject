@@ -28,6 +28,7 @@ namespace ConsoleInterface
             string xmlFileName = ConfigurationManager.AppSettings.Get("XMLFile");
             string connectionString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
             int defaultPageSize = Int32.Parse(ConfigurationManager.AppSettings.Get("DefaultPageSize"));
+            var values = ConfigurationManager.AppSettings.GetValues("CommandName");
 
             services.AddTransient<DbContext, EducationProjectDbContext>(c => new EducationProjectDbContext(connectionString));
 
@@ -57,31 +58,69 @@ namespace ConsoleInterface
 
             services.AddSingleton<ICommandHandler, CommandHandler>();
 
-            services.AddTransient<ICommand, InvalidCommand>();
-            services.AddTransient<ICommand, CreateAccountCommand>();
-            services.AddTransient<ICommand, LogInCommand>();
-            services.AddTransient<ICommand, LogOutCommand>();
-            services.AddTransient<ICommand, CreateCourseCommand>();
-            services.AddTransient<ICommand, CreateSkillCommand>();
-            services.AddTransient<ICommand, CreateMaterialCommand>();
+
+            services.AddTransient<ICommand, InvalidCommand>(c => 
+                new InvalidCommand(ConfigurationManager.AppSettings.Get("InvalidCommand")));
+            services.AddTransient<ICommand, CreateAccountCommand>(c =>
+                new CreateAccountCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("CreateAccountCommand")));
+            services.AddTransient<ICommand, LogInCommand>(c => 
+                new LogInCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("LoginCommand")));
+            services.AddTransient<ICommand, LogOutCommand>(c =>
+                new LogOutCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("LogoutCommand")));
+            services.AddTransient<ICommand, CreateCourseCommand>(c => 
+                new CreateCourseCommand(c.GetRequiredService<ICourseService>(),
+                ConfigurationManager.AppSettings.Get("CreateCourseCommand")));
+            services.AddTransient<ICommand, CreateSkillCommand>(c =>
+                new CreateSkillCommand(c.GetRequiredService<ISkillService>(),
+                ConfigurationManager.AppSettings.Get("CreateSkillCommand")));
+            services.AddTransient<ICommand, CreateMaterialCommand>(c =>
+                new CreateMaterialCommand(c.GetRequiredService<IMaterialService>(),
+                ConfigurationManager.AppSettings.Get("CreateMaterialCommand")));
             services.AddTransient<ICommand, GetSkillsCommand>(c =>
-                new GetSkillsCommand(c.GetRequiredService<ISkillService>(), defaultPageSize));
+                new GetSkillsCommand(c.GetRequiredService<ISkillService>(), defaultPageSize,
+                ConfigurationManager.AppSettings.Get("GetSkillsCommand")));
             services.AddTransient<ICommand, GetMaterialsCommand>(c =>
-                new GetMaterialsCommand(c.GetRequiredService<IMaterialService>(), defaultPageSize));
+                new GetMaterialsCommand(c.GetRequiredService<IMaterialService>(), defaultPageSize,
+                ConfigurationManager.AppSettings.Get("GetMaterialsCommand")));
             services.AddTransient<ICommand, GetCoursesCommand>(c =>
-                new GetCoursesCommand(c.GetRequiredService<ICourseService>(), defaultPageSize));
+                new GetCoursesCommand(c.GetRequiredService<ICourseService>(), defaultPageSize,
+                ConfigurationManager.AppSettings.Get("GetCoursesCommand")));
             services.AddTransient<ICommand, GetAccountCourses>(c => 
-                new GetAccountCourses(c.GetRequiredService<ICourseService>(), defaultPageSize));
-            services.AddTransient<ICommand, AddSkillToCourseCommand>();
-            services.AddTransient<ICommand, AddMaterialToCourseCommand>();
-            services.AddTransient<ICommand, AddCourseToAccountCommand>();
-            services.AddTransient<ICommand, ShowAccountInfoCommand>();
-            services.AddTransient<ICommand, ChangeCourseStateCommand>();
-            services.AddTransient<ICommand, ShowCourseInfoCommand>();
-            services.AddTransient<ICommand, ShowMaterialInfoCommand>();
-            services.AddTransient<ICommand, PassMaterialCommand>();
-            services.AddTransient<ICommand, PassCourseCommand>();
-            services.AddTransient<ICommand, PublishCourseCommand>();
+                new GetAccountCourses(c.GetRequiredService<ICourseService>(), defaultPageSize,
+                ConfigurationManager.AppSettings.Get("GetAccountCourses")));
+            services.AddTransient<ICommand, AddSkillToCourseCommand>(c =>
+                new AddSkillToCourseCommand(c.GetRequiredService<ICourseService>(),
+                ConfigurationManager.AppSettings.Get("AddSkillToCourseCommand")));
+            services.AddTransient<ICommand, AddMaterialToCourseCommand>(c =>
+                new AddMaterialToCourseCommand(c.GetRequiredService<ICourseService>(),
+                ConfigurationManager.AppSettings.Get("AddMaterialToCourseCommand")));
+            services.AddTransient<ICommand, AddCourseToAccountCommand>(c =>
+                new AddCourseToAccountCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("AddCourseToAccountCommand")));
+            services.AddTransient<ICommand, ShowAccountInfoCommand>(c =>
+                new ShowAccountInfoCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("ShowAccountInfoCommand")));
+            services.AddTransient<ICommand, ChangeCourseStateCommand>(c =>
+                new ChangeCourseStateCommand(c.GetRequiredService<ICourseService>(),
+                ConfigurationManager.AppSettings.Get("ChangeCourseStateCommand")));
+            services.AddTransient<ICommand, ShowCourseInfoCommand>(c =>
+                new ShowCourseInfoCommand(c.GetRequiredService<ICourseService>(),
+                ConfigurationManager.AppSettings.Get("ShowCourseInfoCommand")));
+            services.AddTransient<ICommand, ShowMaterialInfoCommand>(c =>
+                new ShowMaterialInfoCommand(c.GetRequiredService<IMaterialService>(),
+                ConfigurationManager.AppSettings.Get("ShowMaterialInfoCommand")));
+            services.AddTransient<ICommand, PassMaterialCommand>(c =>
+                new PassMaterialCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("PassMaterialCommand")));
+            services.AddTransient<ICommand, PassCourseCommand>(c =>
+                new PassCourseCommand(c.GetRequiredService<IAccountService>(),
+                ConfigurationManager.AppSettings.Get("PassCourseCommand")));
+            services.AddTransient<ICommand, PublishCourseCommand>(c =>
+                new PublishCourseCommand(c.GetRequiredService<ICourseService>(),
+                ConfigurationManager.AppSettings.Get("PublishCourseCommand")));
 
             services.AddSingleton<IConsoleHandler, ConsoleHandler>();
         }

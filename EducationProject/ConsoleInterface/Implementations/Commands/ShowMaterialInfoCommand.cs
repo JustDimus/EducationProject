@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class ShowMaterialInfoCommand : ICommand
+    public class ShowMaterialInfoCommand : BaseCommand
     {
-        public string Name => "_getMaterial";
-
         private IMaterialService materials;
 
-        public ShowMaterialInfoCommand(IMaterialService materialService)
+        public ShowMaterialInfoCommand(IMaterialService materialService,
+            string commandName)
+            : base(commandName)
         {
             this.materials = materialService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int materialId = 0;
 

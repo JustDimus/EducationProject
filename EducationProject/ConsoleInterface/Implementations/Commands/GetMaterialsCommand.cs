@@ -7,22 +7,22 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class GetMaterialsCommand : ICommand
+    public class GetMaterialsCommand : BaseCommand
     {
-        public string Name => "_getMaterials";
-
         private IMaterialService materials;
 
         private int pageSize;
 
-        public GetMaterialsCommand(IMaterialService materialService, int defaultPageSize)
+        public GetMaterialsCommand(IMaterialService materialService, 
+            int defaultPageSize, string commandName)
+            : base(commandName)
         {
             this.materials = materialService;
 
             this.pageSize = defaultPageSize;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int pageNumber = 0;
 

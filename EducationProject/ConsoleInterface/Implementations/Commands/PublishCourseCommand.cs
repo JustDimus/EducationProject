@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class PublishCourseCommand : ICommand
+    public class PublishCourseCommand : BaseCommand
     {
-        public string Name => "_publishCourse";
-
         private ICourseService courses;
 
-        public PublishCourseCommand(ICourseService courseService)
+        public PublishCourseCommand(ICourseService courseService,
+            string commandName)
+            : base(commandName)
         {
             this.courses = courseService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int courseId = 0;
 

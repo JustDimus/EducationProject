@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class PassMaterialCommand : ICommand
+    public class PassMaterialCommand : BaseCommand
     {
-        public string Name => "_passMaterial";
-
         private IAccountService accounts;
 
-        public PassMaterialCommand(IAccountService accountService)
+        public PassMaterialCommand(IAccountService accountService,
+            string commandName)
+            : base(commandName)
         {
             this.accounts = accountService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int materialId = 0;
 

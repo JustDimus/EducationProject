@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class ShowAccountInfoCommand : ICommand
+    public class ShowAccountInfoCommand : BaseCommand
     {
-        public string Name => "_getAccountInfo";
-
         private IAccountService accounts;
 
-        public ShowAccountInfoCommand(IAccountService accountService)
+        public ShowAccountInfoCommand(IAccountService accountService,
+            string commandName)
+            : base(commandName)
         {
             this.accounts = accountService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             Console.WriteLine("Showing account info");
 

@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class ShowCourseInfoCommand : ICommand
+    public class ShowCourseInfoCommand : BaseCommand
     {
-        public string Name => "_getCourseInfo";
-
         private ICourseService courses;
 
-        public ShowCourseInfoCommand(ICourseService courseService)
+        public ShowCourseInfoCommand(ICourseService courseService,
+            string commandName)
+            : base(commandName)
         {
             this.courses = courseService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int courseId = 0;
 

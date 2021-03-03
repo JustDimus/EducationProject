@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class CreateMaterialCommand : ICommand
+    public class CreateMaterialCommand : BaseCommand
     {
-        public string Name => "_createMaterial";
-
         private IMaterialService materials;
 
-        public CreateMaterialCommand(IMaterialService materialService)
+        public CreateMaterialCommand(IMaterialService materialService,
+            string commandName)
+            : base(commandName)
         {
             materials = materialService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int type = 0;
 

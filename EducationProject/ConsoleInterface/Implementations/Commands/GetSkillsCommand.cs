@@ -7,22 +7,22 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class GetSkillsCommand : ICommand
+    public class GetSkillsCommand : BaseCommand
     {
-        public string Name => "_getSkills";
-
         private ISkillService skills;
 
         private int pageSize;
 
-        public GetSkillsCommand(ISkillService skillService, int defaultPageSize)
+        public GetSkillsCommand(ISkillService skillService, 
+            int defaultPageSize, string commandName)
+            : base(commandName)
         {
             this.skills = skillService;
 
             this.pageSize = defaultPageSize;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int pageNumber = 0;
 

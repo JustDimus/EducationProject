@@ -7,22 +7,22 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class GetCoursesCommand : ICommand
+    public class GetCoursesCommand : BaseCommand
     {
-        public string Name => "_getCourses";
-
         private ICourseService courses;
 
         private int pageSize;
 
-        public GetCoursesCommand(ICourseService courseService, int defaultPageSize)
+        public GetCoursesCommand(ICourseService courseService, 
+            int defaultPageSize, string commandName)
+            : base(commandName)
         {
             this.courses = courseService;
 
             this.pageSize = defaultPageSize;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int pageNumber = 0;
 

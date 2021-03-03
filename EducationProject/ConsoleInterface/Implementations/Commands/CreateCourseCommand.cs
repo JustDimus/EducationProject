@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class CreateCourseCommand : ICommand
+    public class CreateCourseCommand : BaseCommand
     {
-        public string Name => "_createCourse";
-
         private ICourseService courses;
 
-        public CreateCourseCommand(ICourseService courseService)
+        public CreateCourseCommand(ICourseService courseService,
+            string commandName)
+            : base(commandName)
         {
             courses = courseService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             string title = null;
 

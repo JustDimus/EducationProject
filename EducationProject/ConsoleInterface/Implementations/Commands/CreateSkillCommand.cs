@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class CreateSkillCommand : ICommand
+    public class CreateSkillCommand : BaseCommand
     {
-        public string Name => "_createSkill";
-
         private ISkillService skills;
 
-        public CreateSkillCommand(ISkillService skillService)
+        public CreateSkillCommand(ISkillService skillService,
+            string commandName)
+            : base(commandName)
         {
             skills = skillService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             string title = null;
 

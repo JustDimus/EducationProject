@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class LogInCommand : ICommand
+    public class LogInCommand : BaseCommand
     {
-        public string Name => "_login";
-
         private IAccountService accounts;
 
-        public LogInCommand(IAccountService accountService)
+        public LogInCommand(IAccountService accountService,
+            string commandName)
+            : base(commandName)
         {
             accounts = accountService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             string email = null;
 

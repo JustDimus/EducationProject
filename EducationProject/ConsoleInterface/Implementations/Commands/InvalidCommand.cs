@@ -5,11 +5,15 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class InvalidCommand : ICommand
+    public class InvalidCommand : BaseCommand
     {
-        public string Name => "InvalidCommand";
+        public InvalidCommand(string commandName)
+            : base(commandName)
+        {
+            
+        }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             Console.WriteLine("Invalid command");
         }

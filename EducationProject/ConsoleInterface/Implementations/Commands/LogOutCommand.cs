@@ -6,18 +6,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class LogOutCommand : ICommand
+    public class LogOutCommand : BaseCommand
     {
-        public string Name => "_logout";
-
         private IAccountService accounts;
 
-        public LogOutCommand(IAccountService accountService)
+        public LogOutCommand(IAccountService accountService,
+            string commandName)
+            : base(commandName)
         {
             accounts = accountService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             Console.WriteLine("Trying to logout");
 

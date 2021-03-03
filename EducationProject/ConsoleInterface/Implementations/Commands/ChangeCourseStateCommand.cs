@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class ChangeCourseStateCommand : ICommand
+    public class ChangeCourseStateCommand : BaseCommand
     {
-        public string Name => "_changeCourseVisibility";
-
         private ICourseService courses;
 
-        public ChangeCourseStateCommand(ICourseService courseService)
+        public ChangeCourseStateCommand(ICourseService courseService,
+            string commandName)
+            : base(commandName)
         {
             this.courses = courseService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int courseId = 0;
 

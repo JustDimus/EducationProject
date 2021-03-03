@@ -7,18 +7,18 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class AddCourseToAccountCommand : ICommand
+    public class AddCourseToAccountCommand : BaseCommand
     {
-        public string Name => "_addCourseToAccount";
-
         private IAccountService accounts;
 
-        public AddCourseToAccountCommand(IAccountService accountService)
+        public AddCourseToAccountCommand(IAccountService accountService,
+            string commandName)
+            : base(commandName)
         {
             this.accounts = accountService;
         }
 
-        public void Run(ref string token)
+        public override void Run(ref string token)
         {
             int courseId = 0;
 

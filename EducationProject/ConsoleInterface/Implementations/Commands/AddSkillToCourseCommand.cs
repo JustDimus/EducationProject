@@ -9,28 +9,22 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class AddSkillToCourseCommand : BaseCommand
     {
-        private ICourseService courses;
+        private ICourseService courseService;
 
         public AddSkillToCourseCommand(ICourseService courseService,
             string commandName)
             : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
         }
 
         public override void Run(ref string token)
         {
-            int courseId = 0;
-
-            int skillId = 0;
-
-            int change = 0;
-
             Console.WriteLine("Adding skill to course");
 
             Console.Write("Course ID: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if(Int32.TryParse(Console.ReadLine(), out int courseId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -39,7 +33,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Skill ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out skillId) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int skillId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -48,20 +42,22 @@ namespace ConsoleInterface.Implementations.Commands
             
             Console.Write("Skill change: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out change) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int change) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(courses.AddCourseSkill(new ChangeCourseSkillDTO()
+            var actionResult = this.courseService.AddCourseSkill(new ChangeCourseSkillDTO()
             {
                 Change = change,
                 Token = token,
                 CourseId = courseId,
                 SkillId = skillId
-            }) == false)
+            });
+
+            if (actionResult == false)
             {
                 Console.WriteLine("Error");
             }

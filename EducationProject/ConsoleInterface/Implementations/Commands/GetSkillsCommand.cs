@@ -9,7 +9,7 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class GetSkillsCommand : BaseCommand
     {
-        private ISkillService skills;
+        private ISkillService skillService;
 
         private int pageSize;
 
@@ -17,26 +17,34 @@ namespace ConsoleInterface.Implementations.Commands
             int defaultPageSize, string commandName)
             : base(commandName)
         {
-            this.skills = skillService;
+            this.skillService = skillService;
 
             this.pageSize = defaultPageSize;
         }
 
         public override void Run(ref string token)
         {
-            int pageNumber = 0;
-
             Console.WriteLine("Getting skills");
 
             Console.Write("Enter the page: ");
 
-            Int32.TryParse(Console.ReadLine(), out pageNumber);
+            if(Int32.TryParse(Console.ReadLine(), out int pageNumber) == false)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
-            var skillsData = skills.Get(new PageInfoDTO()
+            var skillsData = skillService.Get(new PageInfoDTO()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize
             });
+
+            if (skillsData == null)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
             StringBuilder builder = new StringBuilder();
 

@@ -9,35 +9,35 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class PassMaterialCommand : BaseCommand
     {
-        private IAccountService accounts;
+        private IAccountService accountService;
 
         public PassMaterialCommand(IAccountService accountService,
             string commandName)
             : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
         }
 
         public override void Run(ref string token)
         {
-            int materialId = 0;
-
             Console.WriteLine("Passing material");
 
             Console.Write("Material ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out materialId) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int materialId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(accounts.AddAccountMaterial(new ChangeAccountMaterialDTO()
+            var actionResult = accountService.AddAccountMaterial(new ChangeAccountMaterialDTO()
             {
                 MaterialId = materialId,
                 Token = token
-            }) == false)
+            });
+
+            if (actionResult == false)
             {
                 Console.WriteLine("Error");
             }

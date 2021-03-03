@@ -56,7 +56,9 @@ namespace ConsoleInterface
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddTransient<IAccountService, AccountService>();
 
-            services.AddSingleton<ICommandHandler, CommandHandler>();
+            services.AddTransient<ICommandHandler, CommandHandler>(c =>
+                new CommandHandler(c.GetRequiredService<IEnumerable<ICommand>>(),
+                ConfigurationManager.AppSettings.Get("ShowAllCommands")));
 
 
             services.AddTransient<ICommand, InvalidCommand>(c => 
@@ -122,7 +124,9 @@ namespace ConsoleInterface
                 new PublishCourseCommand(c.GetRequiredService<ICourseService>(),
                 ConfigurationManager.AppSettings.Get("PublishCourseCommand")));
 
-            services.AddSingleton<IConsoleHandler, ConsoleHandler>();
+            services.AddSingleton<IConsoleHandler, ConsoleHandler>(c =>
+                new ConsoleHandler(c.GetRequiredService<ICommandHandler>(),
+                ConfigurationManager.AppSettings.Get("ExitCommand")));
         }
 
         static void Main(string[] args)

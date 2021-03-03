@@ -9,7 +9,7 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class GetAccountCourses : BaseCommand
     {        
-        private ICourseService courses;
+        private ICourseService courseService;
 
         private int pageSize;
 
@@ -17,22 +17,24 @@ namespace ConsoleInterface.Implementations.Commands
             int defaultPageSize, string commandName)
             : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
 
             this.pageSize = defaultPageSize;
         }
 
         public override void Run(ref string token)
         {
-            int pageNumber = 0;
-
             Console.WriteLine("Getting courses");
 
             Console.Write("Enter the page: ");
 
-            Int32.TryParse(Console.ReadLine(), out pageNumber);
+            if (Int32.TryParse(Console.ReadLine(), out int pageNumber) == false)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
-            var coursesData = courses.GetMyCourses(new GetCoursesByCreator()
+            var coursesData = this.courseService.GetMyCourses(new GetCoursesByCreator()
             {
                 Token = token,
                 PageInfo = new PageInfoDTO()

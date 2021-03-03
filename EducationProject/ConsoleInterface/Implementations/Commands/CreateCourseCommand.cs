@@ -9,32 +9,34 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class CreateCourseCommand : BaseCommand
     {
-        private ICourseService courses;
+        private ICourseService courseService;
 
         public CreateCourseCommand(ICourseService courseService,
             string commandName)
             : base(commandName)
         {
-            courses = courseService;
+            this.courseService = courseService;
         }
 
         public override void Run(ref string token)
         {
-            string title = null;
-
-            string description = null;
-
             Console.WriteLine("Creating new course");
 
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
-            if(courses.Create(new ChangeEntityDTO<ShortCourseInfoDTO>()
+            if (String.IsNullOrEmpty(title) == true || String.IsNullOrEmpty(description) == true)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
+
+            var actionResult = this.courseService.Create(new ChangeEntityDTO<ShortCourseInfoDTO>()
             {
                 Token = token,
                 Entity = new ShortCourseInfoDTO()
@@ -42,13 +44,15 @@ namespace ConsoleInterface.Implementations.Commands
                     Title = title,
                     Description = description
                 }
-            }) == true)
+            });
+
+            if (actionResult == false)
             {
-                Console.WriteLine("Successful");
+                Console.WriteLine("Error");
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();

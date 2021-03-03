@@ -8,20 +8,22 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class LogOutCommand : BaseCommand
     {
-        private IAccountService accounts;
+        private IAccountService accountService;
 
         public LogOutCommand(IAccountService accountService,
             string commandName)
             : base(commandName)
         {
-            accounts = accountService;
+            this.accountService = accountService;
         }
 
         public override void Run(ref string token)
         {
             Console.WriteLine("Trying to logout");
 
-            if(accounts.LogOut(token) == true)
+            var actionResult = accountService.LogOut(token);
+
+            if (actionService == true)
             {
                 Console.WriteLine("Successful");
                 token = null;

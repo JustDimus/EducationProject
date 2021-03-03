@@ -9,32 +9,28 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class LogInCommand : BaseCommand
     {
-        private IAccountService accounts;
+        private IAccountService accountService;
 
         public LogInCommand(IAccountService accountService,
             string commandName)
             : base(commandName)
         {
-            accounts = accountService;
+            this.accountService = accountService;
         }
 
         public override void Run(ref string token)
         {
-            string email = null;
-
-            string password = null;
-
             Console.WriteLine("Logginning");
 
             Console.Write("Email: ");
 
-            email = Console.ReadLine();
+            var email = Console.ReadLine();
 
             Console.Write("Password: ");
 
-            password = Console.ReadLine();
+            var password = Console.ReadLine();
 
-            string newToken = accounts.LogIn(new AccountAuthorizationDataDTO()
+            string newToken = accountService.LogIn(new AccountAuthorizationDataDTO()
             {
                 Email = email,
                 Password = password

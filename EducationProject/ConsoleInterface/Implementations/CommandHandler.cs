@@ -9,10 +9,13 @@ namespace ConsoleInterface.Implementations
     {
         private Dictionary<string, ICommand> commandList;
 
-        private string helpCommand = "_help";
+        private string helpCommand;
 
-        public CommandHandler(IEnumerable<ICommand> commands)
+        public CommandHandler(IEnumerable<ICommand> commands,
+            string helpCommand)
         {
+            this.helpCommand = helpCommand;
+
             commandList = new Dictionary<string, ICommand>();
 
             foreach(var command in commands)

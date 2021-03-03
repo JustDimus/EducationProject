@@ -9,28 +9,26 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class CreateMaterialCommand : BaseCommand
     {
-        private IMaterialService materials;
+        private IMaterialService materialService;
 
         public CreateMaterialCommand(IMaterialService materialService,
             string commandName)
             : base(commandName)
         {
-            materials = materialService;
+            this.materialService = materialService;
         }
 
         public override void Run(ref string token)
         {
-            int type = 0;
-
-            MaterialDTO material = null;
-
             Console.WriteLine("Creating material");
 
             Console.WriteLine("Enter the type of material: 1 - Artcle, 2 - Book, 3 - Video");
 
-            Int32.TryParse(Console.ReadLine(), out type);
+            Int32.TryParse(Console.ReadLine(), out int type);
 
-            switch(type)
+            MaterialDTO material = null;
+
+            switch (type)
             {
                 case 1:
                     material = GetArticleMaterial();
@@ -47,24 +45,26 @@ namespace ConsoleInterface.Implementations.Commands
                     return;
             }
 
-            if(material is null)
+            if(material == null)
             {
                 Console.WriteLine("Error. Invalid data!");
                 Console.WriteLine();
                 return;
             }
 
-            if(materials.Create(new ChangeEntityDTO<MaterialDTO>()
+            var actionResult = this.materialService.Create(new ChangeEntityDTO<MaterialDTO>()
             {
                 Token = token,
                 Entity = material
-            }) == true)
+            });
+
+            if (actionResult == false)
             {
-                Console.WriteLine("Successful");
+                Console.WriteLine("Error");
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();
@@ -72,30 +72,27 @@ namespace ConsoleInterface.Implementations.Commands
 
         private MaterialDTO GetArticleMaterial()
         {
-            string title = null;
-
-            string description = null;
-
-            string URI = null;
-
-            DateTime publicationDate = default;
-
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("URI: ");
 
-            URI = Console.ReadLine();
+            var URI = Console.ReadLine();
 
             Console.Write("Publication date (dd.MM.yyyy)");
 
             if (DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy",
-                null, System.Globalization.DateTimeStyles.None, out publicationDate) == false)
+                null, System.Globalization.DateTimeStyles.None, out DateTime publicationDate) == false)
+            {
+                return null;
+            }
+
+            if(String.IsNullOrEmpty(title) == true || String.IsNullOrEmpty(URI) == true)
             {
                 return null;
             }
@@ -112,29 +109,26 @@ namespace ConsoleInterface.Implementations.Commands
 
         private MaterialDTO GetBookMaterial()
         {
-            string title = null;
-
-            string description = null;
-
-            string Author = null;
-
-            int pages = 0;
-
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("Author: ");
 
-            Author = Console.ReadLine();
+            var Author = Console.ReadLine();
 
             Console.Write("Pages: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out pages) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int pages) == false)
+            {
+                return null;
+            }
+
+            if(String.IsNullOrEmpty(title) == true)
             {
                 return null;
             }
@@ -151,38 +145,33 @@ namespace ConsoleInterface.Implementations.Commands
 
         private MaterialDTO GetVideoMaterial()
         {
-            string title = null;
-
-            string description = null;
-
-            string URI = null;
-
-            int duration = 0;
-
-            int quality = 0;
-
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("URI: ");
 
-            URI = Console.ReadLine();
+            var URI = Console.ReadLine();
 
             Console.Write("Duration: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out duration) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int duration) == false)
             {
                 return null;
             }
 
             Console.Write("Quality: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out quality) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int quality) == false)
+            {
+                return null;
+            }
+
+            if(String.IsNullOrEmpty(title) == true || String.IsNullOrEmpty(URI) == true)
             {
                 return null;
             }

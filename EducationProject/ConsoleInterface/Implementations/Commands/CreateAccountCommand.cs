@@ -9,32 +9,34 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class CreateAccountCommand : BaseCommand
     {
-        private IAccountService accounts;
+        private IAccountService accountService;
 
         public CreateAccountCommand(IAccountService accountService,
             string commandName)
             : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
         }
 
         public override void Run(ref string token)
-        {
-            string email = null;
-
-            string password = null;
-            
+        {            
             Console.WriteLine("Creating new account");
 
             Console.Write("Email: ");
 
-            email = Console.ReadLine();
+            var email = Console.ReadLine();
 
             Console.Write("Password: ");
 
-            password = Console.ReadLine();
+            var password = Console.ReadLine();
 
-            if(accounts.Create(new ChangeEntityDTO<ShortAccountInfoDTO>()
+            if (String.IsNullOrEmpty(email) == true || String.IsNullOrEmpty(password) == true)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
+
+            var actionResult = this.accountService.Create(new ChangeEntityDTO<ShortAccountInfoDTO>()
             {
                 Token = token,
                 Entity = new ShortAccountInfoDTO()
@@ -42,13 +44,15 @@ namespace ConsoleInterface.Implementations.Commands
                     Email = email,
                     Password = password
                 }
-            }) == true)
+            });
+
+            if (actionResult == false)
             {
-                Console.WriteLine("Succesful");
+                Console.WriteLine("Error");
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Succesful");
             }
 
             Console.WriteLine();

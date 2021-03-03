@@ -9,26 +9,22 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class ChangeCourseStateCommand : BaseCommand
     {
-        private ICourseService courses;
+        private ICourseService courseService;
 
         public ChangeCourseStateCommand(ICourseService courseService,
             string commandName)
             : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
         }
 
         public override void Run(ref string token)
         {
-            int courseId = 0;
-
-            int state = 0;
-
             Console.WriteLine("Changing course state");
 
             Console.Write("Course ID: ");
 
-            if (int.TryParse(Console.ReadLine(), out courseId) == false)
+            if (int.TryParse(Console.ReadLine(), out int courseId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -37,7 +33,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("New state 0 - hide, 1 - publish: ");
 
-            if(int.TryParse(Console.ReadLine(), out state) == false)
+            if(int.TryParse(Console.ReadLine(), out int state) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -51,14 +47,16 @@ namespace ConsoleInterface.Implementations.Commands
                 return;
             }
 
-            if(courses.ChangeCourseVisibility(new CourseVisibilityDTO()
+            var actionResult = this.courseService.ChangeCourseVisibility(new CourseVisibilityDTO()
             {
                 Token = token,
                 CourseId = courseId,
-                Visibility = state == 0? false : true
-            }) == false)
+                Visibility = state == 0 ? false : true
+            });
+
+            if (actionResult == false)
             {
-                Console.WriteLine("Error.");
+                Console.WriteLine("Error");
             }
             else
             {

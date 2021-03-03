@@ -9,20 +9,20 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class ShowAccountInfoCommand : BaseCommand
     {
-        private IAccountService accounts;
+        private IAccountService accountService;
 
         public ShowAccountInfoCommand(IAccountService accountService,
             string commandName)
             : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
         }
 
         public override void Run(ref string token)
         {
             Console.WriteLine("Showing account info");
 
-            var account = this.accounts.GetAccountInfo(token);
+            var account = this.accountService.GetAccountInfo(token);
 
             if(account is null)
             {

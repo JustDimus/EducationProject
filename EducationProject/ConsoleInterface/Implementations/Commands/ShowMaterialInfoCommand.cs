@@ -9,31 +9,29 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class ShowMaterialInfoCommand : BaseCommand
     {
-        private IMaterialService materials;
+        private IMaterialService materialService;
 
         public ShowMaterialInfoCommand(IMaterialService materialService,
             string commandName)
             : base(commandName)
         {
-            this.materials = materialService;
+            this.materialService = materialService;
         }
 
         public override void Run(ref string token)
         {
-            int materialId = 0;
-
             Console.WriteLine("Showing material data");
 
             Console.Write("Material ID: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out materialId) == false)
+            if(Int32.TryParse(Console.ReadLine(), out int materialId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var material = materials.GetMaterialInfo(materialId);
+            var material = materialService.GetMaterialInfo(materialId);
 
             StringBuilder builder = new StringBuilder();
 
@@ -54,6 +52,7 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine(builder);
+            Console.WriteLine();
         }
     }
 }

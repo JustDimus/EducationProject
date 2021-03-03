@@ -9,43 +9,37 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class CreateSkillCommand : BaseCommand
     {
-        private ISkillService skills;
+        private ISkillService skillService;
 
         public CreateSkillCommand(ISkillService skillService,
             string commandName)
             : base(commandName)
         {
-            skills = skillService;
+            this.skillService = skillService;
         }
 
         public override void Run(ref string token)
         {
-            string title = null;
-
-            string description = null;
-
-            int maxValue = 0;
-
             Console.WriteLine("Creating new skill");
 
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("Max value: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out maxValue) == false)
+            if(Int32.TryParse(Console.ReadLine(), out int maxValue) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(skills.Create(new ChangeEntityDTO<SkillDTO>()
+            var actionResult = this.skillService.Create(new ChangeEntityDTO<SkillDTO>()
             {
                 Token = token,
                 Entity = new SkillDTO()
@@ -54,13 +48,15 @@ namespace ConsoleInterface.Implementations.Commands
                     MaxValue = maxValue,
                     Description = description
                 }
-            }) == true)
+            });
+
+            if (actionResult == false)
             {
-                Console.WriteLine("Successful");
+                Console.WriteLine("Error");
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();

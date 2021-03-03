@@ -9,31 +9,29 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class ShowCourseInfoCommand : BaseCommand
     {
-        private ICourseService courses;
+        private ICourseService courseService;
 
         public ShowCourseInfoCommand(ICourseService courseService,
             string commandName)
             : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
         }
 
         public override void Run(ref string token)
         {
-            int courseId = 0;
-
             Console.WriteLine("Showing course data");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int courseId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var course = courses.GetCourseInfo(courseId);
+            var course = courseService.GetCourseInfo(courseId);
 
             if(course is null)
             {
@@ -54,7 +52,6 @@ namespace ConsoleInterface.Implementations.Commands
                 .Select(m => $"ID: {m.MaterialId} Title: {m.MaterialTitle}")));
 
             Console.WriteLine(builder);
-
             Console.WriteLine();
         }
     }

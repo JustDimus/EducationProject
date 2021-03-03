@@ -9,42 +9,42 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class PassCourseCommand : BaseCommand
     {
-        private IAccountService accounts;
+        private IAccountService accountService;
 
         public PassCourseCommand(IAccountService accountService,
             string commandName)
             : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
         }
 
         public override void Run(ref string token)
         {
-            int courseId = 0;
-
             Console.WriteLine("Passing the course");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int courseId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if (accounts.ChangeAccountCourseStatus(new ChangeAccountCourseDTO()
+            var actionResult = accountService.ChangeAccountCourseStatus(new ChangeAccountCourseDTO()
             {
                 Token = token,
                 Status = EducationProject.Core.DAL.EF.Enums.ProgressStatus.Passed,
                 CourseId = courseId
-            }) == true)
+            });
+
+            if (actionResult == false)
             {
-                Console.WriteLine("Successful");
+                Console.WriteLine("Error");
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();

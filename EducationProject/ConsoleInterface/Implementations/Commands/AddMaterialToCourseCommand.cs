@@ -9,26 +9,22 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class AddMaterialToCourseCommand : BaseCommand
     {
-        private ICourseService courses;
+        private ICourseService courseService;
 
         public AddMaterialToCourseCommand(ICourseService courseService,
             string commandName)
             : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
         }
 
         public override void Run(ref string token)
         {
-            int courseId = 0;
-
-            int materialId = 0;
-
             Console.WriteLine("Adding skill to course");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int courseId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -37,19 +33,21 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Material ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out materialId) == false)
+            if (Int32.TryParse(Console.ReadLine(), out int materialId) == false)
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if (courses.AddCourseMaterial(new ChangeCourseMaterialDTO()
+            var actionResult = this.courseService.AddCourseMaterial(new ChangeCourseMaterialDTO()
             {
                 Token = token,
                 CourseId = courseId,
                 MaterialId = materialId
-            }) == false)
+            });
+
+            if (actionResult == false)
             {
                 Console.WriteLine("Error");
             }

@@ -9,7 +9,7 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public class GetMaterialsCommand : BaseCommand
     {
-        private IMaterialService materials;
+        private IMaterialService materialService;
 
         private int pageSize;
 
@@ -17,26 +17,34 @@ namespace ConsoleInterface.Implementations.Commands
             int defaultPageSize, string commandName)
             : base(commandName)
         {
-            this.materials = materialService;
+            this.materialService = materialService;
 
             this.pageSize = defaultPageSize;
         }
 
         public override void Run(ref string token)
         {
-            int pageNumber = 0;
-
             Console.WriteLine("Getting materials");
 
             Console.Write("Enter the page: ");
 
-            Int32.TryParse(Console.ReadLine(), out pageNumber);
+            if (Int32.TryParse(Console.ReadLine(), out int pageNumber) == false)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
-            var materialsData = materials.Get(new PageInfoDTO()
+            var materialsData = materialService.Get(new PageInfoDTO()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize
             });
+
+            if(materialsData == null)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
             StringBuilder builder = new StringBuilder();
 

@@ -10,11 +10,16 @@ namespace ConsoleInterface.Implementations
     {
         private ICommandHandler commands;
 
+        private string exitCommand;
+
         private string token = null;
 
-        public ConsoleHandler(ICommandHandler commandList)
+        public ConsoleHandler(ICommandHandler commandList,
+            string exitCommand)
         {
-            commands = commandList;
+            this.exitCommand = exitCommand;
+
+            this.commands = commandList;
         }
 
         public void Run()
@@ -25,7 +30,7 @@ namespace ConsoleInterface.Implementations
             {
                 currentCommand = Console.ReadLine();
 
-                if(currentCommand == ConsoleCommands.ExitCommand)
+                if(currentCommand == this.exitCommand)
                 {
                     break;
                 }
@@ -34,5 +39,4 @@ namespace ConsoleInterface.Implementations
             }
         }
     }
-    
 }

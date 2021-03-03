@@ -10,11 +10,15 @@ namespace ConsoleInterface.Implementations
         private Dictionary<string, ICommand> commandList;
 
         private string helpCommand;
+        private string invalidCommand;
 
         public CommandHandler(IEnumerable<ICommand> commands,
-            string helpCommand)
+            string helpCommand,
+            string invalidCommand)
         {
             this.helpCommand = helpCommand;
+
+            this.invalidCommand = invalidCommand;
 
             commandList = new Dictionary<string, ICommand>();
 
@@ -39,7 +43,7 @@ namespace ConsoleInterface.Implementations
                 }
                 else
                 {
-                    return commandList["InvalidCommand"];
+                    return commandList[invalidCommand];
                 }
             }
         }

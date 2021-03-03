@@ -1,5 +1,5 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using System;

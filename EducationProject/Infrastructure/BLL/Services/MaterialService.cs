@@ -1,6 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
-using EducationProject.Core.DAL.EF;
+using EducationProject.BLL.DTO;
+using EducationProject.Core.DAL;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using System;
@@ -8,13 +8,13 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-using MaterialType = EducationProject.Core.DAL.EF.Enums.MaterialType;
+using MaterialType = EducationProject.Core.DAL.Enums.MaterialType;
 
 namespace Infrastructure.BLL.Services
 {
-    public class MaterialService : BaseService<BaseMaterialDBO, MaterialDTO>, IMaterialService
+    public class MaterialService : BaseService<BaseMaterial, MaterialDTO>, IMaterialService
     {
-        public MaterialService(IRepository<BaseMaterialDBO> baseEntityRepository,
+        public MaterialService(IRepository<BaseMaterial> baseEntityRepository,
             AuthorizationService authorisztionService)
             : base(baseEntityRepository, authorisztionService)
         {
@@ -26,7 +26,7 @@ namespace Infrastructure.BLL.Services
             return entity.Get<MaterialDTO>(m => m.Id == id, FromBOMapping);
         }
 
-        protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FromBOMapping
+        protected override Expression<Func<BaseMaterial, MaterialDTO>> FromBOMapping
         {
             get => bm => bm.Type == MaterialType.ArticleMaterial ? (MaterialDTO)new ArticleMaterialDTO()
             {
@@ -34,8 +34,8 @@ namespace Infrastructure.BLL.Services
                 Description = bm.Description,
                 Title = bm.Title,
                 Type = bm.Type,
-                URI = ((ArticleMaterialDBO)bm).URI,
-                PublicationDate = ((ArticleMaterialDBO)bm).PublicationDate
+                URI = ((ArticleMaterial)bm).URI,
+                PublicationDate = ((ArticleMaterial)bm).PublicationDate
             } :
             bm.Type == MaterialType.BookMaterial ? (MaterialDTO)new BookMaterialDTO()
             {
@@ -43,8 +43,8 @@ namespace Infrastructure.BLL.Services
                 Description = bm.Description,
                 Title = bm.Title,
                 Type = bm.Type,
-                Author = ((BookMaterialDBO)bm).Author,
-                Pages = ((BookMaterialDBO)bm).Pages
+                Author = ((BookMaterial)bm).Author,
+                Pages = ((BookMaterial)bm).Pages
             } :
             bm.Type == MaterialType.VideoMaterial ? (MaterialDTO)new VideoMaterialDTO()
             {
@@ -52,21 +52,21 @@ namespace Infrastructure.BLL.Services
                 Description = bm.Description,
                 Title = bm.Title,
                 Type = bm.Type,
-                URI = ((VideoMaterialDBO)bm).URI,
-                Duration = ((VideoMaterialDBO)bm).Duration,
-                Quality = ((VideoMaterialDBO)bm).Quality
+                URI = ((VideoMaterial)bm).URI,
+                Duration = ((VideoMaterial)bm).Duration,
+                Quality = ((VideoMaterial)bm).Quality
             } :
             null;
         }
 
-        protected override BaseMaterialDBO Map(MaterialDTO entity)
+        protected override BaseMaterial Map(MaterialDTO entity)
         {
-            BaseMaterialDBO material = null;
+            BaseMaterial material = null;
 
             switch(entity)
             {
                 case ArticleMaterialDTO article:
-                    material = new ArticleMaterialDBO()
+                    material = new ArticleMaterial()
                     {
                         Id = article.Id,
                         Description = article.Description,
@@ -77,7 +77,7 @@ namespace Infrastructure.BLL.Services
                     };
                     break;
                 case BookMaterialDTO book:
-                    material = new BookMaterialDBO()
+                    material = new BookMaterial()
                     {
                         Id = book.Id,
                         Description = book.Description,
@@ -88,7 +88,7 @@ namespace Infrastructure.BLL.Services
                     };
                     break;
                 case VideoMaterialDTO video:
-                    material = new VideoMaterialDBO()
+                    material = new VideoMaterial()
                     {
                         Id = video.Id,
                         Description = video.Description,
@@ -159,7 +159,7 @@ namespace Infrastructure.BLL.Services
             return true;
         }
 
-        protected override Expression<Func<BaseMaterialDBO, bool>> IsExistExpression(MaterialDTO entity)
+        protected override Expression<Func<BaseMaterial, bool>> IsExistExpression(MaterialDTO entity)
         {
             return m => m.Id == entity.Id;
         }

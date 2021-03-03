@@ -1,6 +1,6 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -101,7 +101,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.EF.Enums.MaterialType.ArticleMaterial,
+                Type = EducationProject.Core.DAL.Enums.MaterialType.ArticleMaterial,
                 URI = URI,
                 PublicationDate = publicationDate
             };
@@ -137,7 +137,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.EF.Enums.MaterialType.BookMaterial,
+                Type = EducationProject.Core.DAL.Enums.MaterialType.BookMaterial,
                 Author = Author,
                 Pages = pages
             };
@@ -180,7 +180,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.EF.Enums.MaterialType.VideoMaterial,
+                Type = EducationProject.Core.DAL.Enums.MaterialType.VideoMaterial,
                 URI = URI,
                 Duration = duration,
                 Quality = quality

@@ -1,6 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
-using EducationProject.Core.DAL.EF;
+using EducationProject.BLL.DTO;
+using EducationProject.Core.DAL;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using System;
@@ -11,24 +11,24 @@ using System.Text;
 
 namespace Infrastructure.BLL.Services
 {
-    public class CourseService : BaseService<CourseDBO, ShortCourseInfoDTO>, ICourseService
+    public class CourseService : BaseService<Course, ShortCourseInfoDTO>, ICourseService
     {
         private IMaterialService materials;
 
         private ISkillService skills;
 
-        private IRepository<CourseSkillDBO> courseSkills;
+        private IRepository<CourseSkill> courseSkills;
 
-        private IRepository<CourseMaterialDBO> courseMaterials;
+        private IRepository<CourseMaterial> courseMaterials;
 
         private int defaultPageSize;
 
-        public CourseService(IRepository<CourseDBO> baseEntityRepository, 
+        public CourseService(IRepository<Course> baseEntityRepository, 
             AuthorizationService authorisztionService,
             IMaterialService materialService,
             ISkillService skillService,
-            IRepository<CourseSkillDBO> courseSkillsRepository,
-            IRepository<CourseMaterialDBO> courseMaterialsRepository,
+            IRepository<CourseSkill> courseSkillsRepository,
+            IRepository<CourseMaterial> courseMaterialsRepository,
             int defaultPageSize) 
             : base(baseEntityRepository, authorisztionService)
         {
@@ -42,7 +42,7 @@ namespace Infrastructure.BLL.Services
             this.defaultPageSize = defaultPageSize;
         }
 
-        protected override Expression<Func<CourseDBO, ShortCourseInfoDTO>> FromBOMapping
+        protected override Expression<Func<Course, ShortCourseInfoDTO>> FromBOMapping
         {
             get => c => new ShortCourseInfoDTO()
             {
@@ -52,7 +52,7 @@ namespace Infrastructure.BLL.Services
             };
         }
 
-        protected override Expression<Func<CourseDBO, bool>> defaultGetCondition => c => c.IsVisible == true;
+        protected override Expression<Func<Course, bool>> defaultGetCondition => c => c.IsVisible == true;
 
         public IEnumerable<ShortCourseInfoDTO> GetCoursesByCreatorId(GetCoursesByCreator courseCreator)
         {
@@ -130,7 +130,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            courseMaterials.Create(new CourseMaterialDBO()
+            courseMaterials.Create(new CourseMaterial()
             {
                 CourseId = courseMaterialChange.CourseId,
                 MaterialId = courseMaterialChange.MaterialId,
@@ -155,7 +155,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            courseMaterials.Delete(new CourseMaterialDBO()
+            courseMaterials.Delete(new CourseMaterial()
             {
                 CourseId = courseMaterialChange.CourseId,
                 MaterialId = courseMaterialChange.MaterialId,
@@ -163,7 +163,7 @@ namespace Infrastructure.BLL.Services
 
             if(courseMaterials.Count(cm => cm.CourseId == courseMaterialChange.CourseId) == 1)
             {
-                CourseDBO course = entity.Get(c => c.Id == courseMaterialChange.CourseId);
+                Course course = entity.Get(c => c.Id == courseMaterialChange.CourseId);
                 course.IsVisible = false;
 
                 this.entity.Update(course);
@@ -195,7 +195,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            courseSkills.Create(new CourseSkillDBO()
+            courseSkills.Create(new CourseSkill()
             {
                 CourseId = courseSkillChange.CourseId,
                 SkillId = courseSkillChange.SkillId,
@@ -256,7 +256,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            courseSkills.Update(new CourseSkillDBO()
+            courseSkills.Update(new CourseSkill()
             {
                 CourseId = courseSkillChange.CourseId,
                 SkillId = courseSkillChange.SkillId,
@@ -287,7 +287,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            CourseDBO course = entity.Get(c => c.Id == visibilityParams.CourseId);
+            Course course = entity.Get(c => c.Id == visibilityParams.CourseId);
             course.IsVisible = visibilityParams.Visibility;
 
             this.entity.Update(course);
@@ -339,7 +339,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            return this.courseMaterials.Contains(new CourseMaterialDBO()
+            return this.courseMaterials.Contains(new CourseMaterial()
             {
                 CourseId = courseMaterial.CourseId,
                 MaterialId = courseMaterial.MaterialId
@@ -365,9 +365,9 @@ namespace Infrastructure.BLL.Services
                 this.courseMaterials.Count(cm => cm.CourseId == courseId));
         }
 
-        protected override CourseDBO Map(ShortCourseInfoDTO entity)
+        protected override Course Map(ShortCourseInfoDTO entity)
         {
-            return new CourseDBO()
+            return new Course()
             {
                 Id = entity.Id,
                 Description = entity.Description,
@@ -428,7 +428,7 @@ namespace Infrastructure.BLL.Services
             return true;
         }
 
-        protected override Expression<Func<CourseDBO, bool>> IsExistExpression(ShortCourseInfoDTO entity)
+        protected override Expression<Func<Course, bool>> IsExistExpression(ShortCourseInfoDTO entity)
         {
             return c => c.Id == entity.Id;
         }

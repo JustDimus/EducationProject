@@ -11,7 +11,7 @@ using System.Text;
 
 namespace ADODataContext.DataSets
 {
-    public class BaseDbSet<T> : IDbSet<T> where T : BaseEntity
+    public class BaseDbSet<T> : IDbSet<T> where T : class
     {
         private LambdaConverter<T> converter;
 

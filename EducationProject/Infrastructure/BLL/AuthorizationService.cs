@@ -1,5 +1,5 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.DAL.EF;
+using EducationProject.Core.DAL;
 using EducationProject.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,9 +13,9 @@ namespace Infrastructure.BLL
     {
         private Dictionary<string, int> authorizedAccounts;
         
-        private IRepository<AccountDBO> accounts;
+        private IRepository<Account> accounts;
 
-        public AuthorizationService(IRepository<AccountDBO> accountMapping)
+        public AuthorizationService(IRepository<Account> accountMapping)
         {
             accounts = accountMapping;
 

@@ -1,22 +1,22 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.DAL.EF;
+using EducationProject.Core.DAL;
 using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using EducationProject.BLL.Models;
-using CourseStatus = EducationProject.Core.DAL.EF.Enums.ProgressStatus;
+using EducationProject.BLL.DTO;
+using CourseStatus = EducationProject.Core.DAL.Enums.ProgressStatus;
 using System.Linq.Expressions;
 using EducationProject.DAL.Interfaces;
 
 namespace Infrastructure.BLL.Services
 {
-    public class AccountService : BaseService<AccountDBO, ShortAccountInfoDTO>, IAccountService
+    public class AccountService : BaseService<Account, ShortAccountInfoDTO>, IAccountService
     {
-        private IRepository<AccountCourseDBO> accountCourses { get; set; }
+        private IRepository<AccountCourse> accountCourses { get; set; }
 
-        private IRepository<AccountMaterialDBO> accountMaterials { get; set; }
+        private IRepository<AccountMaterial> accountMaterials { get; set; }
 
         private ICourseService courses;
 
@@ -24,10 +24,10 @@ namespace Infrastructure.BLL.Services
 
         private ISkillService skills;
 
-        public AccountService(IRepository<AccountDBO> baseEntityRepository, 
+        public AccountService(IRepository<Account> baseEntityRepository, 
             AuthorizationService authorisztionService,
-            IRepository<AccountCourseDBO> accountCoursesRepository,
-            IRepository<AccountMaterialDBO> accountMaterialsRepository,
+            IRepository<AccountCourse> accountCoursesRepository,
+            IRepository<AccountMaterial> accountMaterialsRepository,
             ICourseService courseService,
             IMaterialService materialService,
             ISkillService skillService) 
@@ -42,7 +42,7 @@ namespace Infrastructure.BLL.Services
 
         }
 
-        protected override Expression<Func<AccountDBO, ShortAccountInfoDTO>> FromBOMapping
+        protected override Expression<Func<Account, ShortAccountInfoDTO>> FromBOMapping
         {
             get => a => new ShortAccountInfoDTO()
             {
@@ -55,7 +55,7 @@ namespace Infrastructure.BLL.Services
             };
         }
 
-        protected override Expression<Func<AccountDBO, bool>> IsExistExpression(ShortAccountInfoDTO entity)
+        protected override Expression<Func<Account, bool>> IsExistExpression(ShortAccountInfoDTO entity)
         {
             return a => a.Id == entity.Id;
         }
@@ -82,7 +82,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            this.accountCourses.Create(new AccountCourseDBO()
+            this.accountCourses.Create(new AccountCourse()
             {
                 AccountId = accountCourseChange.AccountId,
                 CourseId = accountCourseChange.CourseId,
@@ -199,7 +199,7 @@ namespace Infrastructure.BLL.Services
                 return false;
             }
 
-            this.accountMaterials.Create(new AccountMaterialDBO()
+            this.accountMaterials.Create(new AccountMaterial()
             {
                 AccountId = accountMaterialChange.AccountId,
                 MaterialId = accountMaterialChange.MaterialId
@@ -315,9 +315,9 @@ namespace Infrastructure.BLL.Services
             }
         }
 
-        protected override AccountDBO Map(ShortAccountInfoDTO entity)
+        protected override Account Map(ShortAccountInfoDTO entity)
         {
-            return new AccountDBO()
+            return new Account()
             {
                 Email = entity.Email,
                 RegistrationDate = entity.RegistrationDate,

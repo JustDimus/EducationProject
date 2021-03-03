@@ -1,6 +1,6 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
-using EducationProject.Core.DAL.EF;
+using EducationProject.BLL.DTO;
+using EducationProject.Core.DAL;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using System;
@@ -11,16 +11,16 @@ using System.Text;
 
 namespace Infrastructure.BLL.Services
 {
-    public class SkillService : BaseService<SkillDBO, SkillDTO>, ISkillService
+    public class SkillService : BaseService<Skill, SkillDTO>, ISkillService
     {
-        private IRepository<AccountSkillDBO> accountSkills;
+        private IRepository<AccountSkill> accountSkills;
 
-        private IRepository<CourseSkillDBO> courseSkills;
+        private IRepository<CourseSkill> courseSkills;
 
-        public SkillService(IRepository<SkillDBO> baseEntityRepository,
+        public SkillService(IRepository<Skill> baseEntityRepository,
             AuthorizationService authorisztionService,
-            IRepository<AccountSkillDBO> accountSkillRepository,
-            IRepository<CourseSkillDBO> courseSkillRepository)
+            IRepository<AccountSkill> accountSkillRepository,
+            IRepository<CourseSkill> courseSkillRepository)
             : base(baseEntityRepository, authorisztionService)
         {
             this.accountSkills = accountSkillRepository;
@@ -38,7 +38,7 @@ namespace Infrastructure.BLL.Services
             return base.Create(createEntity);
         }
 
-        protected override Expression<Func<SkillDBO, SkillDTO>> FromBOMapping
+        protected override Expression<Func<Skill, SkillDTO>> FromBOMapping
         {
             get => s => new SkillDTO()
             {
@@ -81,14 +81,14 @@ namespace Infrastructure.BLL.Services
                 }, accountSkills.PageNumber, accountSkills.PageSize);
         }
 
-        protected override Expression<Func<SkillDBO, bool>> IsExistExpression(SkillDTO entity)
+        protected override Expression<Func<Skill, bool>> IsExistExpression(SkillDTO entity)
         {
             return s => s.Id == entity.Id;
         }
 
-        protected override SkillDBO Map(SkillDTO entity)
+        protected override Skill Map(SkillDTO entity)
         {
-            return new SkillDBO()
+            return new Skill()
             {
                 Id = entity.Id,
                 Description = entity.Description,
@@ -111,7 +111,7 @@ namespace Infrastructure.BLL.Services
         {
             if(accountSkills.Any(a => a.AccountId == accountId && a.SkillId == skillId) == false)
             {
-                accountSkills.Create(new AccountSkillDBO()
+                accountSkills.Create(new AccountSkill()
                 {
                     AccountId = accountId,
                     SkillId = skillId,

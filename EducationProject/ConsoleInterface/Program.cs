@@ -1,5 +1,4 @@
-﻿using Infrastructure.UOW;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using EducationProject.EFCore;
-using EducationProject.Core.DAL.EF;
+using EducationProject.Core.DAL;
 using EducationProject.DAL.Interfaces;
 using Infrastructure.DAL.Repositories;
 using EducationProject.BLL.Interfaces;
@@ -32,34 +31,34 @@ namespace ConsoleInterface
 
             services.AddTransient<DbContext, EducationProjectDbContext>(c => new EducationProjectDbContext(connectionString));
 
-            services.AddTransient<IRepository<CourseDBO>, BaseRepository<CourseDBO>>();
-            services.AddTransient<IRepository<AccountDBO>, BaseRepository<AccountDBO>>();
-            services.AddTransient<IRepository<SkillDBO>, BaseRepository<SkillDBO>>();
-            services.AddTransient<IRepository<BaseMaterialDBO>, BaseRepository<BaseMaterialDBO>>();
-            services.AddTransient<IRepository<CourseSkillDBO>, BaseRepository<CourseSkillDBO>>();
-            services.AddTransient<IRepository<CourseMaterialDBO>, BaseRepository<CourseMaterialDBO>>();
-            services.AddTransient<IRepository<AccountCourseDBO>, BaseRepository<AccountCourseDBO>>();
-            services.AddTransient<IRepository<AccountMaterialDBO>, BaseRepository<AccountMaterialDBO>>();
-            services.AddTransient<IRepository<AccountSkillDBO>, BaseRepository<AccountSkillDBO>>();
+            services.AddTransient<IRepository<Course>, BaseRepository<Course>>();
+            services.AddTransient<IRepository<Account>, BaseRepository<Account>>();
+            services.AddTransient<IRepository<Skill>, BaseRepository<Skill>>();
+            services.AddTransient<IRepository<BaseMaterial>, BaseRepository<BaseMaterial>>();
+            services.AddTransient<IRepository<CourseSkill>, BaseRepository<CourseSkill>>();
+            services.AddTransient<IRepository<CourseMaterial>, BaseRepository<CourseMaterial>>();
+            services.AddTransient<IRepository<AccountCourse>, BaseRepository<AccountCourse>>();
+            services.AddTransient<IRepository<AccountMaterial>, BaseRepository<AccountMaterial>>();
+            services.AddTransient<IRepository<AccountSkill>, BaseRepository<AccountSkill>>();
 
             services.AddSingleton<AuthorizationService>();
 
             services.AddTransient<ISkillService, SkillService>();
             services.AddTransient<ICourseService, CourseService>(c => 
-                new CourseService(c.GetRequiredService<IRepository<CourseDBO>>(),
+                new CourseService(c.GetRequiredService<IRepository<Course>>(),
                 c.GetRequiredService<AuthorizationService>(),
                 c.GetRequiredService<IMaterialService>(),
                 c.GetRequiredService<ISkillService>(),
-                c.GetRequiredService<IRepository<CourseSkillDBO>>(),
-                c.GetRequiredService<IRepository<CourseMaterialDBO>>(),
+                c.GetRequiredService<IRepository<CourseSkill>>(),
+                c.GetRequiredService<IRepository<CourseMaterial>>(),
                 defaultPageSize));
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddTransient<IAccountService, AccountService>();
 
             services.AddTransient<ICommandHandler, CommandHandler>(c =>
                 new CommandHandler(c.GetRequiredService<IEnumerable<ICommand>>(),
-                ConfigurationManager.AppSettings.Get("ShowAllCommands")));
-
+                ConfigurationManager.AppSettings.Get("ShowAllCommands"),
+                ConfigurationManager.AppSettings.Get("InvalidCommand")));
 
             services.AddTransient<ICommand, InvalidCommand>(c => 
                 new InvalidCommand(ConfigurationManager.AppSettings.Get("InvalidCommand")));

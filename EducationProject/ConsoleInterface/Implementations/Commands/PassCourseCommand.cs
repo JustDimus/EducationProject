@@ -1,6 +1,6 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -34,7 +34,7 @@ namespace ConsoleInterface.Implementations.Commands
             var actionResult = accountService.ChangeAccountCourseStatus(new ChangeAccountCourseDTO()
             {
                 Token = token,
-                Status = EducationProject.Core.DAL.EF.Enums.ProgressStatus.Passed,
+                Status = EducationProject.Core.DAL.Enums.ProgressStatus.Passed,
                 CourseId = courseId
             });
 

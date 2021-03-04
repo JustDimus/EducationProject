@@ -8,303 +8,306 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
+using EducationProject.BLL;
 
 namespace Infrastructure.BLL.Services
 {
-    public class CourseService : BaseService<Course, ShortCourseInfoDTO>, ICourseService
+    public class CourseService : ICourseService
     {
-        private IMaterialService materials;
+        private IMaterialService materialService;
 
-        private ISkillService skills;
+        private ISkillService skillService;
 
-        private IRepository<CourseSkill> courseSkills;
+        private IRepository<CourseSkill> courseSkillRepository;
 
-        private IRepository<CourseMaterial> courseMaterials;
+        private IRepository<CourseMaterial> courseMaterialRepository;
+
+        private IMapping<Course, ShortCourseInfoDTO> courseMapping;
+
+        private IRepository<Course> courseRepository;
 
         private int defaultPageSize;
 
-        public CourseService(IRepository<Course> baseEntityRepository, 
+        public CourseService(IRepository<Course> courseRepository, 
             AuthorizationService authorisztionService,
             IMaterialService materialService,
             ISkillService skillService,
-            IRepository<CourseSkill> courseSkillsRepository,
-            IRepository<CourseMaterial> courseMaterialsRepository,
-            int defaultPageSize) 
-            : base(baseEntityRepository, authorisztionService)
+            IRepository<CourseSkill> courseSkillRepository,
+            IRepository<CourseMaterial> courseMaterialRepository,
+            IMapping<Course, ShortCourseInfoDTO> courseMapping,
+            int defaultPageSize)
         {
-            materials = materialService;
-            skills = skillService;
+            this.materialService = materialService;
 
-            this.courseSkills = courseSkillsRepository;
+            this.courseRepository = courseRepository;
 
-            this.courseMaterials = courseMaterialsRepository;
+            this.materialService = materialService;
+
+            this.skillService = skillService;
+
+            this.courseSkillRepository = courseSkillRepository;
 
             this.defaultPageSize = defaultPageSize;
-        }
 
-        protected override Expression<Func<Course, ShortCourseInfoDTO>> FromBOMapping
+            this.courseMapping = courseMapping;
+        }
+      
+        public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreator courseCreator)
         {
-            get => c => new ShortCourseInfoDTO()
+            return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
             {
-                Id = c.Id,
-                Description = c.Description,
-                Title = c.Title
+                IsSuccessful = true,
+                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(c =>
+                    c.CreatorId == courseCreator.AccountId,
+                    this.courseMapping.ConvertExpression, 
+                    courseCreator.PageInfo.PageNumber, courseCreator.PageInfo.PageSize)
             };
         }
 
-        protected override Expression<Func<Course, bool>> defaultGetCondition => c => c.IsVisible == true;
-
-        public IEnumerable<ShortCourseInfoDTO> GetCoursesByCreatorId(GetCoursesByCreator courseCreator)
+        public async Task<IActionResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
-            if(ValidatePageInfo(courseCreator.PageInfo) == false)
+            var isCourseAndMaterialExist = await this.CheckCourseMaterialsAsync(courseMaterialChange);
+
+            if (!isCourseAndMaterialExist)
             {
-                return null;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            return entity.GetPage<ShortCourseInfoDTO>(c => c.CreatorId == courseCreator.AccountId,
-                FromBOMapping, courseCreator.PageInfo.PageNumber, courseCreator.PageInfo.PageSize);
-        }
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseMaterialChange.CourseId,
+                courseMaterialChange.AccountId);
 
-        public IEnumerable<ShortCourseInfoDTO> GetMyCourses(GetCoursesByCreator courseCreator)
-        {
-            int accountId = this.Authenticate(courseCreator.Token);
-
-            if(accountId == 0)
+            if (!isAccountCanChangeCourse)
             {
-                return null;
-            }
-            else
-            {
-                courseCreator.AccountId = accountId;
-
-                return GetCoursesByCreatorId(courseCreator);
-            }
-        }
-
-        public override bool Create(ChangeEntityDTO<ShortCourseInfoDTO> createEntity)
-        {
-            int accountId = 0;
-
-            if (this.createCheckAuth == true)
-            {
-                accountId = this.authService.AuthenticateAccount(createEntity.Token);
-                if(accountId == 0)
-                { 
-                    return false;
-                }
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (ValidateEntity(createEntity.Entity) == false)
+            var isCourseMaterialAlreadyExist = await this.courseMaterialRepository.AnyAsync(c =>
+                c.MaterialId == courseMaterialChange.MaterialId
+                && c.CourseId == courseMaterialChange.CourseId);
+
+            if (isCourseMaterialAlreadyExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            var course = Map(createEntity.Entity);
-
-            course.CreatorId = accountId;
-
-            entity.Create(course);
-
-            entity.Save();
-
-            return true;
-        }
-
-        public bool AddCourseMaterial(ChangeCourseMaterialDTO courseMaterialChange)
-        {
-            int accountId = Authenticate(courseMaterialChange.Token);
-
-            if (accountId == 0)
-            {
-                return false;
-            }
-
-            if (CheckCourseMaterials(courseMaterialChange, accountId) == false)
-            {
-                return false;
-            }
-
-            if(courseMaterials.Any(cm => cm.CourseId == courseMaterialChange.CourseId
-            && cm.MaterialId == courseMaterialChange.MaterialId) == true)
-            {
-                return false;
-            }
-
-            courseMaterials.Create(new CourseMaterial()
+            await this.courseMaterialRepository.CreateAsync(new CourseMaterial()
             {
                 CourseId = courseMaterialChange.CourseId,
-                MaterialId = courseMaterialChange.MaterialId,
+                MaterialId = courseMaterialChange.MaterialId
             });
 
-            entity.Save();
+            await this.courseMaterialRepository.SaveAsync();
 
-            return true;
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
         }
         
-        public bool RemoveCourseMaterial(ChangeCourseMaterialDTO courseMaterialChange)
+        public async Task<IActionResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
-            int accountId = Authenticate(courseMaterialChange.Token);
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseMaterialChange.CourseId,
+               courseMaterialChange.AccountId);
 
-            if (accountId == 0)
+            if (!isAccountCanChangeCourse)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (CheckCourseMaterials(courseMaterialChange, accountId) == false)
-            {
-                return false;
-            }
-
-            courseMaterials.Delete(new CourseMaterial()
+            await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()
             {
                 CourseId = courseMaterialChange.CourseId,
-                MaterialId = courseMaterialChange.MaterialId,
+                MaterialId = courseMaterialChange.MaterialId
             });
 
-            if(courseMaterials.Count(cm => cm.CourseId == courseMaterialChange.CourseId) == 1)
+            await this.courseSkillRepository.SaveAsync();
+
+            return new ActionResult()
             {
-                Course course = entity.Get(c => c.Id == courseMaterialChange.CourseId);
-                course.IsVisible = false;
-
-                this.entity.Update(course);
-            }
-
-            entity.Save();
-
-            return true;
+                IsSuccessful = true
+            };
         }
 
-        public bool AddCourseSkill(ChangeCourseSkillDTO courseSkillChange)
+        public async Task<IActionResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            int accountId = Authenticate(courseSkillChange.Token);
+            var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
 
-            if (accountId == 0)
+            if (!isCourseAndSkillExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (CheckCourseSkills(courseSkillChange, accountId) == false
-                || courseSkillChange.Change <= 0)
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseSkillChange.CourseId,
+                courseSkillChange.AccountId);
+
+            if (!isAccountCanChangeCourse)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if(courseSkills.Any(cs => cs.CourseId == courseSkillChange.CourseId
-            && cs.SkillId == courseSkillChange.SkillId) == true)
+            var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(c =>
+                c.SkillId == courseSkillChange.SkillId 
+                && c.CourseId == courseSkillChange.CourseId);
+
+            if(isCourseSkillAlreadyExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            courseSkills.Create(new CourseSkill()
+            await this.courseSkillRepository.CreateAsync(new CourseSkill()
             {
                 CourseId = courseSkillChange.CourseId,
                 SkillId = courseSkillChange.SkillId,
                 Change = courseSkillChange.Change
             });
 
-            courseSkills.Save();
+            await this.courseSkillRepository.SaveAsync();
 
-            return true;
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
         }
 
-        public bool RemoveCourseSkill(ChangeCourseSkillDTO courseSkillChange)
+        public async Task<IActionResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            int accountId = Authenticate(courseSkillChange.Token);
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseSkillChange.CourseId,
+                courseSkillChange.AccountId);
 
-            if (accountId == 0)
+            if (!isAccountCanChangeCourse)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (CheckCourseSkills(courseSkillChange, accountId) == false)
+            await this.courseSkillRepository.DeleteAsync(new CourseSkill()
             {
-                return false;
-            }
+                CourseId = courseSkillChange.CourseId,
+                SkillId = courseSkillChange.SkillId
+            });
 
-            if(courseSkills.Any(cs => cs.CourseId == courseSkillChange.CourseId
-            && cs.SkillId == courseSkillChange.SkillId) == false)
+            await this.courseSkillRepository.SaveAsync();
+
+            return new ActionResult()
             {
-                return false;
-            }
-
-            courseSkills.Delete(cs => cs.CourseId == courseSkillChange.CourseId
-            && cs.SkillId == courseSkillChange.SkillId);
-
-            courseSkills.Save();
-
-            return true;
+                IsSuccessful = true
+            };
         }
 
-        public bool ChangeCourseSkill(ChangeCourseSkillDTO courseSkillChange)
+        public async Task<IActionResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            int accountId = Authenticate(courseSkillChange.Token);
+            var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
 
-            if (accountId == 0)
+            if(!isCourseAndSkillExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (CheckCourseSkills(courseSkillChange, accountId) == false
-                || courseSkillChange.Change <= 0)
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseSkillChange.CourseId,
+                courseSkillChange.AccountId);
+            
+            if(!isAccountCanChangeCourse)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (courseSkills.Any(cs => cs.CourseId == courseSkillChange.CourseId
-             && cs.SkillId == courseSkillChange.SkillId) == false)
+            var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(cs =>
+                cs.CourseId == courseSkillChange.CourseId && cs.SkillId == courseSkillChange.SkillId);
+
+            if(!isCourseSkillAlreadyExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            courseSkills.Update(new CourseSkill()
+            await this.courseSkillRepository.UpdateAsync(new CourseSkill()
             {
                 CourseId = courseSkillChange.CourseId,
                 SkillId = courseSkillChange.SkillId,
                 Change = courseSkillChange.Change
             });
 
-            courseSkills.Save();
+            await this.courseSkillRepository.SaveAsync();
 
-            return true;
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
         }
 
-        public bool ChangeCourseVisibility(CourseVisibilityDTO visibilityParams)
+        public async Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
         {
-            int accountId = Authenticate(visibilityParams.Token);
+            var isCourseExist = await this.courseRepository.AnyAsync(c =>
+                c.Id == visibilityParams.CourseId && c.CreatorId == visibilityParams.AccountId);
 
-            if (accountId == 0)
+            if(!isCourseExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if(this.entity.Any(c => c.Id == visibilityParams.CourseId && c.CreatorId == accountId) == false)
+            var courseMaterialsCount = await this.courseMaterialRepository.CountAsync(cm =>
+                cm.CourseId == visibilityParams.CourseId);
+
+            if (courseMaterialsCount == 0)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            if (courseMaterials.Count(cm => cm.CourseId == visibilityParams.CourseId) == 0)
+            var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == visibilityParams.CourseId);
+
+            courseToUpdate.IsVisible = visibilityParams.Visibility;
+
+            await this.courseRepository.UpdateAsync(courseToUpdate);
+
+            await this.courseRepository.SaveAsync();
+
+            return new ActionResult()
             {
-                return false;
-            }
-
-            Course course = entity.Get(c => c.Id == visibilityParams.CourseId);
-            course.IsVisible = visibilityParams.Visibility;
-
-            this.entity.Update(course);
-
-            entity.Save();
-
-            return true;
+                IsSuccessful = true
+            };
         }
 
-        public FullCourseInfoDTO GetCourseInfo(int id)
+        public async Task<IActionResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id)
         {
-            if(entity.Any(c => c.Id == id) == false)
-            {
-                return null;
-            }
-
-            var result = entity.Get<FullCourseInfoDTO>(c => c.Id == id,
+            FullCourseInfoDTO result = await this.courseRepository.GetAsync<FullCourseInfoDTO>(c => c.Id == id,
                 c => new FullCourseInfoDTO()
                 {
                     Id = c.Id,
@@ -313,7 +316,7 @@ namespace Infrastructure.BLL.Services
                     CreatorId = c.CreatorId
                 });
 
-            result.Materials = courseMaterials.GetPage<CourseMaterialDTO>(cm => cm.CourseId == id,
+            result.Materials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(cm => cm.CourseId == id,
                 cm => new CourseMaterialDTO()
                 {
                     MaterialTitle = cm.Material.Title,
@@ -321,7 +324,7 @@ namespace Infrastructure.BLL.Services
                     MaterialType = cm.Material.Type
                 }, 0, defaultPageSize);
 
-            result.Skills = courseSkills.GetPage<CourseSkillDTO>(cs => cs.CourseId == id,
+            result.Skills = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(cs => cs.CourseId == id,
                 cs => new CourseSkillDTO()
                 {
                     SkillId = cs.Skill.Id,
@@ -329,76 +332,125 @@ namespace Infrastructure.BLL.Services
                     SkillTitle = cs.Skill.Title
                 }, 0, defaultPageSize);
 
-            return result;
-        }
-
-        public bool IsCourseContainsMaterial(ChangeCourseMaterialDTO courseMaterial)
-        {
-            if (courseMaterial.CourseId == 0 || courseMaterial.MaterialId == 0)
+            return new ActionResult<FullCourseInfoDTO>()
             {
-                return false;
-            }
-
-            return this.courseMaterials.Contains(new CourseMaterial()
-            {
-                CourseId = courseMaterial.CourseId,
-                MaterialId = courseMaterial.MaterialId
-            });
-        }
-
-        public bool IsCourseContainsMaterial(IEnumerable<ChangeCourseMaterialDTO> courseMaterials)
-        {
-            foreach (var entity in courseMaterials)
-            {
-                if (IsCourseContainsMaterial(entity) == false)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public IEnumerable<int> GetAllCourseMaterialsId(int courseId)
-        {
-            return this.courseMaterials.GetPage<int>(cm => cm.CourseId == courseId, cm => cm.MaterialId, 0,
-                this.courseMaterials.Count(cm => cm.CourseId == courseId));
-        }
-
-        protected override Course Map(ShortCourseInfoDTO entity)
-        {
-            return new Course()
-            {
-                Id = entity.Id,
-                Description = entity.Description,
-                Title = entity.Title,
-                CreatorId = entity.CreatorId,
-                IsVisible = false
+                IsSuccessful = true,
+                Result = result
             };
         }
 
-        protected override bool ValidateEntity(ShortCourseInfoDTO entity)
+        public async Task<IActionResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial)
         {
-            if(String.IsNullOrEmpty(entity.Title) == true || String.IsNullOrEmpty(entity.Description) == true)
+            return new ActionResult<bool>()
             {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+                IsSuccessful = true,
+                Result = await this.courseMaterialRepository.ContainsAsync(new CourseMaterial()
+                {
+                    CourseId = courseMaterial.CourseId,
+                    MaterialId = courseMaterial.MaterialId
+                })
+            }; 
         }
 
-        private bool CheckCourseMaterials(ChangeCourseMaterialDTO courseMaterialChange, int accountId)
+        public async Task<IActionResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials)
         {
-            if (courseMaterialChange.CourseId <= 0 
-                || courseMaterialChange.MaterialId <= 0)
+            foreach (var entity in courseMaterials)
             {
-                return false;
+                var isCourseContainsMaterial = await this.IsCourseContainsMaterialAsync(entity);
+
+                if(!isCourseContainsMaterial.Result)
+                {
+                    return new ActionResult<bool>()
+                    {
+                        IsSuccessful = true,
+                        Result = false
+                    };
+                }
             }
 
-            if (this.IsExist(c => c.Id == courseMaterialChange.CourseId && c.CreatorId == accountId) == false
-                || materials.IsExist(new MaterialDTO() { Id = courseMaterialChange.MaterialId }) == false)
+            return new ActionResult<bool>()
+            {
+                IsSuccessful = true,
+                Result = true
+            };
+        }
+
+        public async Task<IActionResult<IEnumerable<int>>> GetAllCourseMaterialsIdAsync(int courseId)
+        {
+            return new ActionResult<IEnumerable<int>>()
+            {
+                IsSuccessful = true,
+                Result = await this.courseMaterialRepository.GetPageAsync<int>(cm => cm.CourseId == courseId,
+                cm => cm.MaterialId, 0,
+                await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId))
+            };
+        }
+
+        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<ShortCourseInfoDTO> createEntity)
+        {
+            await this.courseRepository.CreateAsync(this.courseMapping.Map(createEntity.Entity));
+
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
+        }
+
+        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortCourseInfoDTO> updateEntity)
+        {
+            await this.courseRepository.UpdateAsync(this.courseMapping.Map(updateEntity.Entity));
+
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
+        }
+
+        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortCourseInfoDTO> deleteEntity)
+        {
+            await this.courseRepository.DeleteAsync(this.courseMapping.Map(deleteEntity.Entity));
+
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
+        }
+
+        public async Task<IActionResult<bool>> IsExistAsync(ShortCourseInfoDTO checkEntity)
+        {
+            return new ActionResult<bool>()
+            {
+                IsSuccessful = true,
+                Result = await this.courseRepository.AnyAsync(c => c.Id == checkEntity.Id)
+            };
+        }
+
+        public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetAsync(PageInfoDTO pageInfo)
+        {
+            return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
+            {
+                IsSuccessful = true,
+                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(c => c.IsVisible == true,
+                this.courseMapping.ConvertExpression, 0, pageInfo.PageNumber)
+            };
+        }
+
+        private async Task<bool> CheckCourseCreatorAsync(int courseId, int accountId)
+        {
+            return await this.courseRepository.AnyAsync(c => c.Id == courseId && c.CreatorId == accountId);
+        }
+
+        private async Task<bool> CheckCourseMaterialsAsync(ChangeCourseMaterialDTO courseMaterialChange)
+        {
+            var isCourseExist = await this.courseRepository.AnyAsync(c =>
+                c.Id == courseMaterialChange.CourseId);
+
+            var isMaterialExist = await this.materialService.IsExistAsync(new MaterialDTO()
+            {
+                Id = courseMaterialChange.MaterialId
+            });
+
+            if (!isCourseExist || !isMaterialExist.Result)
             {
                 return false;
             }
@@ -406,31 +458,22 @@ namespace Infrastructure.BLL.Services
             return true;
         }
 
-        private bool CheckCourseSkills(ChangeCourseSkillDTO courseSkillChange, int accountId)
+        private async Task<bool> CheckCourseSkillsAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            if (courseSkillChange.CourseId <= 0 
-                || courseSkillChange.SkillId <= 0)
-            {
-                return false;
-            }
+            var isCourseExist = await this.courseRepository.AnyAsync(c =>
+                c.Id == courseSkillChange.CourseId);
 
-            if (this.IsExist(c => c.Id == courseSkillChange.CourseId
-            && c.CreatorId == accountId) == false)
+            var isSkillExist = await this.skillService.IsExistAsync(new SkillDTO()
             {
-                return false;
-            }
+                Id = courseSkillChange.SkillId
+            });
 
-            if(skills.IsExist(new SkillDTO() { Id = courseSkillChange.SkillId }) == false)
+            if (!isCourseExist || !isSkillExist.Result)
             {
                 return false;
             }
 
             return true;
-        }
-
-        protected override Expression<Func<Course, bool>> IsExistExpression(ShortCourseInfoDTO entity)
-        {
-            return c => c.Id == entity.Id;
         }
     }
 }

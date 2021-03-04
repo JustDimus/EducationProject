@@ -2,33 +2,32 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface ICourseService : IBusinessService<ShortCourseInfoDTO>
     {
-        FullCourseInfoDTO GetCourseInfo(int id);
+        Task<IActionResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id);
 
-        bool ChangeCourseVisibility(CourseVisibilityDTO visibilityParams);
+        Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams);
 
-        bool AddCourseMaterial(ChangeCourseMaterialDTO courseMaterialChange);
+        Task<IActionResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange);
 
-        bool RemoveCourseMaterial(ChangeCourseMaterialDTO courseMaterialChange);
+        Task<IActionResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange);
 
-        bool AddCourseSkill(ChangeCourseSkillDTO courseSkillChange);
+        Task<IActionResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
 
-        bool RemoveCourseSkill(ChangeCourseSkillDTO courseSkillChange);
+        Task<IActionResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
 
-        bool ChangeCourseSkill(ChangeCourseSkillDTO courseSkillChange);
+        Task<IActionResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
 
-        bool IsCourseContainsMaterial(ChangeCourseMaterialDTO courseMaterial);
+        Task<IActionResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial);
 
-        bool IsCourseContainsMaterial(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
+        Task<IActionResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
 
-        IEnumerable<ShortCourseInfoDTO> GetCoursesByCreatorId(GetCoursesByCreator courseCreator);
+        Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreator courseCreator);
 
-        IEnumerable<ShortCourseInfoDTO> GetMyCourses(GetCoursesByCreator courseCreator);
-
-        IEnumerable<int> GetAllCourseMaterialsId(int courseId);
+        Task<IActionResult<IEnumerable<int>>> GetAllCourseMaterialsIdAsync(int courseId);
     }
 }

@@ -8,69 +8,117 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
+using EducationProject.BLL;
 
 namespace Infrastructure.BLL.Services
 {
-    public class SkillService : BaseService<Skill, SkillDTO>, ISkillService
+    public class SkillService : ISkillService
     {
-        private IRepository<AccountSkill> accountSkills;
+        private IRepository<AccountSkill> accountSkillRepository;
 
-        private IRepository<CourseSkill> courseSkills;
+        private IRepository<CourseSkill> courseSkillRepository;
 
-        public SkillService(IRepository<Skill> baseEntityRepository,
-            AuthorizationService authorisztionService,
+        private IRepository<Skill> skillRepository;
+
+        private IMapping<Skill, SkillDTO> skillMapping;
+
+        public SkillService(IRepository<Skill> skillRepository,
             IRepository<AccountSkill> accountSkillRepository,
-            IRepository<CourseSkill> courseSkillRepository)
-            : base(baseEntityRepository, authorisztionService)
+            IRepository<CourseSkill> courseSkillRepository,
+            IMapping<Skill, SkillDTO> skillMapping)
         {
-            this.accountSkills = accountSkillRepository;
+            this.accountSkillRepository = accountSkillRepository;
 
-            this.courseSkills = courseSkillRepository;
+            this.courseSkillRepository = courseSkillRepository;
+
+            this.skillRepository = skillRepository;
+
+            this.skillMapping = skillMapping;
         }
 
-        public override bool Create(ChangeEntityDTO<SkillDTO> createEntity)
+        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<SkillDTO> createEntity)
         {
-            if(this.entity.Any(s => s.Title == createEntity.Entity.Title) == true)
+            var isSkillExist = await this.skillRepository
+                .AnyAsync(s => s.Title == createEntity.Entity.Title);
+
+            if(isSkillExist)
             {
-                return false;
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
             }
 
-            return base.Create(createEntity);
-        }
+            await this.skillRepository.CreateAsync(skillMapping.Map(createEntity.Entity));
 
-        protected override Expression<Func<Skill, SkillDTO>> FromBOMapping
-        {
-            get => s => new SkillDTO()
+            return new ActionResult()
             {
-                Id = s.Id,
-                Description = s.Description,
-                MaxValue = s.MaxValue,
-                Title = s.Title
+                IsSuccessful = true
             };
         }
 
-        public bool AddSkilsToAccountByCourseId(AddSkillsToAccountByCourseDTO changeSkills)
+        public async Task<IActionResult<IEnumerable<SkillDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            if(changeSkills.AccountId <= 0 && changeSkills.CourseId <= 0)
+            return new ActionResult<IEnumerable<SkillDTO>>()
             {
-                return false;
-            }
-
-            var skillsToAdd = courseSkills.GetPage(cs => cs.CourseId == changeSkills.CourseId,
-                cs => new { cs.Change, cs.SkillId }, 0, 
-                courseSkills.Count(cs => cs.CourseId == changeSkills.CourseId)).ToList();
-
-            foreach(var skill in skillsToAdd)
-            {
-                AddSkillValueToAccount(skill.SkillId, changeSkills.AccountId, skill.Change);
-            }
-
-            return true;
+                IsSuccessful = true,
+                Result = await this.skillRepository.GetPageAsync<SkillDTO>(s => true,
+                   skillMapping.ConvertExpression, pageInfo.PageNumber, pageInfo.PageSize)
+            };
         }
 
-        public IEnumerable<AccountSkillDTO> GetAccountSkills(GetAccountSkillsDTO accountSkills)
+        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
-            return this.accountSkills.GetPage<AccountSkillDTO>(a => a.AccountId == accountSkills.AccountId,
+            await skillRepository.UpdateAsync(skillMapping.Map(changeEntity.Entity));
+
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
+        }
+
+        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<SkillDTO> changeEntity)
+        {
+            await this.skillRepository.DeleteAsync(skillMapping.Map(changeEntity.Entity));
+
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
+        }
+
+        public async Task<IActionResult<bool>> IsExistAsync(SkillDTO entity)
+        {
+            return new ActionResult<bool>()
+            {
+                IsSuccessful = true,
+                Result = await this.skillRepository.AnyAsync(s => s.Id == entity.Id)
+            };
+        }
+
+        public async Task<IActionResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills)
+        {
+            var skillsToAdd = await this.courseSkillRepository
+                .GetPageAsync(cs => cs.CourseId == changeSkills.CourseId,
+                cs => new { cs.Change, cs.SkillId }, 0, 
+                await this.courseSkillRepository.CountAsync(cs => cs.CourseId == changeSkills.CourseId));
+
+            skillsToAdd.ToList().ForEach(s =>
+                AddSkillValueToAccountAsync(s.SkillId, changeSkills.AccountId, s.Change));
+
+            return new ActionResult()
+            {
+                IsSuccessful = true
+            };
+        }
+
+        public async Task<IActionResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills)
+        {
+            return new ActionResult<IEnumerable<AccountSkillDTO>>()
+            {
+                IsSuccessful = true,
+                Result = await this.accountSkillRepository.GetPageAsync<AccountSkillDTO>(a => a.AccountId == accountSkills.AccountId,
                 a => new AccountSkillDTO()
                 {
                     Title = a.Skill.Title,
@@ -78,40 +126,18 @@ namespace Infrastructure.BLL.Services
                     MaxValue = a.Skill.MaxValue,
                     CurrentResult = a.CurrentResult % a.Skill.MaxValue,
                     Level = a.CurrentResult / a.Skill.MaxValue
-                }, accountSkills.PageNumber, accountSkills.PageSize);
-        }
-
-        protected override Expression<Func<Skill, bool>> IsExistExpression(SkillDTO entity)
-        {
-            return s => s.Id == entity.Id;
-        }
-
-        protected override Skill Map(SkillDTO entity)
-        {
-            return new Skill()
-            {
-                Id = entity.Id,
-                Description = entity.Description,
-                MaxValue = entity.MaxValue,
-                Title = entity.Title
+                }, accountSkills.PageNumber, accountSkills.PageSize)
             };
         }
 
-        protected override bool ValidateEntity(SkillDTO entity)
+        private async void AddSkillValueToAccountAsync(int skillId, int accountId, int value)
         {
-            if(String.IsNullOrEmpty(entity.Title) == true || entity.MaxValue <= 0)
-            {
-                return false;
-            }
+            var isAccountSkillExists = await this.accountSkillRepository
+                .AnyAsync(a => a.AccountId == accountId && a.SkillId == skillId);
 
-            return true;
-        }
-
-        private void AddSkillValueToAccount(int skillId, int accountId, int value)
-        {
-            if(accountSkills.Any(a => a.AccountId == accountId && a.SkillId == skillId) == false)
+            if (!isAccountSkillExists)
             {
-                accountSkills.Create(new AccountSkill()
+                await this.accountSkillRepository.CreateAsync(new AccountSkill()
                 {
                     AccountId = accountId,
                     SkillId = skillId,
@@ -120,11 +146,11 @@ namespace Infrastructure.BLL.Services
             }
             else
             {
-                var accountSkill = accountSkills.Get(a => a.AccountId == accountId && a.SkillId == skillId);
+                var accountSkill = await this.accountSkillRepository.GetAsync(a => a.AccountId == accountId && a.SkillId == skillId);
 
                 accountSkill.CurrentResult += value;
 
-                accountSkills.Update(accountSkill);
+                await this.accountSkillRepository.UpdateAsync(accountSkill);
             }
         }
     }

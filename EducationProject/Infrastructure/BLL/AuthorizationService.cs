@@ -2,15 +2,17 @@
 using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Infrastructure.BLL
 {
     public class AuthorizationService
     {
-        private Dictionary<string, int> authorizedAccounts;
+        private ConcurrentDictionary<string, int> authorizedAccounts;
         
         private IRepository<Account> accounts;
 
@@ -18,12 +20,12 @@ namespace Infrastructure.BLL
         {
             accounts = accountMapping;
 
-            authorizedAccounts = new Dictionary<string, int>();
+            authorizedAccounts = new ConcurrentDictionary<string, int>();
         }
 
-        public string AuthorizeAccount(string email, string password)
+        public async Task<string> AuthorizeAccountAsync(string email, string password)
         {
-            var accountId = accounts.Get(a => a.Email == email && a.Password == password, a => a.Id);
+            var accountId = await accounts.GetAsync(a => a.Email == email && a.Password == password, a => a.Id);
 
             if(accountId == 0)
             {
@@ -32,19 +34,21 @@ namespace Infrastructure.BLL
 
             string token = $"{DateTime.Now}/{email}";
 
-            authorizedAccounts.Add(token, accountId);
+            authorizedAccounts.TryAdd(token, accountId);
 
             return token;
         }
 
-        public int AuthenticateAccount(string token)
+        public Task<int> AuthenticateAccountAsync(string token)
         {
-            return token == null ? 0 : authorizedAccounts.GetValueOrDefault(token);
+            return Task.Run(() =>
+                token == null ? 0 : authorizedAccounts.GetValueOrDefault(token));
         }
 
-        public bool DeauthorizeAccount(string token)
+        public Task<bool> DeauthorizeAccountAsync(string token)
         {
-            return token == null ? false : authorizedAccounts.Remove(token);
+            return Task.Run(() => 
+                token == null ? false : authorizedAccounts.TryRemove(token, out _));
         }
     }
 }

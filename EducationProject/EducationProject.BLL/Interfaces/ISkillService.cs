@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface ISkillService : IBusinessService<SkillDTO>
     {
-        IEnumerable<AccountSkillDTO> GetAccountSkills(GetAccountSkillsDTO accountSkills);
+        Task<IEnumerable<AccountSkillDTO>> GetAccountSkills(GetAccountSkillsDTO accountSkills);
 
-        bool AddSkilsToAccountByCourseId(AddSkillsToAccountByCourseDTO changeSkills);
+        Task<bool> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills);
     }
 }

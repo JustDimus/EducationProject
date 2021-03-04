@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface IMaterialService : IBusinessService<MaterialDTO>
     {
-        MaterialDTO GetMaterialInfo(int id);
+        Task<IActionResult<MaterialDTO>> GetMaterialInfo(int id);
     }
 }

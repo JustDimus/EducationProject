@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,14 +12,19 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private ICourseService courseService;
 
+        private ChangeEntityValidator<ShortCourseInfoDTO> changeEntityValidator;
+
         public CreateCourseCommand(ICourseService courseService,
+            ChangeEntityValidator<ShortCourseInfoDTO> changeEntityValidator,
             string commandName)
             : base(commandName)
         {
             this.courseService = courseService;
+
+            this.changeEntityValidator = changeEntityValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Creating new course");
 
@@ -30,23 +36,24 @@ namespace ConsoleInterface.Implementations.Commands
 
             var description = Console.ReadLine();
 
-            if (String.IsNullOrEmpty(title) == true || String.IsNullOrEmpty(description) == true)
+            var changeEntity = new ChangeEntityDTO<ShortCourseInfoDTO>()
             {
-                Console.WriteLine("Error");
-                Console.WriteLine();
-            }
-
-            var actionResult = this.courseService.Create(new ChangeEntityDTO<ShortCourseInfoDTO>()
-            {
-                Token = token,
+                AccountId = accountId,
                 Entity = new ShortCourseInfoDTO()
                 {
                     Title = title,
                     Description = description
                 }
-            });
+            };
 
-            if (actionResult == false)
+            if(!this.ValidateEntity(changeEntity))
+            {
+                return;
+            }
+
+            var actionResult = await this.courseService.CreateAsync(changeEntity);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -56,6 +63,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeEntityDTO<ShortCourseInfoDTO> changeEntity)
+        {
+            var validationresult = this.changeEntityValidator.Validate(changeEntity);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

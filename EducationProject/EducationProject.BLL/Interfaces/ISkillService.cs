@@ -8,8 +8,8 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface ISkillService : IBusinessService<SkillDTO>
     {
-        Task<IEnumerable<AccountSkillDTO>> GetAccountSkills(GetAccountSkillsDTO accountSkills);
+        Task<IActionResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills);
 
-        Task<bool> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills);
+        Task<IActionResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills);
     }
 }

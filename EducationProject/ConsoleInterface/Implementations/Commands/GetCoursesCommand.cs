@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -12,36 +13,48 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private ICourseService courseService;
 
-        private int pageSize;
+        private int defaultpageSize;
+
+        private PageInfoValidator pageInfoValidator;
 
         public GetCoursesCommand(ICourseService courseService, 
+            PageInfoValidator pageInfoValidator,
             int defaultPageSize, string commandName)
             : base(commandName)
         {
             this.courseService = courseService;
 
-            this.pageSize = defaultPageSize;
+            this.defaultpageSize = defaultPageSize;
+
+            this.pageInfoValidator = pageInfoValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Getting courses");
 
             Console.Write("Enter the page: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int pageNumber) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int pageNumber))
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
             }
 
-            var coursesData = courseService.Get(new PageInfoDTO()
+            var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
-                PageSize = pageSize
-            });
+                PageSize = defaultpageSize
+            };
 
-            if(coursesData == null)
+            if(!this.ValidateEntity(pageInfo))
+            {
+                return;
+            }
+
+            var coursesData = await courseService.GetAsync(pageInfo);
+
+            if(!coursesData.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -50,10 +63,24 @@ namespace ConsoleInterface.Implementations.Commands
             StringBuilder builder = new StringBuilder();
 
             builder.AppendJoin("\n",
-                coursesData.Select(c => $"{c.Id}: {c.Title}.\n\tDescription: {c.Description}"));
+                coursesData.Result.Select(c => $"{c.Id}: {c.Title}.\n\tDescription: {c.Description}"));
 
             Console.WriteLine(builder);
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(PageInfoDTO pageInfo)
+        {
+            var validationresult = this.pageInfoValidator.Validate(pageInfo);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -18,24 +18,31 @@ namespace ConsoleInterface.Implementations.Commands
             this.materialService = materialService;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Showing material data");
 
             Console.Write("Material ID: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out int materialId) == false)
+            if(!Int32.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var material = materialService.GetMaterialInfo(materialId);
+            var actionResult = await materialService.GetMaterialInfoAsync(materialId);
+
+            if(!actionResult.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+                return;
+            }
 
             StringBuilder builder = new StringBuilder();
 
-            switch (material)
+            switch (actionResult.Result)
             {
                 case ArticleMaterialDTO article:
                     builder.Append($"{article.Id}: {article.Title}.\n");

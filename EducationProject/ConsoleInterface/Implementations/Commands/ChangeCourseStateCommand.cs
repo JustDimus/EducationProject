@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,20 +12,25 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private ICourseService courseService;
 
+        private CourseVisibilityValidator courseVisibilityValidator;
+
         public ChangeCourseStateCommand(ICourseService courseService,
+            CourseVisibilityValidator courseVisibilityValidator,
             string commandName)
             : base(commandName)
         {
             this.courseService = courseService;
+
+            this.courseVisibilityValidator = courseVisibilityValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Changing course state");
 
             Console.Write("Course ID: ");
 
-            if (int.TryParse(Console.ReadLine(), out int courseId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -33,7 +39,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("New state 0 - hide, 1 - publish: ");
 
-            if(int.TryParse(Console.ReadLine(), out int state) == false)
+            if(!Int32.TryParse(Console.ReadLine(), out int state))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -47,14 +53,21 @@ namespace ConsoleInterface.Implementations.Commands
                 return;
             }
 
-            var actionResult = this.courseService.ChangeCourseVisibility(new CourseVisibilityDTO()
+            var courseVisibility = new CourseVisibilityDTO()
             {
-                Token = token,
+                AccountId = accountId,
                 CourseId = courseId,
                 Visibility = state == 0 ? false : true
-            });
+            };
 
-            if (actionResult == false)
+            if(!this.ValidateEntity(courseVisibility))
+            {
+                return;
+            }
+
+            var actionResult = await this.courseService.ChangeCourseVisibilityAsync(courseVisibility);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -64,6 +77,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(CourseVisibilityDTO courseVisibility)
+        {
+            var validationresult = this.courseVisibilityValidator.Validate(courseVisibility);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

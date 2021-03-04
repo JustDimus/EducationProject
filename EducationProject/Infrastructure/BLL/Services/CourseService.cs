@@ -21,20 +21,16 @@ namespace Infrastructure.BLL.Services
 
         private IRepository<CourseSkill> courseSkillRepository;
 
-        private IRepository<CourseMaterial> courseMaterialRepository;
-
         private IMapping<Course, ShortCourseInfoDTO> courseMapping;
 
         private IRepository<Course> courseRepository;
 
         private int defaultPageSize;
 
-        public CourseService(IRepository<Course> courseRepository, 
-            AuthorizationService authorisztionService,
+        public CourseService(IRepository<Course> courseRepository,
             IMaterialService materialService,
             ISkillService skillService,
             IRepository<CourseSkill> courseSkillRepository,
-            IRepository<CourseMaterial> courseMaterialRepository,
             IMapping<Course, ShortCourseInfoDTO> courseMapping,
             int defaultPageSize)
         {
@@ -53,7 +49,7 @@ namespace Infrastructure.BLL.Services
             this.courseMapping = courseMapping;
         }
       
-        public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreator courseCreator)
+        public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
         {
             return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
             {
@@ -269,10 +265,9 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
         {
-            var isCourseExist = await this.courseRepository.AnyAsync(c =>
-                c.Id == visibilityParams.CourseId && c.CreatorId == visibilityParams.AccountId);
+            var isCourseExist = await CheckCourseCreatorAsync(visibilityParams.CourseId, visibilityParams.AccountId);
 
-            if(!isCourseExist)
+            if (!isCourseExist)
             {
                 return new ActionResult()
                 {
@@ -375,20 +370,13 @@ namespace Infrastructure.BLL.Services
             };
         }
 
-        public async Task<IActionResult<IEnumerable<int>>> GetAllCourseMaterialsIdAsync(int courseId)
-        {
-            return new ActionResult<IEnumerable<int>>()
-            {
-                IsSuccessful = true,
-                Result = await this.courseMaterialRepository.GetPageAsync<int>(cm => cm.CourseId == courseId,
-                cm => cm.MaterialId, 0,
-                await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId))
-            };
-        }
-
         public async Task<IActionResult> CreateAsync(ChangeEntityDTO<ShortCourseInfoDTO> createEntity)
         {
-            await this.courseRepository.CreateAsync(this.courseMapping.Map(createEntity.Entity));
+            var courseToCreate = this.courseMapping.Map(createEntity.Entity);
+
+            courseToCreate.CreatorId = createEntity.AccountId;
+
+            await this.courseRepository.CreateAsync(courseToCreate);
 
             return new ActionResult()
             {
@@ -398,6 +386,16 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortCourseInfoDTO> updateEntity)
         {
+            var isCourseExist = await this.CheckCourseCreatorAsync(updateEntity.Entity.Id, updateEntity.AccountId);
+
+            if (!isCourseExist)
+            {
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
+            }
+
             await this.courseRepository.UpdateAsync(this.courseMapping.Map(updateEntity.Entity));
 
             return new ActionResult()
@@ -408,6 +406,16 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortCourseInfoDTO> deleteEntity)
         {
+            var isCourseExist = await this.CheckCourseCreatorAsync(deleteEntity.Entity.Id, deleteEntity.AccountId);
+
+            if (!isCourseExist)
+            {
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
+            }
+
             await this.courseRepository.DeleteAsync(this.courseMapping.Map(deleteEntity.Entity));
 
             return new ActionResult()

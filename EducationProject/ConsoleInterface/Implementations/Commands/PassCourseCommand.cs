@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,34 +12,46 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private IAccountService accountService;
 
+        private ChangeAccountCourseValidator changeAccountCourseValidator;
+
         public PassCourseCommand(IAccountService accountService,
+            ChangeAccountCourseValidator changeAccountCourseValidator,
             string commandName)
             : base(commandName)
         {
             this.accountService = accountService;
+
+            this.changeAccountCourseValidator = changeAccountCourseValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Passing the course");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int courseId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var actionResult = accountService.ChangeAccountCourseStatus(new ChangeAccountCourseDTO()
+            var changeAccountCourse = new ChangeAccountCourseDTO()
             {
-                Token = token,
+                AccountId = accountId,
                 Status = EducationProject.Core.Models.Enums.ProgressStatus.Passed,
                 CourseId = courseId
-            });
+            };
 
-            if (actionResult == false)
+            if(!this.ValidateEntity(changeAccountCourse))
+            {
+                return;
+            }
+
+            var actionResult = await accountService.ChangeAccountCourseStatusAsync(changeAccountCourse);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -48,6 +61,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeAccountCourseDTO changeAccountCourse)
+        {
+            var validationresult = this.changeAccountCourseValidator.Validate(changeAccountCourse);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

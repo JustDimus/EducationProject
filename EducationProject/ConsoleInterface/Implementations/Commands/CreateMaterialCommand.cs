@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,54 +12,56 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private IMaterialService materialService;
 
+        private ChangeEntityValidator<MaterialDTO> changeEntityValidator;
+
         public CreateMaterialCommand(IMaterialService materialService,
+            ChangeEntityValidator<MaterialDTO> changeEntityValidator,
             string commandName)
             : base(commandName)
         {
             this.materialService = materialService;
+
+            this.changeEntityValidator = changeEntityValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Creating material");
 
             Console.WriteLine("Enter the type of material: 1 - Artcle, 2 - Book, 3 - Video");
 
-            Int32.TryParse(Console.ReadLine(), out int type);
+            if(!Int32.TryParse(Console.ReadLine(), out int type))
+            {
+                Console.WriteLine("Error. Enter the number!");
+                Console.WriteLine();
+            }
 
-            MaterialDTO material = null;
+            var changeEntity = new ChangeEntityDTO<MaterialDTO>()
+            {
+                AccountId = accountId
+            };
 
             switch (type)
             {
                 case 1:
-                    material = GetArticleMaterial();
+                    changeEntity.Entity = GetArticleMaterial();
                     break;
                 case 2:
-                    material = GetBookMaterial();
+                    changeEntity.Entity = GetBookMaterial();
                     break;
                 case 3:
-                    material = GetVideoMaterial();
+                    changeEntity.Entity = GetVideoMaterial();
                     break;
-                default:
-                    Console.WriteLine("Error. Enter the number!");
-                    Console.WriteLine();
-                    return;
             }
 
-            if(material == null)
+            if(!this.ValidateEntity(changeEntity))
             {
-                Console.WriteLine("Error. Invalid data!");
-                Console.WriteLine();
                 return;
             }
 
-            var actionResult = this.materialService.Create(new ChangeEntityDTO<MaterialDTO>()
-            {
-                Token = token,
-                Entity = material
-            });
+            var actionResult = await this.materialService.CreateAsync(changeEntity);
 
-            if (actionResult == false)
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -185,6 +188,20 @@ namespace ConsoleInterface.Implementations.Commands
                 Duration = duration,
                 Quality = quality
             };
+        }
+
+        private bool ValidateEntity(ChangeEntityDTO<MaterialDTO> changeEntity)
+        {
+            var validationresult = this.changeEntityValidator.Validate(changeEntity);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

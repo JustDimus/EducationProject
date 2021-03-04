@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,20 +12,25 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private ICourseService courseService;
 
+        private ChangeCourseMaterialValidator changeCourseMaterialValidator;
+
         public AddMaterialToCourseCommand(ICourseService courseService,
+            ChangeCourseMaterialValidator changeCourseMaterialValidator,
             string commandName)
             : base(commandName)
         {
             this.courseService = courseService;
+
+            this.changeCourseMaterialValidator = changeCourseMaterialValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Adding skill to course");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int courseId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -33,21 +39,28 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Material ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int materialId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var actionResult = this.courseService.AddCourseMaterial(new ChangeCourseMaterialDTO()
+            var changeCourseMaterial = new ChangeCourseMaterialDTO()
             {
-                Token = token,
+                AccountId = accountId,
                 CourseId = courseId,
                 MaterialId = materialId
-            });
+            };
 
-            if (actionResult == false)
+            if(!this.ValidateEntity(changeCourseMaterial))
+            {
+                return;
+            }
+
+            var actionResult = await this.courseService.AddCourseMaterialAsync(changeCourseMaterial);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -57,6 +70,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeCourseMaterialDTO changeCourseMaterial)
+        {
+            var validationresult = this.changeCourseMaterialValidator.Validate(changeCourseMaterial);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -14,34 +15,46 @@ namespace ConsoleInterface.Implementations.Commands
 
         private int pageSize;
 
-        public GetMaterialsCommand(IMaterialService materialService, 
+        private PageInfoValidator pageInfoValidator;
+
+        public GetMaterialsCommand(IMaterialService materialService,
+            PageInfoValidator pageInfoValidator,
             int defaultPageSize, string commandName)
             : base(commandName)
         {
             this.materialService = materialService;
 
             this.pageSize = defaultPageSize;
+
+            this.pageInfoValidator = pageInfoValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Getting materials");
 
             Console.Write("Enter the page: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int pageNumber) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int pageNumber))
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
             }
 
-            var materialsData = materialService.Get(new PageInfoDTO()
+            var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize
-            });
+            };
 
-            if(materialsData == null)
+            if(!this.ValidateEntity(pageInfo))
+            {
+                return;
+            }
+
+            var materialsData = await materialService.GetAsync(pageInfo);
+
+            if(!materialsData.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -50,7 +63,7 @@ namespace ConsoleInterface.Implementations.Commands
             StringBuilder builder = new StringBuilder();
 
             builder.AppendJoin("\n",
-                materialsData.Select(m => m switch
+                materialsData.Result.Select(m => m switch
                 {
                     ArticleMaterialDTO article => new StringBuilder()
                     .Append($"{article.Id}: {article.Title}. Type: Article.\n")
@@ -68,6 +81,20 @@ namespace ConsoleInterface.Implementations.Commands
                 }));
 
             Console.WriteLine(builder);
+        }
+
+        private bool ValidateEntity(PageInfoDTO pageInfo)
+        {
+            var validationresult = this.pageInfoValidator.Validate(pageInfo);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

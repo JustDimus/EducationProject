@@ -50,7 +50,7 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            await this.skillRepository.CreateAsync(skillMapping.Map(createEntity.Entity));
+            await this.skillRepository.CreateAsync(this.skillMapping.Map(createEntity.Entity));
 
             return new ActionResult()
             {
@@ -70,7 +70,18 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
-            await skillRepository.UpdateAsync(skillMapping.Map(changeEntity.Entity));
+            var isSkillExist = await this.skillRepository
+                .AnyAsync(s => s.Id == changeEntity.Entity.Id);
+
+            if (!isSkillExist)
+            {
+                return new ActionResult()
+                {
+                    IsSuccessful = false
+                };
+            }
+
+            await this.skillRepository.UpdateAsync(skillMapping.Map(changeEntity.Entity));
 
             return new ActionResult()
             {

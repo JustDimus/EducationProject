@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,20 +12,25 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private ICourseService courseService;
 
+        private ChangeCourseSkillValidator changeCourseSkillValidator;
+
         public AddSkillToCourseCommand(ICourseService courseService,
+            ChangeCourseSkillValidator changeCourseSkillValidator,
             string commandName)
             : base(commandName)
         {
             this.courseService = courseService;
+
+            this.changeCourseSkillValidator = changeCourseSkillValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Adding skill to course");
 
             Console.Write("Course ID: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out int courseId) == false)
+            if(!Int32.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -33,7 +39,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Skill ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int skillId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int skillId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -42,22 +48,29 @@ namespace ConsoleInterface.Implementations.Commands
             
             Console.Write("Skill change: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int change) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int change))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var actionResult = this.courseService.AddCourseSkill(new ChangeCourseSkillDTO()
+            var changeCourseSkill = new ChangeCourseSkillDTO()
             {
                 Change = change,
-                Token = token,
+                AccountId = accountId,
                 CourseId = courseId,
                 SkillId = skillId
-            });
+            };
 
-            if (actionResult == false)
+            if(!this.ValidateEntity(changeCourseSkill))
+            {
+                return;
+            }
+
+            var actionResult = await this.courseService.AddCourseSkillAsync(changeCourseSkill);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -67,6 +80,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeCourseSkillDTO changeCourseSkill)
+        {
+            var validationresult = this.changeCourseSkillValidator.Validate(changeCourseSkill);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

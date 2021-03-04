@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -14,34 +15,46 @@ namespace ConsoleInterface.Implementations.Commands
 
         private int pageSize;
 
-        public GetSkillsCommand(ISkillService skillService, 
+        private PageInfoValidator pageInfoValidator;
+
+        public GetSkillsCommand(ISkillService skillService,
+            PageInfoValidator pageInfoValidator,
             int defaultPageSize, string commandName)
             : base(commandName)
         {
             this.skillService = skillService;
 
             this.pageSize = defaultPageSize;
+
+            this.pageInfoValidator = pageInfoValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Getting skills");
 
             Console.Write("Enter the page: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out int pageNumber) == false)
+            if(!Int32.TryParse(Console.ReadLine(), out int pageNumber))
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
             }
 
-            var skillsData = skillService.Get(new PageInfoDTO()
+            var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize
-            });
+            };
 
-            if (skillsData == null)
+            if(!this.ValidateEntity(pageInfo))
+            {
+                return;
+            }
+
+            var skillsData = await skillService.GetAsync(pageInfo);
+
+            if (!skillsData.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -50,9 +63,23 @@ namespace ConsoleInterface.Implementations.Commands
             StringBuilder builder = new StringBuilder();
 
             builder.AppendJoin("\n",
-                skillsData.Select(s => $"{s.Id}: {s.Title}. Max value: {s.MaxValue}\n"));
+                skillsData.Result.Select(s => $"{s.Id}: {s.Title}. Max value: {s.MaxValue}\n"));
 
             Console.WriteLine(builder);
+        }
+
+        private bool ValidateEntity(PageInfoDTO pageInfo)
+        {
+            var validationresult = this.pageInfoValidator.Validate(pageInfo);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

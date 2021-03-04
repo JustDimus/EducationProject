@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -11,33 +12,45 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private IAccountService accountService;
 
+        private ChangeAccountMaterialValidator changeAccountMaterialValidator;
+
         public PassMaterialCommand(IAccountService accountService,
+            ChangeAccountMaterialValidator changeAccountMaterialValidator,
             string commandName)
             : base(commandName)
         {
             this.accountService = accountService;
+
+            this.changeAccountMaterialValidator = changeAccountMaterialValidator;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Passing material");
 
             Console.Write("Material ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int materialId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var actionResult = accountService.AddAccountMaterial(new ChangeAccountMaterialDTO()
+            var changeAccountMaterial = new ChangeAccountMaterialDTO()
             {
                 MaterialId = materialId,
-                Token = token
-            });
+                AccountId = accountId
+            };
 
-            if (actionResult == false)
+            if(!this.ValidateEntity(changeAccountMaterial))
+            {
+                return;
+            }
+
+            var actionResult = await accountService.AddAccountMaterialAsync(changeAccountMaterial);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
             }
@@ -47,6 +60,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        public bool ValidateEntity(ChangeAccountMaterialDTO changeAccountMaterial)
+        {
+            var validationresult = this.changeAccountMaterialValidator.Validate(changeAccountMaterial);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -18,22 +18,22 @@ namespace ConsoleInterface.Implementations.Commands
             this.courseService = courseService;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Showing course data");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int courseId) == false)
+            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var course = courseService.GetCourseInfo(courseId);
+            var actionResult = await this.courseService.GetCourseInfoAsync(courseId);
 
-            if(course == null)
+            if(!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -41,6 +41,8 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             StringBuilder builder = new StringBuilder();
+
+            var course = actionResult.Result
 
             builder.Append($"ID: {course.Id} {course.Title}\n");
             builder.Append($"Description: {course.Description}\n");

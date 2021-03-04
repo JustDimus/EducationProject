@@ -18,13 +18,13 @@ namespace ConsoleInterface.Implementations.Commands
             this.accountService = accountService;
         }
 
-        public override void Run(ref string token)
+        public async override void Run(int accountId)
         {
             Console.WriteLine("Showing account info");
 
-            var account = this.accountService.GetAccountInfo(token);
+            var actionresult = await this.accountService.GetAccountInfoAsync(accountId);
 
-            if(account == null)
+            if(!actionresult.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -32,6 +32,8 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             StringBuilder builder = new StringBuilder();
+
+            var account = actionresult.Result;
 
             builder.Append($"ID: {account.Id} Email: {account.Email}\n");
             builder.Append($"Registration date: {account.RegistrationDate}\n");

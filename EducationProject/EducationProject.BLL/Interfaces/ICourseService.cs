@@ -26,8 +26,6 @@ namespace EducationProject.BLL.Interfaces
 
         Task<IActionResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
 
-        Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreator courseCreator);
-
-        Task<IActionResult<IEnumerable<int>>> GetAllCourseMaterialsIdAsync(int courseId);
+        Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator);
     }
 }

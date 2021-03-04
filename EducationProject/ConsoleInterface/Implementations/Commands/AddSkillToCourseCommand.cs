@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeCourseSkillValidator changeCourseSkillValidator;
 
-        public AddSkillToCourseCommand(ICourseService courseService,
+        public AddSkillToCourseCommand(
+            ICourseService courseService,
             ChangeCourseSkillValidator changeCourseSkillValidator,
             string commandName)
             : base(commandName)
@@ -30,7 +31,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Course ID: ");
 
-            if(!Int32.TryParse(Console.ReadLine(), out int courseId))
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -39,7 +40,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Skill ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int skillId))
+            if (!int.TryParse(Console.ReadLine(), out int skillId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -48,7 +49,7 @@ namespace ConsoleInterface.Implementations.Commands
             
             Console.Write("Skill change: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int change))
+            if (!int.TryParse(Console.ReadLine(), out int change))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -63,7 +64,7 @@ namespace ConsoleInterface.Implementations.Commands
                 SkillId = skillId
             };
 
-            if(!this.ValidateEntity(changeCourseSkill))
+            if (!this.ValidateEntity(changeCourseSkill))
             {
                 return;
             }
@@ -88,7 +89,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

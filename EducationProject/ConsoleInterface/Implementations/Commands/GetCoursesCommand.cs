@@ -17,9 +17,11 @@ namespace ConsoleInterface.Implementations.Commands
 
         private PageInfoValidator pageInfoValidator;
 
-        public GetCoursesCommand(ICourseService courseService, 
+        public GetCoursesCommand(
+            ICourseService courseService, 
             PageInfoValidator pageInfoValidator,
-            int defaultPageSize, string commandName)
+            int defaultPageSize, 
+            string commandName)
             : base(commandName)
         {
             this.courseService = courseService;
@@ -35,7 +37,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Enter the page: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int pageNumber))
+            if (!int.TryParse(Console.ReadLine(), out int pageNumber))
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -44,17 +46,17 @@ namespace ConsoleInterface.Implementations.Commands
             var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
-                PageSize = defaultpageSize
+                PageSize = this.defaultpageSize
             };
 
-            if(!this.ValidateEntity(pageInfo))
+            if (!this.ValidateEntity(pageInfo))
             {
                 return;
             }
 
-            var coursesData = await courseService.GetAsync(pageInfo);
+            var coursesData = await this.courseService.GetAsync(pageInfo);
 
-            if(!coursesData.IsSuccessful)
+            if (!coursesData.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -62,7 +64,8 @@ namespace ConsoleInterface.Implementations.Commands
 
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendJoin("\n",
+            builder.AppendJoin(
+                "\n",
                 coursesData.Result.Select(c => $"{c.Id}: {c.Title}.\n\tDescription: {c.Description}"));
 
             Console.WriteLine(builder);
@@ -75,7 +78,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

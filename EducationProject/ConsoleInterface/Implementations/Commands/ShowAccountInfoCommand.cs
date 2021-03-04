@@ -11,7 +11,8 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private IAccountService accountService;
 
-        public ShowAccountInfoCommand(IAccountService accountService,
+        public ShowAccountInfoCommand(
+            IAccountService accountService,
             string commandName)
             : base(commandName)
         {
@@ -24,7 +25,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             var actionresult = await this.accountService.GetAccountInfoAsync(accountId);
 
-            if(!actionresult.IsSuccessful)
+            if (!actionresult.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -39,14 +40,17 @@ namespace ConsoleInterface.Implementations.Commands
             builder.Append($"Registration date: {account.RegistrationDate}\n");
             builder.Append($"Name: {account.FirstName} {account.SecondName}\n");
             builder.Append($"Passed courses({account.PassedCoursesCount}):\n\t");
-            builder.Append(String.Join("\n\t", account.PassedCourses
-                .Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
+            builder.Append(string.Join(
+                "\n\t", 
+                account.PassedCourses.Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
             builder.Append($"\nCourses in progress({account.CoursesInProgressCount}):\n\t");
-            builder.Append(String.Join("\n\t", account.CoursesInProgress
-                .Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
+            builder.Append(string.Join(
+                "\n\t", 
+                account.CoursesInProgress.Select(c => $"ID: {c.CourseId} Title: {c.Title}")));
             builder.Append("\nSkills:\n\t");
-            builder.Append(String.Join("\n\t", account.AccountSkills
-                .Select(s => $"Id: {s.SkillId}. Title: {s.Title}. Results: Lvl {s.Level}, value {s.CurrentResult}")));
+            builder.Append(string.Join(
+                "\n\t", 
+                account.AccountSkills.Select(s => $"Id: {s.SkillId}. Title: {s.Title}. Results: Lvl {s.Level}, value {s.CurrentResult}")));
 
             Console.WriteLine(builder);
             Console.WriteLine();

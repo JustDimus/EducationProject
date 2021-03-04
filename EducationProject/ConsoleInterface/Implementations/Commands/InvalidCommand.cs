@@ -12,7 +12,7 @@ namespace ConsoleInterface.Implementations.Commands
         {
         }
 
-        public override void Run(ref string token)
+        public override void Run(int accountId)
         {
             Console.WriteLine("Invalid command");
         }

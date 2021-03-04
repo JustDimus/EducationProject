@@ -2,12 +2,8 @@
 using EducationProject.BLL.DTO;
 using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using EducationProject.BLL;
 
@@ -21,16 +17,20 @@ namespace Infrastructure.BLL.Services
 
         private IRepository<CourseSkill> courseSkillRepository;
 
+        private IRepository<CourseMaterial> courseMaterialRepository;
+
         private IMapping<Course, ShortCourseInfoDTO> courseMapping;
 
         private IRepository<Course> courseRepository;
 
         private int defaultPageSize;
 
-        public CourseService(IRepository<Course> courseRepository,
+        public CourseService(
+            IRepository<Course> courseRepository,
             IMaterialService materialService,
             ISkillService skillService,
             IRepository<CourseSkill> courseSkillRepository,
+            IRepository<CourseMaterial> courseMaterialRepository,
             IMapping<Course, ShortCourseInfoDTO> courseMapping,
             int defaultPageSize)
         {
@@ -44,6 +44,8 @@ namespace Infrastructure.BLL.Services
 
             this.courseSkillRepository = courseSkillRepository;
 
+            this.courseMaterialRepository = courseMaterialRepository;
+
             this.defaultPageSize = defaultPageSize;
 
             this.courseMapping = courseMapping;
@@ -54,10 +56,11 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(c =>
-                    c.CreatorId == courseCreator.AccountId,
+                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
+                    c => c.CreatorId == courseCreator.AccountId,
                     this.courseMapping.ConvertExpression, 
-                    courseCreator.PageInfo.PageNumber, courseCreator.PageInfo.PageSize)
+                    courseCreator.PageInfo.PageNumber, 
+                    courseCreator.PageInfo.PageSize)
             };
         }
 
@@ -73,7 +76,8 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseMaterialChange.CourseId,
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                courseMaterialChange.CourseId,
                 courseMaterialChange.AccountId);
 
             if (!isAccountCanChangeCourse)
@@ -112,7 +116,8 @@ namespace Infrastructure.BLL.Services
         
         public async Task<IActionResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseMaterialChange.CourseId,
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                courseMaterialChange.CourseId,
                courseMaterialChange.AccountId);
 
             if (!isAccountCanChangeCourse)
@@ -149,7 +154,8 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseSkillChange.CourseId,
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                courseSkillChange.CourseId,
                 courseSkillChange.AccountId);
 
             if (!isAccountCanChangeCourse)
@@ -164,7 +170,7 @@ namespace Infrastructure.BLL.Services
                 c.SkillId == courseSkillChange.SkillId 
                 && c.CourseId == courseSkillChange.CourseId);
 
-            if(isCourseSkillAlreadyExist)
+            if (isCourseSkillAlreadyExist)
             {
                 return new ActionResult()
                 {
@@ -189,7 +195,8 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseSkillChange.CourseId,
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                courseSkillChange.CourseId,
                 courseSkillChange.AccountId);
 
             if (!isAccountCanChangeCourse)
@@ -218,7 +225,7 @@ namespace Infrastructure.BLL.Services
         {
             var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
 
-            if(!isCourseAndSkillExist)
+            if (!isCourseAndSkillExist)
             {
                 return new ActionResult()
                 {
@@ -226,10 +233,11 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(courseSkillChange.CourseId,
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                courseSkillChange.CourseId,
                 courseSkillChange.AccountId);
             
-            if(!isAccountCanChangeCourse)
+            if (!isAccountCanChangeCourse)
             {
                 return new ActionResult()
                 {
@@ -240,7 +248,7 @@ namespace Infrastructure.BLL.Services
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(cs =>
                 cs.CourseId == courseSkillChange.CourseId && cs.SkillId == courseSkillChange.SkillId);
 
-            if(!isCourseSkillAlreadyExist)
+            if (!isCourseSkillAlreadyExist)
             {
                 return new ActionResult()
                 {
@@ -265,7 +273,9 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
         {
-            var isCourseExist = await CheckCourseCreatorAsync(visibilityParams.CourseId, visibilityParams.AccountId);
+            var isCourseExist = await this.CheckCourseCreatorAsync(
+                visibilityParams.CourseId, 
+                visibilityParams.AccountId);
 
             if (!isCourseExist)
             {
@@ -302,7 +312,8 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id)
         {
-            FullCourseInfoDTO result = await this.courseRepository.GetAsync<FullCourseInfoDTO>(c => c.Id == id,
+            FullCourseInfoDTO result = await this.courseRepository.GetAsync<FullCourseInfoDTO>(
+                c => c.Id == id,
                 c => new FullCourseInfoDTO()
                 {
                     Id = c.Id,
@@ -311,21 +322,27 @@ namespace Infrastructure.BLL.Services
                     CreatorId = c.CreatorId
                 });
 
-            result.Materials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(cm => cm.CourseId == id,
+            result.Materials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(
+                cm => cm.CourseId == id,
                 cm => new CourseMaterialDTO()
                 {
                     MaterialTitle = cm.Material.Title,
                     MaterialId = cm.Material.Id,
                     MaterialType = cm.Material.Type
-                }, 0, defaultPageSize);
+                }, 
+                0,
+                this.defaultPageSize);
 
-            result.Skills = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(cs => cs.CourseId == id,
+            result.Skills = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(
+                cs => cs.CourseId == id,
                 cs => new CourseSkillDTO()
                 {
                     SkillId = cs.Skill.Id,
                     SkillChange = cs.Change,
                     SkillTitle = cs.Skill.Title
-                }, 0, defaultPageSize);
+                }, 
+                0,
+                this.defaultPageSize);
 
             return new ActionResult<FullCourseInfoDTO>()
             {
@@ -353,7 +370,7 @@ namespace Infrastructure.BLL.Services
             {
                 var isCourseContainsMaterial = await this.IsCourseContainsMaterialAsync(entity);
 
-                if(!isCourseContainsMaterial.Result)
+                if (!isCourseContainsMaterial.Result)
                 {
                     return new ActionResult<bool>()
                     {
@@ -438,8 +455,11 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(c => c.IsVisible == true,
-                this.courseMapping.ConvertExpression, 0, pageInfo.PageNumber)
+                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
+                    c => c.IsVisible == true,
+                    this.courseMapping.ConvertExpression, 
+                    pageInfo.PageNumber, 
+                    pageInfo.PageSize)
             };
         }
 

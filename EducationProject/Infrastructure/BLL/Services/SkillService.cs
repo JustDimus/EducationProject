@@ -2,12 +2,8 @@
 using EducationProject.BLL.DTO;
 using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using EducationProject.BLL;
 
@@ -23,7 +19,8 @@ namespace Infrastructure.BLL.Services
 
         private IMapping<Skill, SkillDTO> skillMapping;
 
-        public SkillService(IRepository<Skill> skillRepository,
+        public SkillService(
+            IRepository<Skill> skillRepository,
             IRepository<AccountSkill> accountSkillRepository,
             IRepository<CourseSkill> courseSkillRepository,
             IMapping<Skill, SkillDTO> skillMapping)
@@ -42,7 +39,7 @@ namespace Infrastructure.BLL.Services
             var isSkillExist = await this.skillRepository
                 .AnyAsync(s => s.Title == createEntity.Entity.Title);
 
-            if(isSkillExist)
+            if (isSkillExist)
             {
                 return new ActionResult()
                 {
@@ -63,8 +60,11 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<IEnumerable<SkillDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.skillRepository.GetPageAsync<SkillDTO>(s => true,
-                   skillMapping.ConvertExpression, pageInfo.PageNumber, pageInfo.PageSize)
+                Result = await this.skillRepository.GetPageAsync<SkillDTO>(
+                   s => true,
+                   this.skillMapping.ConvertExpression, 
+                   pageInfo.PageNumber, 
+                   pageInfo.PageSize)
             };
         }
 
@@ -81,7 +81,7 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            await this.skillRepository.UpdateAsync(skillMapping.Map(changeEntity.Entity));
+            await this.skillRepository.UpdateAsync(this.skillMapping.Map(changeEntity.Entity));
 
             return new ActionResult()
             {
@@ -91,7 +91,7 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
-            await this.skillRepository.DeleteAsync(skillMapping.Map(changeEntity.Entity));
+            await this.skillRepository.DeleteAsync(this.skillMapping.Map(changeEntity.Entity));
 
             return new ActionResult()
             {
@@ -110,13 +110,14 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills)
         {
-            var skillsToAdd = await this.courseSkillRepository
-                .GetPageAsync(cs => cs.CourseId == changeSkills.CourseId,
-                cs => new { cs.Change, cs.SkillId }, 0, 
+            var skillsToAdd = await this.courseSkillRepository.GetPageAsync(
+                cs => cs.CourseId == changeSkills.CourseId,
+                cs => new { cs.Change, cs.SkillId }, 
+                0, 
                 await this.courseSkillRepository.CountAsync(cs => cs.CourseId == changeSkills.CourseId));
 
             skillsToAdd.ToList().ForEach(s =>
-                AddSkillValueToAccountAsync(s.SkillId, changeSkills.AccountId, s.Change));
+                this.AddSkillValueToAccountAsync(s.SkillId, changeSkills.AccountId, s.Change));
 
             return new ActionResult()
             {
@@ -129,15 +130,18 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<IEnumerable<AccountSkillDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.accountSkillRepository.GetPageAsync<AccountSkillDTO>(a => a.AccountId == accountSkills.AccountId,
-                a => new AccountSkillDTO()
-                {
-                    Title = a.Skill.Title,
-                    SkillId = a.Skill.Id,
-                    MaxValue = a.Skill.MaxValue,
-                    CurrentResult = a.CurrentResult % a.Skill.MaxValue,
-                    Level = a.CurrentResult / a.Skill.MaxValue
-                }, accountSkills.PageNumber, accountSkills.PageSize)
+                Result = await this.accountSkillRepository.GetPageAsync<AccountSkillDTO>(
+                    a => a.AccountId == accountSkills.AccountId,
+                    a => new AccountSkillDTO()
+                    {
+                        Title = a.Skill.Title,
+                        SkillId = a.Skill.Id,
+                        MaxValue = a.Skill.MaxValue,
+                        CurrentResult = a.CurrentResult % a.Skill.MaxValue,
+                        Level = a.CurrentResult / a.Skill.MaxValue
+                    }, 
+                    accountSkills.PageNumber, 
+                    accountSkills.PageSize)
             };
         }
 

@@ -1,26 +1,23 @@
 ﻿using EducationProject.BLL.Interfaces;
 using EducationProject.Core.Models;
-using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using EducationProject.BLL.DTO;
-using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
-using System.Linq.Expressions;
 using EducationProject.DAL.Interfaces;
 using System.Threading.Tasks;
 using EducationProject.BLL;
+
+using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
 
 namespace Infrastructure.BLL.Services
 {
     public class AccountService : IAccountService
     {
-        private IRepository<AccountCourse> accountCourseRepository { get; set; }
+        private IRepository<AccountCourse> accountCourseRepository;
 
-        private IRepository<AccountMaterial> accountMaterialRepository { get; set; }
+        private IRepository<AccountMaterial> accountMaterialRepository;
 
-        private IRepository<Account> accountRepository { get; set; }
+        private IRepository<Account> accountRepository;
 
         private ICourseService courseService;
 
@@ -32,7 +29,8 @@ namespace Infrastructure.BLL.Services
 
         private int defaultAccountInfoPageSize;
 
-        public AccountService(IRepository<Account> accountRepository,
+        public AccountService(
+            IRepository<Account> accountRepository,
             IRepository<AccountCourse> accountCoursesRepository,
             IRepository<AccountMaterial> accountMaterialsRepository,
             ICourseService courseService,
@@ -59,7 +57,7 @@ namespace Infrastructure.BLL.Services
             var isEmailAlreadyExist = await this.accountRepository.AnyAsync(a =>
                 a.Email == createEntity.Entity.Email);
 
-            if(isEmailAlreadyExist)
+            if (isEmailAlreadyExist)
             {
                 return new ActionResult()
                 {
@@ -67,7 +65,11 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            await this.accountRepository.CreateAsync(this.accountMapping.Map(createEntity.Entity));
+            var account = this.accountMapping.Map(createEntity.Entity);
+
+            account.RegistrationDate = DateTime.Now;
+
+            await this.accountRepository.CreateAsync(account);
 
             await this.accountRepository.SaveAsync();
 
@@ -82,7 +84,7 @@ namespace Infrastructure.BLL.Services
             var isAccountExist = await this.accountRepository.AnyAsync(a =>
                 a.Id == updateEntity.Entity.Id);
 
-            if(!isAccountExist)
+            if (!isAccountExist)
             {
                 return new ActionResult()
                 {
@@ -124,9 +126,11 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<IEnumerable<ShortAccountInfoDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.accountRepository.GetPageAsync<ShortAccountInfoDTO>(a => true,
+                Result = await this.accountRepository.GetPageAsync<ShortAccountInfoDTO>(
+                    a => true,
                     this.accountMapping.ConvertExpression,
-                    pageInfo.PageNumber, pageInfo.PageSize)
+                    pageInfo.PageNumber, 
+                    pageInfo.PageSize)
             };
         }
 
@@ -134,7 +138,7 @@ namespace Infrastructure.BLL.Services
         {
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
-            if(!isAccountAndCourseExist)
+            if (!isAccountAndCourseExist)
             {
                 return new ActionResult()
                 {
@@ -146,7 +150,7 @@ namespace Infrastructure.BLL.Services
                 ac.CourseId == accountCourseChange.CourseId
                 && ac.AccountId == accountCourseChange.AccountId);
 
-            if(isAccountCourseAlreadyExist)
+            if (isAccountCourseAlreadyExist)
             {
                 return new ActionResult()
                 {
@@ -173,7 +177,7 @@ namespace Infrastructure.BLL.Services
         {
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
-            if(!isAccountAndCourseExist)
+            if (!isAccountAndCourseExist)
             {
                 return new ActionResult()
                 {
@@ -212,7 +216,7 @@ namespace Infrastructure.BLL.Services
                 && (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == accountCourseChange.AccountId
                 && ac.Status != accountCourseChange.Status));
 
-            if(!isAccountCourseExist)
+            if (!isAccountCourseExist)
             {
                 return new ActionResult()
                 {
@@ -223,10 +227,11 @@ namespace Infrastructure.BLL.Services
             if (accountCourseChange.Status == CourseStatus.Passed)
             {
                 var isAccountPassedAllCourseMaterials = await this.materialService
-                    .IsAccountPassedAllCourseMaterials(accountCourseChange.AccountId,
+                    .IsAccountPassedAllCourseMaterials(
+                    accountCourseChange.AccountId,
                     accountCourseChange.CourseId);
 
-                if(!isAccountPassedAllCourseMaterials)
+                if (!isAccountPassedAllCourseMaterials)
                 {
                     return new ActionResult()
                     {
@@ -239,7 +244,7 @@ namespace Infrastructure.BLL.Services
                 ac.AccountId == accountCourseChange.AccountId
                 && ac.CourseId == accountCourseChange.CourseId);
 
-            if(accountCourse.OncePassed == false && accountCourseChange.Status == CourseStatus.Passed)
+            if (accountCourse.OncePassed == false && accountCourseChange.Status == CourseStatus.Passed)
             {
                 accountCourse.OncePassed = true;
 
@@ -266,7 +271,7 @@ namespace Infrastructure.BLL.Services
         {
             var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
-            if(!isAccountAndMaterialExist)
+            if (!isAccountAndMaterialExist)
             {
                 return new ActionResult()
                 {
@@ -278,7 +283,7 @@ namespace Infrastructure.BLL.Services
                 am.AccountId == accountMaterialChange.AccountId
                 && am.MaterialId == accountMaterialChange.MaterialId);
 
-            if(isAccountMaterialAlreadyExist)
+            if (isAccountMaterialAlreadyExist)
             {
                 return new ActionResult()
                 {
@@ -304,7 +309,7 @@ namespace Infrastructure.BLL.Services
         {
             var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
-            if(!isAccountAndMaterialExist)
+            if (!isAccountAndMaterialExist)
             {
                 return new ActionResult()
                 {
@@ -328,8 +333,8 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult<FullAccountInfoDTO>> GetAccountInfoAsync(int accountId)
         {
-            var result = await this.accountRepository.GetAsync<FullAccountInfoDTO>(a =>
-                a.Id == accountId,
+            var result = await this.accountRepository.GetAsync<FullAccountInfoDTO>(
+                a => a.Id == accountId,
                 a => new FullAccountInfoDTO()
                 {
                     Id = a.Id,
@@ -344,32 +349,36 @@ namespace Infrastructure.BLL.Services
             result.PassedCoursesCount = await this.accountCourseRepository.CountAsync(ac =>
                 ac.AccountId == accountId && ac.Status == CourseStatus.Passed);
 
-            result.PassedCourses = await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(ac =>
-                ac.AccountId == accountId && ac.Status == CourseStatus.Passed,
+            result.PassedCourses = await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(
+                ac => ac.AccountId == accountId && ac.Status == CourseStatus.Passed,
                 ac => new AccountCourseDTO()
                 {
                     Title = ac.Course.Title,
                     CourseId = ac.CourseId,
                     Status = CourseStatus.Passed,
-                }, 0, defaultAccountInfoPageSize);
+                }, 
+                0, 
+                this.defaultAccountInfoPageSize);
 
             result.CoursesInProgressCount = await this.accountCourseRepository.CountAsync(ac => 
                 ac.AccountId == accountId && ac.Status == CourseStatus.InProgress);
 
-            result.CoursesInProgress = await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(ac =>
-                ac.AccountId == accountId && ac.Status == CourseStatus.InProgress,
+            result.CoursesInProgress = await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(
+                ac => ac.AccountId == accountId && ac.Status == CourseStatus.InProgress,
                 ac => new AccountCourseDTO()
                 {
                     Title = ac.Course.Title,
                     CourseId = ac.CourseId,
                     Status = CourseStatus.InProgress
-                }, 0, defaultAccountInfoPageSize);
+                }, 
+                0,
+                this.defaultAccountInfoPageSize);
 
             var accountSkillsResult = await this.skillService.GetAccountSkillsAsync(new GetAccountSkillsDTO()
             {
                 AccountId = accountId,
                 PageNumber = 0,
-                PageSize = defaultAccountInfoPageSize
+                PageSize = this.defaultAccountInfoPageSize
             });
 
             result.AccountSkills = accountSkillsResult.Result;
@@ -409,7 +418,7 @@ namespace Infrastructure.BLL.Services
             var isAccountExist = await this.accountRepository.AnyAsync(a =>
                 a.Id == changeAccountCourse.AccountId);
 
-            if(!isCourseExist.Result || !isAccountExist)
+            if (!isCourseExist.Result || !isAccountExist)
             {
                 return false;
             }

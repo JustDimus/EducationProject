@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeEntityValidator<ShortCourseInfoDTO> changeEntityValidator;
 
-        public CreateCourseCommand(ICourseService courseService,
+        public CreateCourseCommand(
+            ICourseService courseService,
             ChangeEntityValidator<ShortCourseInfoDTO> changeEntityValidator,
             string commandName)
             : base(commandName)
@@ -46,7 +47,7 @@ namespace ConsoleInterface.Implementations.Commands
                 }
             };
 
-            if(!this.ValidateEntity(changeEntity))
+            if (!this.ValidateEntity(changeEntity))
             {
                 return;
             }
@@ -71,7 +72,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

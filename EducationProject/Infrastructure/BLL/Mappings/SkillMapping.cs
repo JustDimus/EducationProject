@@ -2,9 +2,7 @@
 using EducationProject.BLL.Interfaces;
 using EducationProject.Core.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Infrastructure.BLL.Mappings
 {

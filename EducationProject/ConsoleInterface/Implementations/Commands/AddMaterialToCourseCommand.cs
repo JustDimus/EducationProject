@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeCourseMaterialValidator changeCourseMaterialValidator;
 
-        public AddMaterialToCourseCommand(ICourseService courseService,
+        public AddMaterialToCourseCommand(
+            ICourseService courseService,
             ChangeCourseMaterialValidator changeCourseMaterialValidator,
             string commandName)
             : base(commandName)
@@ -30,7 +31,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Course ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -39,7 +40,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Material ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int materialId))
+            if (!int.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -53,7 +54,7 @@ namespace ConsoleInterface.Implementations.Commands
                 MaterialId = materialId
             };
 
-            if(!this.ValidateEntity(changeCourseMaterial))
+            if (!this.ValidateEntity(changeCourseMaterial))
             {
                 return;
             }
@@ -78,7 +79,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

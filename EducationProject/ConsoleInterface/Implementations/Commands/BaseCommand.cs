@@ -9,14 +9,12 @@ namespace ConsoleInterface.Implementations.Commands
 {
     public abstract class BaseCommand : ICommand
     {
-        public string Name => name;
+        public string Name => this.name;
 
         protected string name;
 
         public BaseCommand(string commandName)
         {
-            this.authorizationService = authorizationService;
-
             this.name = commandName;
         }
 

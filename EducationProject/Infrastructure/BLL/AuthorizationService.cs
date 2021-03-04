@@ -1,11 +1,8 @@
-﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.Models;
+﻿using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Infrastructure.BLL
@@ -14,27 +11,27 @@ namespace Infrastructure.BLL
     {
         private ConcurrentDictionary<string, int> authorizedAccounts;
         
-        private IRepository<Account> accounts;
+        private IRepository<Account> accountRepository;
 
         public AuthorizationService(IRepository<Account> accountMapping)
         {
-            accounts = accountMapping;
+            this.accountRepository = accountMapping;
 
-            authorizedAccounts = new ConcurrentDictionary<string, int>();
+            this.authorizedAccounts = new ConcurrentDictionary<string, int>();
         }
 
         public async Task<string> AuthorizeAccountAsync(string email, string password)
         {
-            var accountId = await accounts.GetAsync(a => a.Email == email && a.Password == password, a => a.Id);
+            var accountId = await this.accountRepository.GetAsync(a => a.Email == email && a.Password == password, a => a.Id);
 
-            if(accountId == 0)
+            if (accountId == 0)
             {
                 return null;
             }
 
             string token = $"{DateTime.Now}/{email}";
 
-            authorizedAccounts.TryAdd(token, accountId);
+            this.authorizedAccounts.TryAdd(token, accountId);
 
             return token;
         }
@@ -42,13 +39,13 @@ namespace Infrastructure.BLL
         public Task<int> AuthenticateAccountAsync(string token)
         {
             return Task.Run(() =>
-                token == null ? 0 : authorizedAccounts.GetValueOrDefault(token));
+                token == null ? 0 : this.authorizedAccounts.GetValueOrDefault(token));
         }
 
         public Task<bool> DeauthorizeAccountAsync(string token)
         {
             return Task.Run(() => 
-                token == null ? false : authorizedAccounts.TryRemove(token, out _));
+                token == null ? false : this.authorizedAccounts.TryRemove(token, out _));
         }
     }
 }

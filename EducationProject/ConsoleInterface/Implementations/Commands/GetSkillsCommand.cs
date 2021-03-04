@@ -17,9 +17,11 @@ namespace ConsoleInterface.Implementations.Commands
 
         private PageInfoValidator pageInfoValidator;
 
-        public GetSkillsCommand(ISkillService skillService,
+        public GetSkillsCommand(
+            ISkillService skillService,
             PageInfoValidator pageInfoValidator,
-            int defaultPageSize, string commandName)
+            int defaultPageSize, 
+            string commandName)
             : base(commandName)
         {
             this.skillService = skillService;
@@ -35,7 +37,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Enter the page: ");
 
-            if(!Int32.TryParse(Console.ReadLine(), out int pageNumber))
+            if (!int.TryParse(Console.ReadLine(), out int pageNumber))
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -44,15 +46,15 @@ namespace ConsoleInterface.Implementations.Commands
             var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
-                PageSize = pageSize
+                PageSize = this.pageSize
             };
 
-            if(!this.ValidateEntity(pageInfo))
+            if (!this.ValidateEntity(pageInfo))
             {
                 return;
             }
 
-            var skillsData = await skillService.GetAsync(pageInfo);
+            var skillsData = await this.skillService.GetAsync(pageInfo);
 
             if (!skillsData.IsSuccessful)
             {
@@ -62,7 +64,8 @@ namespace ConsoleInterface.Implementations.Commands
 
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendJoin("\n",
+            builder.AppendJoin(
+                "\n",
                 skillsData.Result.Select(s => $"{s.Id}: {s.Title}. Max value: {s.MaxValue}\n"));
 
             Console.WriteLine(builder);
@@ -74,7 +77,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

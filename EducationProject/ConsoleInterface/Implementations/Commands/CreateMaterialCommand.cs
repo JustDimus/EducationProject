@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeEntityValidator<MaterialDTO> changeEntityValidator;
 
-        public CreateMaterialCommand(IMaterialService materialService,
+        public CreateMaterialCommand(
+            IMaterialService materialService,
             ChangeEntityValidator<MaterialDTO> changeEntityValidator,
             string commandName)
             : base(commandName)
@@ -30,7 +31,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.WriteLine("Enter the type of material: 1 - Artcle, 2 - Book, 3 - Video");
 
-            if(!Int32.TryParse(Console.ReadLine(), out int type))
+            if (!int.TryParse(Console.ReadLine(), out int type))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -44,17 +45,17 @@ namespace ConsoleInterface.Implementations.Commands
             switch (type)
             {
                 case 1:
-                    changeEntity.Entity = GetArticleMaterial();
+                    changeEntity.Entity = this.GetArticleMaterial();
                     break;
                 case 2:
-                    changeEntity.Entity = GetBookMaterial();
+                    changeEntity.Entity = this.GetBookMaterial();
                     break;
                 case 3:
-                    changeEntity.Entity = GetVideoMaterial();
+                    changeEntity.Entity = this.GetVideoMaterial();
                     break;
             }
 
-            if(!this.ValidateEntity(changeEntity))
+            if (!this.ValidateEntity(changeEntity))
             {
                 return;
             }
@@ -89,13 +90,17 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Publication date (dd.MM.yyyy)");
 
-            if (DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy",
-                null, System.Globalization.DateTimeStyles.None, out DateTime publicationDate) == false)
+            if (!DateTime.TryParseExact(
+                Console.ReadLine(), 
+                "dd.MM.yyyy",
+                null, 
+                System.Globalization.DateTimeStyles.None, 
+                out DateTime publicationDate))
             {
                 return null;
             }
 
-            if(String.IsNullOrEmpty(title) == true || String.IsNullOrEmpty(URI) == true)
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(URI))
             {
                 return null;
             }
@@ -126,12 +131,12 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Pages: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int pages) == false)
+            if (!int.TryParse(Console.ReadLine(), out int pages))
             {
                 return null;
             }
 
-            if(String.IsNullOrEmpty(title) == true)
+            if (string.IsNullOrEmpty(title))
             {
                 return null;
             }
@@ -162,19 +167,19 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Duration: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int duration) == false)
+            if (!int.TryParse(Console.ReadLine(), out int duration))
             {
                 return null;
             }
 
             Console.Write("Quality: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out int quality) == false)
+            if (!int.TryParse(Console.ReadLine(), out int quality))
             {
                 return null;
             }
 
-            if(String.IsNullOrEmpty(title) == true || String.IsNullOrEmpty(URI) == true)
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(URI))
             {
                 return null;
             }
@@ -196,7 +201,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

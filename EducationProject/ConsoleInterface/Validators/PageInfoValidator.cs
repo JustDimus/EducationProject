@@ -10,7 +10,7 @@ namespace ConsoleInterface.Validators
     {
         public PageInfoValidator()
         {
-            this.RuleFor(e => e.PageNumber).GreaterThan(0);
+            this.RuleFor(e => e.PageNumber).GreaterThanOrEqualTo(0);
 
             this.RuleFor(e => e.PageSize).GreaterThan(0);
         }

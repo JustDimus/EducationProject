@@ -11,7 +11,8 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private IMaterialService materialService;
 
-        public ShowMaterialInfoCommand(IMaterialService materialService,
+        public ShowMaterialInfoCommand(
+            IMaterialService materialService,
             string commandName)
             : base(commandName)
         {
@@ -24,16 +25,16 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Material ID: ");
 
-            if(!Int32.TryParse(Console.ReadLine(), out int materialId))
+            if (!int.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var actionResult = await materialService.GetMaterialInfoAsync(materialId);
+            var actionResult = await this.materialService.GetMaterialInfoAsync(materialId);
 
-            if(!actionResult.IsSuccessful)
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();

@@ -6,8 +6,6 @@ namespace EducationProject.BLL.DTO
 {
     public class GetCoursesByCreatorDTO : AccountIdBasedDTO
     {
-        public int AccountId { get; set; }
-
         public PageInfoDTO PageInfo { get; set; }
     }
 }

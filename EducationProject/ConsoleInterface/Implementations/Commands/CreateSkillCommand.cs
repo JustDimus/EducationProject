@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeEntityValidator<SkillDTO> changeEntityValidator;
 
-        public CreateSkillCommand(ISkillService skillService,
+        public CreateSkillCommand(
+            ISkillService skillService,
             ChangeEntityValidator<SkillDTO> changeEntityValidator,
             string commandName)
             : base(commandName)
@@ -38,7 +39,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Max value: ");
 
-            if(!Int32.TryParse(Console.ReadLine(), out int maxValue))
+            if (!int.TryParse(Console.ReadLine(), out int maxValue))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -56,7 +57,7 @@ namespace ConsoleInterface.Implementations.Commands
                 }
             };
 
-            if(!this.ValidateEntity(changeEntity))
+            if (!this.ValidateEntity(changeEntity))
             {
                 return;
             }
@@ -81,7 +82,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

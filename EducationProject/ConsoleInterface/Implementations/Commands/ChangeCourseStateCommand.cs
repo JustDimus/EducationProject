@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private CourseVisibilityValidator courseVisibilityValidator;
 
-        public ChangeCourseStateCommand(ICourseService courseService,
+        public ChangeCourseStateCommand(
+            ICourseService courseService,
             CourseVisibilityValidator courseVisibilityValidator,
             string commandName)
             : base(commandName)
@@ -30,7 +31,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Course ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -39,14 +40,14 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("New state 0 - hide, 1 - publish: ");
 
-            if(!Int32.TryParse(Console.ReadLine(), out int state))
+            if (!int.TryParse(Console.ReadLine(), out int courseVisibilityState))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(state != 0 & state != 1)
+            if (courseVisibilityState != 0 & courseVisibilityState != 1)
             {
                 Console.WriteLine("Error. Enter the 0 or 1");
                 Console.WriteLine();
@@ -57,10 +58,10 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 AccountId = accountId,
                 CourseId = courseId,
-                Visibility = state == 0 ? false : true
+                Visibility = courseVisibilityState == 0 ? false : true
             };
 
-            if(!this.ValidateEntity(courseVisibility))
+            if (!this.ValidateEntity(courseVisibility))
             {
                 return;
             }
@@ -85,7 +86,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

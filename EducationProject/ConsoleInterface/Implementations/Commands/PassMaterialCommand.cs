@@ -1,9 +1,6 @@
-﻿using ConsoleInterface.Interfaces;
-using EducationProject.BLL.Interfaces;
+﻿using EducationProject.BLL.Interfaces;
 using EducationProject.BLL.DTO;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using ConsoleInterface.Validators;
 
 namespace ConsoleInterface.Implementations.Commands
@@ -14,7 +11,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeAccountMaterialValidator changeAccountMaterialValidator;
 
-        public PassMaterialCommand(IAccountService accountService,
+        public PassMaterialCommand(
+            IAccountService accountService,
             ChangeAccountMaterialValidator changeAccountMaterialValidator,
             string commandName)
             : base(commandName)
@@ -30,7 +28,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Material ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int materialId))
+            if (!int.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -43,12 +41,12 @@ namespace ConsoleInterface.Implementations.Commands
                 AccountId = accountId
             };
 
-            if(!this.ValidateEntity(changeAccountMaterial))
+            if (!this.ValidateEntity(changeAccountMaterial))
             {
                 return;
             }
 
-            var actionResult = await accountService.AddAccountMaterialAsync(changeAccountMaterial);
+            var actionResult = await this.accountService.AddAccountMaterialAsync(changeAccountMaterial);
 
             if (!actionResult.IsSuccessful)
             {
@@ -68,7 +66,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

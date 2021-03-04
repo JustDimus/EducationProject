@@ -2,13 +2,8 @@
 using EducationProject.BLL.DTO;
 using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-
-using MaterialType = EducationProject.Core.Models.Enums.MaterialType;
 using System.Threading.Tasks;
 using EducationProject.BLL;
 using System.Linq;
@@ -25,7 +20,8 @@ namespace Infrastructure.BLL.Services
 
         private IMapping<BaseMaterial, MaterialDTO> materialMapping;
 
-        public MaterialService(IRepository<BaseMaterial> materialRepository,
+        public MaterialService(
+            IRepository<BaseMaterial> materialRepository,
             AuthorizationService authorizationService,
             IMapping<BaseMaterial, MaterialDTO> materialMapping,
             IRepository<CourseMaterial> courseMaterialRepository,
@@ -42,7 +38,7 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
         {
-            await this.materialRepository.CreateAsync(materialMapping.Map(createEntity.Entity));
+            await this.materialRepository.CreateAsync(this.materialMapping.Map(createEntity.Entity));
 
             return new ActionResult()
             {
@@ -55,14 +51,17 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<IEnumerable<MaterialDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(m => true,
-                materialMapping.ConvertExpression, pageInfo.PageNumber, pageInfo.PageSize)
+                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
+                    m => true,
+                    this.materialMapping.ConvertExpression, 
+                    pageInfo.PageNumber, 
+                    pageInfo.PageSize)
             };
         }
 
         public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<MaterialDTO> deleteEntity)
         {
-            await materialRepository.DeleteAsync(materialMapping.Map(deleteEntity.Entity));
+            await this.materialRepository.DeleteAsync(this.materialMapping.Map(deleteEntity.Entity));
 
             return new ActionResult()
             {
@@ -75,8 +74,9 @@ namespace Infrastructure.BLL.Services
             return new ActionResult<MaterialDTO>()
             {
                 IsSuccessful = true,
-                Result = await this.materialRepository.GetAsync<MaterialDTO>(m => m.Id == id, 
-                materialMapping.ConvertExpression)
+                Result = await this.materialRepository.GetAsync<MaterialDTO>(
+                    m => m.Id == id,
+                    this.materialMapping.ConvertExpression)
             };
         }
 
@@ -94,7 +94,7 @@ namespace Infrastructure.BLL.Services
             var isMaterialExist = await this.materialRepository.AnyAsync(m =>
                 m.Id == changeEntity.Entity.Id);
 
-            if(!isMaterialExist)
+            if (!isMaterialExist)
             {
                 return new ActionResult()
                 {
@@ -102,7 +102,7 @@ namespace Infrastructure.BLL.Services
                 };
             }
 
-            await this.materialRepository.UpdateAsync(materialMapping.Map(changeEntity.Entity));
+            await this.materialRepository.UpdateAsync(this.materialMapping.Map(changeEntity.Entity));
 
             return new ActionResult()
             {
@@ -112,29 +112,34 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId)
         {
-            var i = await this.courseMaterialRepository.GetPageAsync<int>(cm => cm.CourseId == courseId,
-                    cm => cm.MaterialId, 0, await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId));
+            var i = await this.courseMaterialRepository.GetPageAsync<int>(
+                cm => cm.CourseId == courseId,
+                cm => cm.MaterialId, 
+                0, 
+                await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId));
 
             return new ActionResult<IEnumerable<MaterialDTO>>()
             {
                 IsSuccessful = true,
-                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(m =>
-                    i.Contains(m.Id), this.materialMapping.ConvertExpression, 0,
-                    await this.materialRepository.CountAsync(m =>
-                    i.Contains(m.Id)))
+                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
+                    m => i.Contains(m.Id), 
+                    this.materialMapping.ConvertExpression, 
+                    0,
+                    await this.materialRepository.CountAsync(m => i.Contains(m.Id)))
             };
         }
 
         public async Task<bool> IsAccountPassedAllCourseMaterials(int accountId, int courseId)
         {
-            var courseMaterialsList = await this.courseMaterialRepository.GetPageAsync<int>(c =>
-                c.CourseId == courseId,
+            var courseMaterialsList = await this.courseMaterialRepository.GetPageAsync<int>(
+                c => c.CourseId == courseId,
                 c => c.MaterialId,
-                0, await this.courseMaterialRepository.CountAsync(c => c.CourseId == courseId));
-
-            return courseMaterialsList.ToList()
-                .TrueForAll((id) => this.accountMaterialRepository.
-                AnyAsync(am => am.AccountId == accountId && am.MaterialId == id).Result);
+                0, 
+                await this.courseMaterialRepository.CountAsync(c => c.CourseId == courseId));
+            return courseMaterialsList.ToList().TrueForAll(
+                id => this.accountMaterialRepository.AnyAsync(
+                    am => am.AccountId == accountId 
+                    && am.MaterialId == id).Result);
         }
     }
 }

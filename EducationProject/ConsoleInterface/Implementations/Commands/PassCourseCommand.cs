@@ -14,7 +14,8 @@ namespace ConsoleInterface.Implementations.Commands
 
         private ChangeAccountCourseValidator changeAccountCourseValidator;
 
-        public PassCourseCommand(IAccountService accountService,
+        public PassCourseCommand(
+            IAccountService accountService,
             ChangeAccountCourseValidator changeAccountCourseValidator,
             string commandName)
             : base(commandName)
@@ -30,7 +31,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Course ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -44,12 +45,12 @@ namespace ConsoleInterface.Implementations.Commands
                 CourseId = courseId
             };
 
-            if(!this.ValidateEntity(changeAccountCourse))
+            if (!this.ValidateEntity(changeAccountCourse))
             {
                 return;
             }
 
-            var actionResult = await accountService.ChangeAccountCourseStatusAsync(changeAccountCourse);
+            var actionResult = await this.accountService.ChangeAccountCourseStatusAsync(changeAccountCourse);
 
             if (!actionResult.IsSuccessful)
             {
@@ -69,7 +70,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             if (!validationresult.IsValid)
             {
-                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
                 Console.WriteLine();
                 return false;
             }

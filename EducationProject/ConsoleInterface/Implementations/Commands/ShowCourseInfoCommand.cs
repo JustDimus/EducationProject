@@ -11,7 +11,8 @@ namespace ConsoleInterface.Implementations.Commands
     {
         private ICourseService courseService;
 
-        public ShowCourseInfoCommand(ICourseService courseService,
+        public ShowCourseInfoCommand(
+            ICourseService courseService,
             string commandName)
             : base(commandName)
         {
@@ -24,7 +25,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Course ID: ");
 
-            if (!Int32.TryParse(Console.ReadLine(), out int courseId))
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -33,7 +34,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             var actionResult = await this.courseService.GetCourseInfoAsync(courseId);
 
-            if(!actionResult.IsSuccessful)
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
                 Console.WriteLine();
@@ -42,16 +43,18 @@ namespace ConsoleInterface.Implementations.Commands
 
             StringBuilder builder = new StringBuilder();
 
-            var course = actionResult.Result
+            var course = actionResult.Result;
 
             builder.Append($"ID: {course.Id} {course.Title}\n");
             builder.Append($"Description: {course.Description}\n");
             builder.Append($"Skills: \n\t");
-            builder.Append(String.Join("\n\t", course.Skills
-                .Select(s => $"ID: {s.SkillId} Title: {s.SkillTitle} Change: {s.SkillChange}")));
+            builder.Append(string.Join(
+                "\n\t", 
+                course.Skills.Select(s => $"ID: {s.SkillId} Title: {s.SkillTitle} Change: {s.SkillChange}")));
             builder.Append("\nMaterials: \n\t");
-            builder.Append(String.Join("\n\t", course.Materials
-                .Select(m => $"ID: {m.MaterialId} Title: {m.MaterialTitle}")));
+            builder.Append(string.Join(
+                "\n\t", 
+                course.Materials.Select(m => $"ID: {m.MaterialId} Title: {m.MaterialTitle}")));
 
             Console.WriteLine(builder);
             Console.WriteLine();

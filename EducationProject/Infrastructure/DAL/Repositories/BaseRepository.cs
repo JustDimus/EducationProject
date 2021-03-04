@@ -4,18 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Infrastructure.DAL.Repositories
 {
-    public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity: class
+    public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private DbContext context;
 
-        public BaseRepository(DbContext dbContext)
+        public BaseRepository(DbContext сontext)
         {
-            context = dbContext;
+            this.context = сontext;
         }
 
         public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> condition)

@@ -3,9 +3,7 @@ using EducationProject.BLL.Interfaces;
 using EducationProject.Core.Models;
 using EducationProject.Core.Models.Enums;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Infrastructure.BLL.Mappings
 {

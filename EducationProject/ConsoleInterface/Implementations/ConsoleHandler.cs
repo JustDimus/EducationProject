@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ConsoleInterface.Implementations
 {
-    public class ConsoleHandler: IConsoleHandler
+    public class ConsoleHandler : IConsoleHandler
     {
         private ICommandHandler commands;
 
@@ -19,15 +19,16 @@ namespace ConsoleInterface.Implementations
 
         private string accountToken;
 
-        private AuthorizationService authrizationService;
+        private AuthorizationService authorizationService;
 
-        public ConsoleHandler(ICommandHandler commandList,
-            AuthorizationService authrizationService,
+        public ConsoleHandler(
+            ICommandHandler commandList,
+            AuthorizationService authorizationService,
             string logInCommand,
             string logOutCommand,
             string exitCommand)
         {
-            this.authrizationService = authrizationService;
+            this.authorizationService = authorizationService;
 
             this.exitCommand = exitCommand;
 
@@ -40,35 +41,35 @@ namespace ConsoleInterface.Implementations
 
         public void Run()
         {
-            while(true)
+            while (true)
             {
                 var currentCommand = Console.ReadLine();
 
-                if(currentCommand == this.exitCommand)
+                if (currentCommand == this.exitCommand)
                 {
                     break;
                 }
 
-                OperateCommand(currentCommand);
+                this.OperateCommand(currentCommand);
             }
         }
 
-        private async void OperateCommand(string command)
+        private void OperateCommand(string command)
         {
-            if(command == this.logInCommand)
+            if (command == this.logInCommand)
             {
                 this.LogIn();
                 return;
             }
 
-            if(command == this.logOutCommand)
+            if (command == this.logOutCommand)
             {
                 this.LogOut();
             }
 
-            int accountId = await this.authrizationService.AuthenticateAccountAsync(this.accountToken);
+            int accountId = this.authorizationService.AuthenticateAccountAsync(this.accountToken).Result;
 
-            commands[command].Run(accountId);
+            this.commands[command].Run(accountId);
         }
 
         private async void LogIn()
@@ -83,7 +84,7 @@ namespace ConsoleInterface.Implementations
 
             var password = Console.ReadLine();
 
-            var newToken = await this.authrizationService.AuthorizeAccountAsync(email, password);
+            var newToken = await this.authorizationService.AuthorizeAccountAsync(email, password);
 
             if (newToken == null)
             {
@@ -103,9 +104,9 @@ namespace ConsoleInterface.Implementations
         {
             Console.WriteLine("Trying to logout");
 
-            var logOutResult = await this.authrizationService.DeauthorizeAccountAsync(this.accountToken);
+            var logOutResult = await this.authorizationService.DeauthorizeAccountAsync(this.accountToken);
 
-            if(logOutResult)
+            if (logOutResult)
             {
                 Console.WriteLine("Successful");
                 this.accountToken = null;

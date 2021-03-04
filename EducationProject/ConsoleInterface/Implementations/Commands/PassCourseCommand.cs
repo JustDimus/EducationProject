@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -25,7 +26,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.changeAccountCourseValidator = changeAccountCourseValidator;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Passing the course");
 
@@ -55,6 +56,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {

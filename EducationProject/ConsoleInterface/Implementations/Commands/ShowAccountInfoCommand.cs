@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -19,22 +20,23 @@ namespace ConsoleInterface.Implementations.Commands
             this.accountService = accountService;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Showing account info");
 
-            var actionresult = await this.accountService.GetAccountInfoAsync(accountId);
+            var actionResult = await this.accountService.GetAccountInfoAsync(accountId);
 
-            if (!actionresult.IsSuccessful)
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
                 Console.WriteLine();
                 return;
             }
 
             StringBuilder builder = new StringBuilder();
 
-            var account = actionresult.Result;
+            var account = actionResult.Result;
 
             builder.Append($"ID: {account.Id} Email: {account.Email}\n");
             builder.Append($"Registration date: {account.RegistrationDate}\n");

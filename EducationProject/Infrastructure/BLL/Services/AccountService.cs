@@ -59,10 +59,7 @@ namespace Infrastructure.BLL.Services
 
             if (isEmailAlreadyExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Account with such Email already exists");
             }
 
             var account = this.accountMapping.Map(createEntity.Entity);
@@ -73,10 +70,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortAccountInfoDTO> updateEntity)
@@ -86,30 +80,21 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Account doesn't exist");
             }
 
             await this.accountRepository.UpdateAsync(this.accountMapping.Map(updateEntity.Entity));
 
             await this.accountRepository.SaveAsync();
-            
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortAccountInfoDTO> deleteEntity)
         {
             await this.accountRepository.DeleteAsync(this.accountMapping.Map(deleteEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<bool>> IsExistAsync(ShortAccountInfoDTO checkEntity)
@@ -140,10 +125,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such account or course doesn't exist");
             }
 
             var isAccountCourseAlreadyExist = await this.accountCourseRepository.AnyAsync(ac =>
@@ -152,10 +134,7 @@ namespace Infrastructure.BLL.Services
 
             if (isAccountCourseAlreadyExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Account already has this course");
             }
 
             await this.accountCourseRepository.CreateAsync(new AccountCourse()
@@ -167,10 +146,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountCourseRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
@@ -179,10 +155,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such account or course doesn't exist");
             }
 
             await this.accountCourseRepository.DeleteAsync(new AccountCourse()
@@ -193,10 +166,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountCourseRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange)
@@ -205,10 +175,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such account or course doesn't exist");
             }
 
             var isAccountCourseExist = await this.accountCourseRepository.AnyAsync(ac =>
@@ -218,10 +185,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Account desn't have that course");
             }
 
             if (accountCourseChange.Status == CourseStatus.Passed)
@@ -233,10 +197,7 @@ namespace Infrastructure.BLL.Services
 
                 if (!isAccountPassedAllCourseMaterials)
                 {
-                    return new ActionResult()
-                    {
-                        IsSuccessful = false
-                    };
+                    return this.GetDefaultActionResult(false, "Account didn't pass all course materials");
                 }
             }
 
@@ -261,10 +222,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountCourseRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
@@ -273,10 +231,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndMaterialExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Account or material doesn't exist");
             }
 
             var isAccountMaterialAlreadyExist = await this.accountMaterialRepository.AnyAsync(am =>
@@ -285,10 +240,7 @@ namespace Infrastructure.BLL.Services
 
             if (isAccountMaterialAlreadyExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Account already passed that material");
             }
 
             await this.accountMaterialRepository.CreateAsync(new AccountMaterial()
@@ -299,10 +251,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountMaterialRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
@@ -311,10 +260,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndMaterialExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = true
-                };
+                return this.GetDefaultActionResult(false, "Account didn't pass that material yet");
             }
 
             await this.accountMaterialRepository.DeleteAsync(new AccountMaterial()
@@ -325,10 +271,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountMaterialRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<FullAccountInfoDTO>> GetAccountInfoAsync(int accountId)
@@ -424,6 +367,15 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
+        }
+
+        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
+        {
+            return new ActionResult()
+            {
+                IsSuccessful = actionStatus,
+                ResultMessage = message
+            };
         }
     }
 }

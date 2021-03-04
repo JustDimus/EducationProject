@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -19,7 +20,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.courseService = courseService;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Showing course data");
 

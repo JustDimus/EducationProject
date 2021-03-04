@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -31,7 +32,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.getCoursesByCreatorValidator = getCoursesByCreatorValidator;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Getting courses");
 
@@ -63,6 +64,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!coursesData.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(coursesData.ResultMessage);
                 Console.WriteLine();
                 return;
             }

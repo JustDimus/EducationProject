@@ -41,18 +41,12 @@ namespace Infrastructure.BLL.Services
 
             if (isSkillExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Skill with that title already exists");
             }
 
             await this.skillRepository.CreateAsync(this.skillMapping.Map(createEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<IEnumerable<SkillDTO>>> GetAsync(PageInfoDTO pageInfo)
@@ -75,28 +69,19 @@ namespace Infrastructure.BLL.Services
 
             if (!isSkillExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such skill doesn't exist");
             }
 
             await this.skillRepository.UpdateAsync(this.skillMapping.Map(changeEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
             await this.skillRepository.DeleteAsync(this.skillMapping.Map(changeEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<bool>> IsExistAsync(SkillDTO entity)
@@ -114,10 +99,7 @@ namespace Infrastructure.BLL.Services
 
             if(courseSkillsCount == 0)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = true
-                };
+                return this.GetDefaultActionResult(true);
             }
 
             var skillsToAdd = await this.courseSkillRepository.GetPageAsync(
@@ -131,10 +113,7 @@ namespace Infrastructure.BLL.Services
 
             await this.accountSkillRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills)
@@ -179,6 +158,15 @@ namespace Infrastructure.BLL.Services
 
                 await this.accountSkillRepository.UpdateAsync(accountSkill);
             }
+        }
+
+        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
+        {
+            return new ActionResult()
+            {
+                IsSuccessful = actionStatus,
+                ResultMessage = message
+            };
         }
     }
 }

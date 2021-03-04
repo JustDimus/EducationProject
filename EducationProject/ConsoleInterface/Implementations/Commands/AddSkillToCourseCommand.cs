@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -25,7 +26,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.changeCourseSkillValidator = changeCourseSkillValidator;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Adding skill to course");
 
@@ -74,6 +75,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {

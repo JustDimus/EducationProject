@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -12,7 +13,7 @@ namespace ConsoleInterface.Implementations.Commands
         {
         }
 
-        public override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Invalid command");
         }

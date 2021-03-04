@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -29,7 +30,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.pageInfoValidator = pageInfoValidator;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Getting materials");
 
@@ -57,6 +58,7 @@ namespace ConsoleInterface.Implementations.Commands
             if(!materialsData.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(materialsData.ResultMessage);
                 Console.WriteLine();
             }
 
@@ -66,16 +68,16 @@ namespace ConsoleInterface.Implementations.Commands
                 materialsData.Result.Select(m => m switch
                 {
                     ArticleMaterialDTO article => new StringBuilder()
-                    .Append($"{article.Id}: {article.Title}. Type: Article.\n")
-                    .Append($"\tURI: {article.URI}."),
+                        .Append($"{article.Id}: {article.Title}. Type: Article.\n")
+                        .Append($"\tURI: {article.URI}."),
 
                     BookMaterialDTO book => new StringBuilder()
-                    .Append($"{book.Id}: {book.Title}. Type: Book.\n")
-                    .Append($"\tAuthor: {book.Author}. Pages: {book.Pages}"),
+                        .Append($"{book.Id}: {book.Title}. Type: Book.\n")
+                        .Append($"\tAuthor: {book.Author}. Pages: {book.Pages}"),
 
                     VideoMaterialDTO video => new StringBuilder()
-                    .Append($"{video.Id}: {video.Title}. Type: Video.\n")
-                    .Append($"\tURI: {video.URI}. Duration: {video.Duration}s."),
+                        .Append($"{video.Id}: {video.Title}. Type: Video.\n")
+                        .Append($"\tURI: {video.URI}. Duration: {video.Duration}s."),
 
                     _ => null
                 }));

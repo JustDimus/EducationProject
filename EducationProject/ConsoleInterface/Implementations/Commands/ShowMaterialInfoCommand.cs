@@ -4,6 +4,7 @@ using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -19,7 +20,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.materialService = materialService;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Showing material data");
 
@@ -37,6 +38,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
                 Console.WriteLine();
                 return;
             }

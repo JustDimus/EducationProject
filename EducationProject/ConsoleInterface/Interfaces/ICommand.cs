@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Interfaces
 {
@@ -8,6 +9,6 @@ namespace ConsoleInterface.Interfaces
     {
         string Name { get; }
 
-        void Run(int accountId);
+        Task Run(int accountId);
     }
 }

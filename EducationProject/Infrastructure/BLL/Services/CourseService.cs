@@ -70,10 +70,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseAndMaterialExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such course or material doesn't exist");
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -82,10 +79,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This account can't change this course");
             }
 
             var isCourseMaterialAlreadyExist = await this.courseMaterialRepository.AnyAsync(c =>
@@ -94,10 +88,7 @@ namespace Infrastructure.BLL.Services
 
             if (isCourseMaterialAlreadyExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This course already has this material");
             }
 
             await this.courseMaterialRepository.CreateAsync(new CourseMaterial()
@@ -108,10 +99,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseMaterialRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
         
         public async Task<IActionResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
@@ -122,10 +110,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This account can't change this course");
             }
 
             await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()
@@ -136,10 +121,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseSkillRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
@@ -148,10 +130,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseAndSkillExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such course or skill doesn't exist");
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -160,10 +139,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This account can't change this course");
             }
 
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(c =>
@@ -172,10 +148,7 @@ namespace Infrastructure.BLL.Services
 
             if (isCourseSkillAlreadyExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This course already has this skill");
             }
 
             await this.courseSkillRepository.CreateAsync(new CourseSkill()
@@ -187,10 +160,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseSkillRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
@@ -201,10 +171,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This account can't change this course");
             }
 
             await this.courseSkillRepository.DeleteAsync(new CourseSkill()
@@ -215,10 +182,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseSkillRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
@@ -227,10 +191,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseAndSkillExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such course or skill doesn't exist");
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -239,10 +200,7 @@ namespace Infrastructure.BLL.Services
             
             if (!isAccountCanChangeCourse)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "This account can't change this course");
             }
 
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(cs =>
@@ -250,10 +208,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseSkillAlreadyExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "That course doesn't have this material");
             }
 
             await this.courseSkillRepository.UpdateAsync(new CourseSkill()
@@ -265,10 +220,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseSkillRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
@@ -279,10 +231,16 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such course doesn't exist");
+            }
+
+            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                visibilityParams.CourseId,
+                visibilityParams.AccountId);
+
+            if (!isAccountCanChangeCourse)
+            {
+                return this.GetDefaultActionResult(false, "This account can't change this course");
             }
 
             var courseMaterialsCount = await this.courseMaterialRepository.CountAsync(cm =>
@@ -290,10 +248,7 @@ namespace Infrastructure.BLL.Services
 
             if (courseMaterialsCount == 0)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "That course doesn't contain any material");
             }
 
             var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == visibilityParams.CourseId);
@@ -304,10 +259,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id)
@@ -397,10 +349,7 @@ namespace Infrastructure.BLL.Services
 
             await this.courseRepository.SaveAsync();
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortCourseInfoDTO> updateEntity)
@@ -409,18 +358,12 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such course doesn't exist");
             }
 
             await this.courseRepository.UpdateAsync(this.courseMapping.Map(updateEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortCourseInfoDTO> deleteEntity)
@@ -429,18 +372,12 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = false
-                };
+                return this.GetDefaultActionResult(false, "Such course doesn't exist");
             }
 
             await this.courseRepository.DeleteAsync(this.courseMapping.Map(deleteEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<bool>> IsExistAsync(ShortCourseInfoDTO checkEntity)
@@ -504,6 +441,15 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
+        }
+
+        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
+        {
+            return new ActionResult()
+            {
+                IsSuccessful = actionStatus,
+                ResultMessage = message
+            };
         }
     }
 }

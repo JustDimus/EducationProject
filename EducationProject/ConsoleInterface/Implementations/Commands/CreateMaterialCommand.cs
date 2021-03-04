@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -25,7 +26,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.changeEntityValidator = changeEntityValidator;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Creating material");
 
@@ -65,6 +66,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
@@ -88,7 +90,7 @@ namespace ConsoleInterface.Implementations.Commands
 
             var URI = Console.ReadLine();
 
-            Console.Write("Publication date (dd.MM.yyyy)");
+            Console.Write("Publication date. Enter date in next format (dd.mm.yyyy)");
 
             if (!DateTime.TryParseExact(
                 Console.ReadLine(), 

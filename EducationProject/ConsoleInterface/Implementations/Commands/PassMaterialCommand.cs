@@ -2,6 +2,7 @@
 using EducationProject.BLL.DTO;
 using System;
 using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
@@ -22,7 +23,7 @@ namespace ConsoleInterface.Implementations.Commands
             this.changeAccountMaterialValidator = changeAccountMaterialValidator;
         }
 
-        public async override void Run(int accountId)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Passing material");
 
@@ -51,6 +52,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {

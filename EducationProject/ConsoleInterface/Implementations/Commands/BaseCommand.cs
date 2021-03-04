@@ -18,6 +18,6 @@ namespace ConsoleInterface.Implementations.Commands
             this.name = commandName;
         }
 
-        public abstract void Run(int accountId);
+        public abstract Task Run(int accountId);
     }
 }

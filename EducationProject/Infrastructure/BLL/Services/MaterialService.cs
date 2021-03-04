@@ -40,10 +40,7 @@ namespace Infrastructure.BLL.Services
         {
             await this.materialRepository.CreateAsync(this.materialMapping.Map(createEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAsync(PageInfoDTO pageInfo)
@@ -63,10 +60,7 @@ namespace Infrastructure.BLL.Services
         {
             await this.materialRepository.DeleteAsync(this.materialMapping.Map(deleteEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<MaterialDTO>> GetMaterialInfoAsync(int id)
@@ -96,18 +90,12 @@ namespace Infrastructure.BLL.Services
 
             if (!isMaterialExist)
             {
-                return new ActionResult()
-                {
-                    IsSuccessful = true
-                };
+                return this.GetDefaultActionResult(false, "Such material doesn't exist");
             }
 
             await this.materialRepository.UpdateAsync(this.materialMapping.Map(changeEntity.Entity));
 
-            return new ActionResult()
-            {
-                IsSuccessful = true
-            };
+            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId)
@@ -140,6 +128,15 @@ namespace Infrastructure.BLL.Services
                 id => this.accountMaterialRepository.AnyAsync(
                     am => am.AccountId == accountId 
                     && am.MaterialId == id).Result);
+        }
+
+        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
+        {
+            return new ActionResult()
+            {
+                IsSuccessful = actionStatus,
+                ResultMessage = message
+            };
         }
     }
 }

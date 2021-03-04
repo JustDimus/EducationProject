@@ -8,5 +8,7 @@ namespace EducationProject.BLL
     public class ActionResult : IActionResult
     {
         public bool IsSuccessful { get; set; }
+
+        public string ResultMessage { get; set; }
     }
 }

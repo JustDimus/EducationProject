@@ -110,14 +110,26 @@ namespace Infrastructure.BLL.Services
 
         public async Task<IActionResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills)
         {
+            var courseSkillsCount = await this.courseSkillRepository.CountAsync(cs => cs.CourseId == changeSkills.CourseId);
+
+            if(courseSkillsCount == 0)
+            {
+                return new ActionResult()
+                {
+                    IsSuccessful = true
+                };
+            }
+
             var skillsToAdd = await this.courseSkillRepository.GetPageAsync(
                 cs => cs.CourseId == changeSkills.CourseId,
                 cs => new { cs.Change, cs.SkillId }, 
-                0, 
-                await this.courseSkillRepository.CountAsync(cs => cs.CourseId == changeSkills.CourseId));
+                0,
+                courseSkillsCount);
 
             skillsToAdd.ToList().ForEach(s =>
                 this.AddSkillValueToAccountAsync(s.SkillId, changeSkills.AccountId, s.Change));
+
+            await this.accountSkillRepository.SaveAsync();
 
             return new ActionResult()
             {

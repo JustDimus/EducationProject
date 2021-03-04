@@ -13,6 +13,8 @@ namespace ConsoleInterface.Validators
             this.RuleFor(e => e.AccountId).GreaterThan(0);
 
             this.RuleFor(e => e.CourseId).GreaterThan(0);
+
+            this.RuleFor(e => e.Status);
         }
     }
 }

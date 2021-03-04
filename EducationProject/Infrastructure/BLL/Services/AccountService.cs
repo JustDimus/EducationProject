@@ -244,7 +244,7 @@ namespace Infrastructure.BLL.Services
                 ac.AccountId == accountCourseChange.AccountId
                 && ac.CourseId == accountCourseChange.CourseId);
 
-            if (accountCourse.OncePassed == false && accountCourseChange.Status == CourseStatus.Passed)
+            if (!accountCourse.OncePassed && accountCourseChange.Status == CourseStatus.Passed)
             {
                 accountCourse.OncePassed = true;
 

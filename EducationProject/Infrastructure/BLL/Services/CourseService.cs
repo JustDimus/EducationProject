@@ -395,6 +395,8 @@ namespace Infrastructure.BLL.Services
 
             await this.courseRepository.CreateAsync(courseToCreate);
 
+            await this.courseRepository.SaveAsync();
+
             return new ActionResult()
             {
                 IsSuccessful = true

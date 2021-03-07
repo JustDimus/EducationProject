@@ -8,9 +8,9 @@ namespace EducationProject.Infrastructure.BLL.Services
 {
     public class BaseService
     {
-        protected IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
+        protected IServiceResult GetDefaultActionResult(bool actionStatus, string message = null)
         {
-            return new ActionResult()
+            return new ServiceResult()
             {
                 IsSuccessful = actionStatus,
                 MessageCode = message

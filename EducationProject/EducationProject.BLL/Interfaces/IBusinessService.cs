@@ -9,14 +9,14 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface IBusinessService<TEntity>
     {
-        Task<IActionResult> CreateAsync(ChangeEntityDTO<TEntity> createEntity);
+        Task<IServiceResult> CreateAsync(ChangeEntityDTO<TEntity> createEntity);
 
-        Task<IActionResult> UpdateAsync(ChangeEntityDTO<TEntity> updateEntity);
+        Task<IServiceResult> UpdateAsync(ChangeEntityDTO<TEntity> updateEntity);
 
-        Task<IActionResult> DeleteAsync(ChangeEntityDTO<TEntity> deleteEntity);
+        Task<IServiceResult> DeleteAsync(ChangeEntityDTO<TEntity> deleteEntity);
 
-        Task<IActionResult<bool>> IsExistAsync(TEntity checkEntity);
+        Task<IServiceResult<bool>> IsExistAsync(TEntity checkEntity);
 
-        Task<IActionResult<IEnumerable<TEntity>>> GetAsync(PageInfoDTO pageInfo);
+        Task<IServiceResult<IEnumerable<TEntity>>> GetAsync(PageInfoDTO pageInfo);
     }
 }

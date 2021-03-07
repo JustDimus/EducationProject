@@ -57,9 +57,9 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.courseResultMessages = courseActionResultMessages;
         }
       
-        public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
+        public async Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
         {
-            return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
+            return new ServiceResult<IEnumerable<ShortCourseInfoDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
@@ -70,7 +70,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
 
-        public async Task<IActionResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
+        public async Task<IServiceResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
             var isCourseAndMaterialExist = await this.CheckCourseMaterialsAsync(courseMaterialChange);
 
@@ -108,7 +108,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
         
-        public async Task<IActionResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
+        public async Task<IServiceResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
                 courseMaterialChange.CourseId,
@@ -130,7 +130,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
+        public async Task<IServiceResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
             var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
 
@@ -169,7 +169,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
+        public async Task<IServiceResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
                 courseSkillChange.CourseId,
@@ -191,7 +191,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
+        public async Task<IServiceResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
             var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
 
@@ -229,7 +229,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
+        public async Task<IServiceResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
         {
             var isCourseExist = await this.CheckCourseCreatorAsync(
                 visibilityParams.CourseId, 
@@ -259,7 +259,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id)
+        public async Task<IServiceResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id)
         {
             FullCourseInfoDTO result = await this.courseRepository.GetAsync<FullCourseInfoDTO>(
                 c => c.Id == id,
@@ -293,16 +293,16 @@ namespace EducationProject.Infrastructure.BLL.Services
                 0,
                 this.defaultPageSize);
 
-            return new ActionResult<FullCourseInfoDTO>()
+            return new ServiceResult<FullCourseInfoDTO>()
             {
                 IsSuccessful = true,
                 Result = result
             };
         }
 
-        public async Task<IActionResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial)
+        public async Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial)
         {
-            return new ActionResult<bool>()
+            return new ServiceResult<bool>()
             {
                 IsSuccessful = true,
                 Result = await this.courseMaterialRepository.ContainsAsync(new CourseMaterial()
@@ -313,7 +313,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             }; 
         }
 
-        public async Task<IActionResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials)
+        public async Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials)
         {
             foreach (var entity in courseMaterials)
             {
@@ -321,7 +321,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 if (!isCourseContainsMaterial.Result)
                 {
-                    return new ActionResult<bool>()
+                    return new ServiceResult<bool>()
                     {
                         IsSuccessful = true,
                         Result = false
@@ -329,14 +329,14 @@ namespace EducationProject.Infrastructure.BLL.Services
                 }
             }
 
-            return new ActionResult<bool>()
+            return new ServiceResult<bool>()
             {
                 IsSuccessful = true,
                 Result = true
             };
         }
 
-        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<ShortCourseInfoDTO> createEntity)
+        public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<ShortCourseInfoDTO> createEntity)
         {
             var courseToCreate = this.courseMapping.Map(createEntity.Entity);
 
@@ -349,7 +349,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortCourseInfoDTO> updateEntity)
+        public async Task<IServiceResult> UpdateAsync(ChangeEntityDTO<ShortCourseInfoDTO> updateEntity)
         {
             var isCourseExist = await this.CheckCourseCreatorAsync(updateEntity.Entity.Id, updateEntity.AccountId);
 
@@ -363,7 +363,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortCourseInfoDTO> deleteEntity)
+        public async Task<IServiceResult> DeleteAsync(ChangeEntityDTO<ShortCourseInfoDTO> deleteEntity)
         {
             var isCourseExist = await this.CheckCourseCreatorAsync(deleteEntity.Entity.Id, deleteEntity.AccountId);
 
@@ -377,18 +377,18 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<bool>> IsExistAsync(ShortCourseInfoDTO checkEntity)
+        public async Task<IServiceResult<bool>> IsExistAsync(ShortCourseInfoDTO checkEntity)
         {
-            return new ActionResult<bool>()
+            return new ServiceResult<bool>()
             {
                 IsSuccessful = true,
                 Result = await this.courseRepository.AnyAsync(c => c.Id == checkEntity.Id)
             };
         }
 
-        public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetAsync(PageInfoDTO pageInfo)
+        public async Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            return new ActionResult<IEnumerable<ShortCourseInfoDTO>>()
+            return new ServiceResult<IEnumerable<ShortCourseInfoDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(

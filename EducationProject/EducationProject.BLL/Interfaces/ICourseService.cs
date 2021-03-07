@@ -8,24 +8,24 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface ICourseService : IBusinessService<ShortCourseInfoDTO>
     {
-        Task<IActionResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id);
+        Task<IServiceResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id);
 
-        Task<IActionResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams);
+        Task<IServiceResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams);
 
-        Task<IActionResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange);
+        Task<IServiceResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange);
 
-        Task<IActionResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange);
+        Task<IServiceResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange);
 
-        Task<IActionResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
+        Task<IServiceResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
 
-        Task<IActionResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
+        Task<IServiceResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
 
-        Task<IActionResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
+        Task<IServiceResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange);
 
-        Task<IActionResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial);
+        Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial);
 
-        Task<IActionResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
+        Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
 
-        Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator);
+        Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator);
     }
 }

@@ -8,9 +8,9 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface IMaterialService : IBusinessService<MaterialDTO>
     {
-        Task<IActionResult<MaterialDTO>> GetMaterialInfoAsync(int id);
+        Task<IServiceResult<MaterialDTO>> GetMaterialInfoAsync(int id);
 
-        Task<IActionResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId);
+        Task<IServiceResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId);
 
         Task<bool> IsAccountPassedAllCourseMaterials(int accountId, int courseId);
     }

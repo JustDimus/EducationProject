@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EducationProject.BLL
 {
-    public class ActionResult<TEntity> : ActionResult, IActionResult<TEntity>
+    public class ServiceResult<TEntity> : ServiceResult, IServiceResult<TEntity>
     {        
         public TEntity Result { get; set; }
     }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface IActionResult<TEntity> : IActionResult
+    public interface IServiceResult<TEntity> : IServiceResult
     {
         TEntity Result { get; set; }
     }

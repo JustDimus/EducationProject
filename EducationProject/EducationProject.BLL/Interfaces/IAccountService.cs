@@ -8,16 +8,16 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface IAccountService : IBusinessService<ShortAccountInfoDTO>
     {
-        Task<IActionResult<FullAccountInfoDTO>> GetAccountInfoAsync(int id);
+        Task<IServiceResult<FullAccountInfoDTO>> GetAccountInfoAsync(int id);
 
-        Task<IActionResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
+        Task<IServiceResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        Task<IActionResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
+        Task<IServiceResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        Task<IActionResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange);
+        Task<IServiceResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        Task<IActionResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
+        Task<IServiceResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
 
-        Task<IActionResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
+        Task<IServiceResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
     }
 }

@@ -58,7 +58,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.defaultAccountInfoPageSize = accountInfoPageSize;
         }
 
-        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
+        public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
         {
             var isEmailAlreadyExist = await this.accountRepository.AnyAsync(a =>
                 a.Email == createEntity.Entity.Email);
@@ -79,7 +79,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortAccountInfoDTO> updateEntity)
+        public async Task<IServiceResult> UpdateAsync(ChangeEntityDTO<ShortAccountInfoDTO> updateEntity)
         {
             var isAccountExist = await this.accountRepository.AnyAsync(a =>
                 a.Id == updateEntity.Entity.Id);
@@ -96,25 +96,25 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortAccountInfoDTO> deleteEntity)
+        public async Task<IServiceResult> DeleteAsync(ChangeEntityDTO<ShortAccountInfoDTO> deleteEntity)
         {
             await this.accountRepository.DeleteAsync(this.accountMapping.Map(deleteEntity.Entity));
 
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<bool>> IsExistAsync(ShortAccountInfoDTO checkEntity)
+        public async Task<IServiceResult<bool>> IsExistAsync(ShortAccountInfoDTO checkEntity)
         {
-            return new ActionResult<bool>()
+            return new ServiceResult<bool>()
             {
                 IsSuccessful = true,
                 Result = await this.accountRepository.AnyAsync(a => a.Id == checkEntity.Id)
             };
         }
 
-        public async Task<IActionResult<IEnumerable<ShortAccountInfoDTO>>> GetAsync(PageInfoDTO pageInfo)
+        public async Task<IServiceResult<IEnumerable<ShortAccountInfoDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            return new ActionResult<IEnumerable<ShortAccountInfoDTO>>()
+            return new ServiceResult<IEnumerable<ShortAccountInfoDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.accountRepository.GetPageAsync<ShortAccountInfoDTO>(
@@ -125,7 +125,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
 
-        public async Task<IActionResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
+        public async Task<IServiceResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
@@ -155,7 +155,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
+        public async Task<IServiceResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
@@ -175,7 +175,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange)
+        public async Task<IServiceResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange)
         {
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
@@ -231,7 +231,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
+        public async Task<IServiceResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
         {
             var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
@@ -260,7 +260,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
+        public async Task<IServiceResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
         {
             var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
@@ -280,7 +280,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<FullAccountInfoDTO>> GetAccountInfoAsync(int accountId)
+        public async Task<IServiceResult<FullAccountInfoDTO>> GetAccountInfoAsync(int accountId)
         {
             var result = await this.accountRepository.GetAsync<FullAccountInfoDTO>(
                 a => a.Id == accountId,
@@ -332,7 +332,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             result.AccountSkills = accountSkillsResult.Result;
 
-            return new ActionResult<FullAccountInfoDTO>()
+            return new ServiceResult<FullAccountInfoDTO>()
             {
                 IsSuccessful = true,
                 Result = result

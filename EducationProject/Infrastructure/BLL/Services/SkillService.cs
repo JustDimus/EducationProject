@@ -40,7 +40,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.skillResultMessages = skillActionResultMessages;
         }
 
-        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<SkillDTO> createEntity)
+        public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<SkillDTO> createEntity)
         {
             var isSkillExist = await this.skillRepository
                 .AnyAsync(s => s.Title == createEntity.Entity.Title);
@@ -55,9 +55,9 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<IEnumerable<SkillDTO>>> GetAsync(PageInfoDTO pageInfo)
+        public async Task<IServiceResult<IEnumerable<SkillDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            return new ActionResult<IEnumerable<SkillDTO>>()
+            return new ServiceResult<IEnumerable<SkillDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.skillRepository.GetPageAsync<SkillDTO>(
@@ -68,7 +68,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
 
-        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<SkillDTO> changeEntity)
+        public async Task<IServiceResult> UpdateAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
             var isSkillExist = await this.skillRepository
                 .AnyAsync(s => s.Id == changeEntity.Entity.Id);
@@ -83,23 +83,23 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<SkillDTO> changeEntity)
+        public async Task<IServiceResult> DeleteAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
             await this.skillRepository.DeleteAsync(this.skillMapping.Map(changeEntity.Entity));
 
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<bool>> IsExistAsync(SkillDTO entity)
+        public async Task<IServiceResult<bool>> IsExistAsync(SkillDTO entity)
         {
-            return new ActionResult<bool>()
+            return new ServiceResult<bool>()
             {
                 IsSuccessful = true,
                 Result = await this.skillRepository.AnyAsync(s => s.Id == entity.Id)
             };
         }
 
-        public async Task<IActionResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills)
+        public async Task<IServiceResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills)
         {
             var courseSkillsCount = await this.courseSkillRepository.CountAsync(cs => cs.CourseId == changeSkills.CourseId);
 
@@ -122,9 +122,9 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills)
+        public async Task<IServiceResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills)
         {
-            return new ActionResult<IEnumerable<AccountSkillDTO>>()
+            return new ServiceResult<IEnumerable<AccountSkillDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.accountSkillRepository.GetPageAsync<AccountSkillDTO>(

@@ -1,11 +1,10 @@
-﻿using EducationProject.BLL.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EducationProject.BLL
+namespace EducationProject.BLL.Interfaces
 {
-    public class ActionResult : IActionResult
+    public interface IServiceResult
     {
         public bool IsSuccessful { get; set; }
 

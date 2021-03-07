@@ -42,7 +42,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.materialResultMessages = materialActionResultMessages;
         }
 
-        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
+        public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
         {
             var newMaterial = this.materialMapping.Map(createEntity.Entity);
 
@@ -51,9 +51,9 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAsync(PageInfoDTO pageInfo)
+        public async Task<IServiceResult<IEnumerable<MaterialDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            return new ActionResult<IEnumerable<MaterialDTO>>()
+            return new ServiceResult<IEnumerable<MaterialDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
@@ -64,16 +64,16 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
 
-        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<MaterialDTO> deleteEntity)
+        public async Task<IServiceResult> DeleteAsync(ChangeEntityDTO<MaterialDTO> deleteEntity)
         {
             await this.materialRepository.DeleteAsync(this.materialMapping.Map(deleteEntity.Entity));
 
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<MaterialDTO>> GetMaterialInfoAsync(int id)
+        public async Task<IServiceResult<MaterialDTO>> GetMaterialInfoAsync(int id)
         {
-            return new ActionResult<MaterialDTO>()
+            return new ServiceResult<MaterialDTO>()
             {
                 IsSuccessful = true,
                 Result = await this.materialRepository.GetAsync<MaterialDTO>(
@@ -82,16 +82,16 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
 
-        public async Task<IActionResult<bool>> IsExistAsync(MaterialDTO entity)
+        public async Task<IServiceResult<bool>> IsExistAsync(MaterialDTO entity)
         {
-            return new ActionResult<bool>()
+            return new ServiceResult<bool>()
             {
                 IsSuccessful = true,
                 Result = await this.materialRepository.AnyAsync(m => m.Id == entity.Id)
             };
         }
 
-        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<MaterialDTO> changeEntity)
+        public async Task<IServiceResult> UpdateAsync(ChangeEntityDTO<MaterialDTO> changeEntity)
         {
             var isMaterialExist = await this.materialRepository.AnyAsync(m =>
                 m.Id == changeEntity.Entity.Id);
@@ -106,7 +106,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId)
+        public async Task<IServiceResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId)
         {
             var i = await this.courseMaterialRepository.GetPageAsync<int>(
                 cm => cm.CourseId == courseId,
@@ -114,7 +114,7 @@ namespace EducationProject.Infrastructure.BLL.Services
                 0, 
                 await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId));
 
-            return new ActionResult<IEnumerable<MaterialDTO>>()
+            return new ServiceResult<IEnumerable<MaterialDTO>>()
             {
                 IsSuccessful = true,
                 Result = await this.materialRepository.GetPageAsync<MaterialDTO>(

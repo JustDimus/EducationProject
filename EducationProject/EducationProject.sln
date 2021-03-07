@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.DAL", "Edu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.EFCore", "EducationProject.EFCore\EducationProject.EFCore.csproj", "{48BDCDE0-D0F5-4912-8DA8-295543088297}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcInterface", "MvcInterface\MvcInterface.csproj", "{B48EFFA2-175E-4FA5-B4DD-18B626953B72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcInterface", "MvcInterface\MvcInterface.csproj", "{E6D84579-1AC9-4F3D-8476-ABE99F75B296}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,10 @@ Global
 		{48BDCDE0-D0F5-4912-8DA8-295543088297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48BDCDE0-D0F5-4912-8DA8-295543088297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48BDCDE0-D0F5-4912-8DA8-295543088297}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B48EFFA2-175E-4FA5-B4DD-18B626953B72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B48EFFA2-175E-4FA5-B4DD-18B626953B72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B48EFFA2-175E-4FA5-B4DD-18B626953B72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B48EFFA2-175E-4FA5-B4DD-18B626953B72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6D84579-1AC9-4F3D-8476-ABE99F75B296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6D84579-1AC9-4F3D-8476-ABE99F75B296}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6D84579-1AC9-4F3D-8476-ABE99F75B296}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6D84579-1AC9-4F3D-8476-ABE99F75B296}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

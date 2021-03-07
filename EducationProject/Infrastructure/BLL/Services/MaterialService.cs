@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EducationProject.BLL;
 using System.Linq;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace Infrastructure.BLL.Services
 {
-    public class MaterialService : IMaterialService
+    public class MaterialService : BaseService, IMaterialService
     {
         private IRepository<BaseMaterial> materialRepository;
 
@@ -20,12 +21,15 @@ namespace Infrastructure.BLL.Services
 
         private IMapping<BaseMaterial, MaterialDTO> materialMapping;
 
+        private MaterialServiceActionResultMessages materialResultMessages;
+
         public MaterialService(
             IRepository<BaseMaterial> materialRepository,
             AuthorizationService authorizationService,
             IMapping<BaseMaterial, MaterialDTO> materialMapping,
             IRepository<CourseMaterial> courseMaterialRepository,
-            IRepository<AccountMaterial> accountMaterialRepository)
+            IRepository<AccountMaterial> accountMaterialRepository,
+            MaterialServiceActionResultMessages materialActionResultMessages)
         {
             this.materialRepository = materialRepository;
 
@@ -34,11 +38,15 @@ namespace Infrastructure.BLL.Services
             this.courseMaterialRepository = courseMaterialRepository;
 
             this.accountMaterialRepository = accountMaterialRepository;
+
+            this.materialResultMessages = materialActionResultMessages;
         }
 
         public async Task<IActionResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
         {
-            await this.materialRepository.CreateAsync(this.materialMapping.Map(createEntity.Entity));
+            var newMaterial = this.materialMapping.Map(createEntity.Entity);
+
+            await this.materialRepository.CreateAsync(newMaterial);
 
             return this.GetDefaultActionResult(true);
         }
@@ -90,7 +98,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isMaterialExist)
             {
-                return this.GetDefaultActionResult(false, "Such material doesn't exist");
+                return this.GetDefaultActionResult(false, this.materialResultMessages.MaterialNotExist);
             }
 
             await this.materialRepository.UpdateAsync(this.materialMapping.Map(changeEntity.Entity));
@@ -135,7 +143,7 @@ namespace Infrastructure.BLL.Services
             return new ActionResult()
             {
                 IsSuccessful = actionStatus,
-                ResultMessage = message
+                MessageCode = message
             };
         }
     }

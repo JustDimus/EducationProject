@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EducationProject.BLL;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace Infrastructure.BLL.Services
 {
-    public class CourseService : ICourseService
+    public class CourseService : BaseService, ICourseService
     {
         private IMaterialService materialService;
 
@@ -23,6 +24,8 @@ namespace Infrastructure.BLL.Services
 
         private IRepository<Course> courseRepository;
 
+        private CourseServiceActionResultMessages courseResultMessages;
+
         private int defaultPageSize;
 
         public CourseService(
@@ -32,6 +35,7 @@ namespace Infrastructure.BLL.Services
             IRepository<CourseSkill> courseSkillRepository,
             IRepository<CourseMaterial> courseMaterialRepository,
             IMapping<Course, ShortCourseInfoDTO> courseMapping,
+            CourseServiceActionResultMessages courseActionResultMessages,
             int defaultPageSize)
         {
             this.materialService = materialService;
@@ -49,6 +53,8 @@ namespace Infrastructure.BLL.Services
             this.defaultPageSize = defaultPageSize;
 
             this.courseMapping = courseMapping;
+
+            this.courseResultMessages = courseActionResultMessages;
         }
       
         public async Task<IActionResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
@@ -70,7 +76,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false, "Such course or material doesn't exist");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseOrMaterialNotExist);
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -79,7 +85,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, "This account can't change this course");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
             }
 
             var isCourseMaterialAlreadyExist = await this.courseMaterialRepository.AnyAsync(c =>
@@ -88,7 +94,7 @@ namespace Infrastructure.BLL.Services
 
             if (isCourseMaterialAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, "This course already has this material");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseMaterialExist);
             }
 
             await this.courseMaterialRepository.CreateAsync(new CourseMaterial()
@@ -110,7 +116,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, "This account can't change this course");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
             }
 
             await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()
@@ -130,7 +136,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseAndSkillExist)
             {
-                return this.GetDefaultActionResult(false, "Such course or skill doesn't exist");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseOrSkillNotExist);
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -139,7 +145,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, "This account can't change this course");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
             }
 
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(c =>
@@ -148,7 +154,7 @@ namespace Infrastructure.BLL.Services
 
             if (isCourseSkillAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, "This course already has this skill");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseSkillExist);
             }
 
             await this.courseSkillRepository.CreateAsync(new CourseSkill()
@@ -171,7 +177,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, "This account can't change this course");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
             }
 
             await this.courseSkillRepository.DeleteAsync(new CourseSkill()
@@ -191,7 +197,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseAndSkillExist)
             {
-                return this.GetDefaultActionResult(false, "Such course or skill doesn't exist");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseOrSkillNotExist);
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -200,7 +206,7 @@ namespace Infrastructure.BLL.Services
             
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, "This account can't change this course");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
             }
 
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(cs =>
@@ -208,7 +214,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseSkillAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, "That course doesn't have this material");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseSkillExist);
             }
 
             await this.courseSkillRepository.UpdateAsync(new CourseSkill()
@@ -231,16 +237,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Such course doesn't exist");
-            }
-
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
-                visibilityParams.CourseId,
-                visibilityParams.AccountId);
-
-            if (!isAccountCanChangeCourse)
-            {
-                return this.GetDefaultActionResult(false, "This account can't change this course");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseNotExist);
             }
 
             var courseMaterialsCount = await this.courseMaterialRepository.CountAsync(cm =>
@@ -248,7 +245,7 @@ namespace Infrastructure.BLL.Services
 
             if (courseMaterialsCount == 0)
             {
-                return this.GetDefaultActionResult(false, "That course doesn't contain any material");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseHasNoMaterials);
             }
 
             var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == visibilityParams.CourseId);
@@ -358,7 +355,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Such course doesn't exist");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseNotExist);
             }
 
             await this.courseRepository.UpdateAsync(this.courseMapping.Map(updateEntity.Entity));
@@ -372,7 +369,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Such course doesn't exist");
+                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseNotExist);
             }
 
             await this.courseRepository.DeleteAsync(this.courseMapping.Map(deleteEntity.Entity));
@@ -441,15 +438,6 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
-        }
-
-        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
-        {
-            return new ActionResult()
-            {
-                IsSuccessful = actionStatus,
-                ResultMessage = message
-            };
         }
     }
 }

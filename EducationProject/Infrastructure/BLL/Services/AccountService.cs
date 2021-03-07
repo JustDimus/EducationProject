@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using EducationProject.BLL;
 
 using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace Infrastructure.BLL.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService : BaseService, IAccountService
     {
         private IRepository<AccountCourse> accountCourseRepository;
 
@@ -27,6 +28,8 @@ namespace Infrastructure.BLL.Services
 
         private IMapping<Account, ShortAccountInfoDTO> accountMapping;
 
+        private AccountServiceActionResultMessages accountResultMessages;
+
         private int defaultAccountInfoPageSize;
 
         public AccountService(
@@ -37,6 +40,7 @@ namespace Infrastructure.BLL.Services
             IMaterialService materialService,
             ISkillService skillService,
             IMapping<Account, ShortAccountInfoDTO> accountMapping,
+            AccountServiceActionResultMessages accountActionResultMessages,
             int accountInfoPageSize)
         {
             this.accountCourseRepository = accountCoursesRepository;
@@ -49,6 +53,8 @@ namespace Infrastructure.BLL.Services
 
             this.accountMapping = accountMapping;
 
+            this.accountResultMessages = accountActionResultMessages;
+
             this.defaultAccountInfoPageSize = accountInfoPageSize;
         }
 
@@ -59,7 +65,7 @@ namespace Infrastructure.BLL.Services
 
             if (isEmailAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, "Account with such Email already exists");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountExist);
             }
 
             var account = this.accountMapping.Map(createEntity.Entity);
@@ -80,7 +86,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountExist)
             {
-                return this.GetDefaultActionResult(false, "Account doesn't exist");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountNotExist);
             }
 
             await this.accountRepository.UpdateAsync(this.accountMapping.Map(updateEntity.Entity));
@@ -125,7 +131,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Such account or course doesn't exist");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrCourseNotExist);
             }
 
             var isAccountCourseAlreadyExist = await this.accountCourseRepository.AnyAsync(ac =>
@@ -134,7 +140,7 @@ namespace Infrastructure.BLL.Services
 
             if (isAccountCourseAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, "Account already has this course");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseExist);
             }
 
             await this.accountCourseRepository.CreateAsync(new AccountCourse()
@@ -155,7 +161,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Such account or course doesn't exist");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseNotExist);
             }
 
             await this.accountCourseRepository.DeleteAsync(new AccountCourse()
@@ -175,7 +181,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Such account or course doesn't exist");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrCourseNotExist);
             }
 
             var isAccountCourseExist = await this.accountCourseRepository.AnyAsync(ac =>
@@ -185,7 +191,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountCourseExist)
             {
-                return this.GetDefaultActionResult(false, "Account desn't have that course");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseNotExist);
             }
 
             if (accountCourseChange.Status == CourseStatus.Passed)
@@ -197,7 +203,7 @@ namespace Infrastructure.BLL.Services
 
                 if (!isAccountPassedAllCourseMaterials)
                 {
-                    return this.GetDefaultActionResult(false, "Account didn't pass all course materials");
+                    return this.GetDefaultActionResult(false, this.accountResultMessages.AccountNotPassedCourseMaterials);
                 }
             }
 
@@ -231,7 +237,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false, "Account or material doesn't exist");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrMaterialNotExist);
             }
 
             var isAccountMaterialAlreadyExist = await this.accountMaterialRepository.AnyAsync(am =>
@@ -240,7 +246,7 @@ namespace Infrastructure.BLL.Services
 
             if (isAccountMaterialAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, "Account already passed that material");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountMaterialExist);
             }
 
             await this.accountMaterialRepository.CreateAsync(new AccountMaterial()
@@ -260,7 +266,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isAccountAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false, "Account didn't pass that material yet");
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountMaterialNotExist);
             }
 
             await this.accountMaterialRepository.DeleteAsync(new AccountMaterial()
@@ -367,15 +373,6 @@ namespace Infrastructure.BLL.Services
             }
 
             return true;
-        }
-
-        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
-        {
-            return new ActionResult()
-            {
-                IsSuccessful = actionStatus,
-                ResultMessage = message
-            };
         }
     }
 }

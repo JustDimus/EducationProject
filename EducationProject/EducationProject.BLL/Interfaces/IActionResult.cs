@@ -8,6 +8,6 @@ namespace EducationProject.BLL.Interfaces
     {
         public bool IsSuccessful { get; set; }
 
-        public string ResultMessage { get; set; }
+        public string MessageCode { get; set; }
     }
 }

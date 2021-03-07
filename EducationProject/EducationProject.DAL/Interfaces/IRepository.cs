@@ -20,7 +20,8 @@ namespace EducationProject.DAL.Interfaces
 
         Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> condition);
 
-        Task<TResult> GetAsync<TResult>(Expression<Func<TEntity, bool>> condition, 
+        Task<TResult> GetAsync<TResult>(
+            Expression<Func<TEntity, bool>> condition, 
             Expression<Func<TEntity, TResult>> selector);
 
         Task<IEnumerable<TEntity>> GetPageAsync(Expression<Func<TEntity, bool>> condition, 

@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EducationProject.BLL;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace Infrastructure.BLL.Services
 {
-    public class SkillService : ISkillService
+    public class SkillService : BaseService, ISkillService
     {
         private IRepository<AccountSkill> accountSkillRepository;
 
@@ -19,11 +20,14 @@ namespace Infrastructure.BLL.Services
 
         private IMapping<Skill, SkillDTO> skillMapping;
 
+        private SkillServiceActionResultMessages skillResultMessages;
+
         public SkillService(
             IRepository<Skill> skillRepository,
             IRepository<AccountSkill> accountSkillRepository,
             IRepository<CourseSkill> courseSkillRepository,
-            IMapping<Skill, SkillDTO> skillMapping)
+            IMapping<Skill, SkillDTO> skillMapping,
+            SkillServiceActionResultMessages skillActionResultMessages)
         {
             this.accountSkillRepository = accountSkillRepository;
 
@@ -32,6 +36,8 @@ namespace Infrastructure.BLL.Services
             this.skillRepository = skillRepository;
 
             this.skillMapping = skillMapping;
+
+            this.skillResultMessages = skillActionResultMessages;
         }
 
         public async Task<IActionResult> CreateAsync(ChangeEntityDTO<SkillDTO> createEntity)
@@ -41,7 +47,7 @@ namespace Infrastructure.BLL.Services
 
             if (isSkillExist)
             {
-                return this.GetDefaultActionResult(false, "Skill with that title already exists");
+                return this.GetDefaultActionResult(false, this.skillResultMessages.SkillTitleExist);
             }
 
             await this.skillRepository.CreateAsync(this.skillMapping.Map(createEntity.Entity));
@@ -69,7 +75,7 @@ namespace Infrastructure.BLL.Services
 
             if (!isSkillExist)
             {
-                return this.GetDefaultActionResult(false, "Such skill doesn't exist");
+                return this.GetDefaultActionResult(false, this.skillResultMessages.SkillNotExist);
             }
 
             await this.skillRepository.UpdateAsync(this.skillMapping.Map(changeEntity.Entity));
@@ -158,15 +164,6 @@ namespace Infrastructure.BLL.Services
 
                 await this.accountSkillRepository.UpdateAsync(accountSkill);
             }
-        }
-
-        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
-        {
-            return new ActionResult()
-            {
-                IsSuccessful = actionStatus,
-                ResultMessage = message
-            };
         }
     }
 }

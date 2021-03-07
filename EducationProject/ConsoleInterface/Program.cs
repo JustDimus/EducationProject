@@ -18,6 +18,7 @@ using ConsoleInterface.Implementations.Commands;
 using EducationProject.BLL.DTO;
 using Infrastructure.BLL.Mappings;
 using ConsoleInterface.Validators;
+using System.Resources;
 
 namespace ConsoleInterface
 {

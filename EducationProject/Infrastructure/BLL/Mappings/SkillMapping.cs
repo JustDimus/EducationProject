@@ -4,7 +4,7 @@ using EducationProject.Core.Models;
 using System;
 using System.Linq.Expressions;
 
-namespace Infrastructure.BLL.Mappings
+namespace EducationProject.Infrastructure.BLL.Mappings
 {
     public class SkillMapping : IMapping<Skill, SkillDTO>
     {

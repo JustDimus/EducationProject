@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Infrastructure.BLL.Services
+namespace EducationProject.Infrastructure.BLL.Services
 {
     public class BaseService
     {

@@ -5,7 +5,7 @@ using EducationProject.Core.Models.Enums;
 using System;
 using System.Linq.Expressions;
 
-namespace Infrastructure.BLL.Mappings
+namespace EducationProject.Infrastructure.BLL.Mappings
 {
     public class MaterialMapping : IMapping<BaseMaterial, MaterialDTO>
     {

@@ -9,7 +9,7 @@ using EducationProject.BLL;
 using System.Linq;
 using EducationProject.BLL.ActionResultMessages;
 
-namespace Infrastructure.BLL.Services
+namespace EducationProject.Infrastructure.BLL.Services
 {
     public class MaterialService : BaseService, IMaterialService
     {
@@ -136,15 +136,6 @@ namespace Infrastructure.BLL.Services
                 id => this.accountMaterialRepository.AnyAsync(
                     am => am.AccountId == accountId 
                     && am.MaterialId == id).Result);
-        }
-
-        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
-        {
-            return new ActionResult()
-            {
-                IsSuccessful = actionStatus,
-                MessageCode = message
-            };
         }
     }
 }

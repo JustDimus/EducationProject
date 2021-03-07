@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EducationProject.EFCore\EducationProject.EFCore.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Infrastructure\EducationProject.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

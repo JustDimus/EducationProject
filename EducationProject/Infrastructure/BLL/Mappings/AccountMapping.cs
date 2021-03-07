@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Infrastructure.BLL.Mappings
+namespace EducationProject.Infrastructure.BLL.Mappings
 {
     public class AccountMapping : IMapping<Account, ShortAccountInfoDTO>
     {

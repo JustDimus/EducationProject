@@ -10,7 +10,7 @@ using EducationProject.BLL;
 using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
 using EducationProject.BLL.ActionResultMessages;
 
-namespace Infrastructure.BLL.Services
+namespace EducationProject.Infrastructure.BLL.Services
 {
     public class AccountService : BaseService, IAccountService
     {

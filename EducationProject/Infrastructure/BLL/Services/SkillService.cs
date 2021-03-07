@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
 
-namespace Infrastructure.BLL.Services
+namespace EducationProject.Infrastructure.BLL.Services
 {
     public class SkillService : BaseService, ISkillService
     {

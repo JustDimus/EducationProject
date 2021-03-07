@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleInterface", "ConsoleInterface\ConsoleInterface.csproj", "{2FE5AC1C-AB95-4BB3-A0A1-79784EAC8FD7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{3833AAEC-F16E-48D7-8E37-2D5F45A4E4FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.Infrastructure", "Infrastructure\EducationProject.Infrastructure.csproj", "{3833AAEC-F16E-48D7-8E37-2D5F45A4E4FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.Core", "EducationProject.Core\EducationProject.Core.csproj", "{53D85054-3714-44F4-AF30-A709F2B73BB6}"
 EndProject
@@ -16,6 +16,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EducationProject.EFCore", "EducationProject.EFCore\EducationProject.EFCore.csproj", "{48BDCDE0-D0F5-4912-8DA8-295543088297}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcInterface", "MvcInterface\MvcInterface.csproj", "{E6D84579-1AC9-4F3D-8476-ABE99F75B296}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B4B1F8AB-42DB-4975-9D41-BB8FD5958438} = {B4B1F8AB-42DB-4975-9D41-BB8FD5958438}
+		{48BDCDE0-D0F5-4912-8DA8-295543088297} = {48BDCDE0-D0F5-4912-8DA8-295543088297}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

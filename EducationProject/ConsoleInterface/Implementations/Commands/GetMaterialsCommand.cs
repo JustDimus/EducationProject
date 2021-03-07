@@ -58,7 +58,7 @@ namespace ConsoleInterface.Implementations.Commands
             if(!materialsData.IsSuccessful)
             {
                 Console.WriteLine("Error");
-                Console.WriteLine(materialsData.ResultMessage);
+                Console.WriteLine(materialsData.MessageCode);
                 Console.WriteLine();
             }
 

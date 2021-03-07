@@ -60,7 +60,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!skillsData.IsSuccessful)
             {
                 Console.WriteLine("Error");
-                Console.WriteLine(skillsData.ResultMessage);
+                Console.WriteLine(skillsData.MessageCode);
                 Console.WriteLine();
             }
 

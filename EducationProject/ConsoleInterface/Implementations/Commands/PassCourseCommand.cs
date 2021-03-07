@@ -56,7 +56,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
-                Console.WriteLine(actionResult.ResultMessage);
+                Console.WriteLine(actionResult.MessageCode);
             }
             else
             {

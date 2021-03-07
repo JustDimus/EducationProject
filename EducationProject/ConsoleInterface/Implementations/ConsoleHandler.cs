@@ -1,6 +1,6 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using Infrastructure.BLL;
+using EducationProject.Infrastructure.BLL;
 using System;
 using System.Collections.Generic;
 using System.Text;

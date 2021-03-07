@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ConsoleInterface.Validators;
-using Infrastructure.BLL;
+using EducationProject.Infrastructure.BLL;
 using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
@@ -56,7 +56,7 @@ namespace ConsoleInterface.Implementations.Commands
             if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
-                Console.WriteLine(actionResult.ResultMessage);
+                Console.WriteLine(actionResult.MessageCode);
             }
             else
             {

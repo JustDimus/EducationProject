@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using EducationProject.EFCore;
 using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
-using EducationProject.Infrastructure.DAL.Repositories;
 using EducationProject.BLL.Interfaces;
 using EducationProject.Infrastructure.BLL.Services;
 using EducationProject.Infrastructure.BLL;
@@ -19,6 +18,8 @@ using EducationProject.BLL.DTO;
 using EducationProject.Infrastructure.BLL.Mappings;
 using ConsoleInterface.Validators;
 using System.Resources;
+using Infrastructure.DAL.Repositories;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace ConsoleInterface
 {
@@ -75,6 +76,7 @@ namespace ConsoleInterface
                     c.GetRequiredService<IRepository<CourseSkill>>(),
                     c.GetRequiredService<IRepository<CourseMaterial>>(),
                     c.GetRequiredService<IMapping<Course, ShortCourseInfoDTO>>(),
+                    c.GetRequiredService<CourseServiceActionResultMessages>(),
                     defaultPageSize));
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddTransient<IAccountService, AccountService>(
@@ -86,6 +88,7 @@ namespace ConsoleInterface
                     c.GetRequiredService<IMaterialService>(),
                     c.GetRequiredService<ISkillService>(),
                     c.GetRequiredService<IMapping<Account, ShortAccountInfoDTO>>(),
+                    c.GetRequiredService<AccountServiceActionResultMessages>(),
                     defaultPageSize));
 
             services.AddTransient<ICommandHandler, CommandHandler>(
@@ -208,6 +211,11 @@ namespace ConsoleInterface
                     ConfigurationManager.AppSettings.Get("LoginCommand"),
                     ConfigurationManager.AppSettings.Get("LogoutCommand"),
                     ConfigurationManager.AppSettings.Get("ExitCommand")));
+
+            services.AddTransient<CourseServiceActionResultMessages>();
+            services.AddTransient<AccountServiceActionResultMessages>();
+            services.AddTransient<MaterialServiceActionResultMessages>();
+            services.AddTransient<SkillServiceActionResultMessages>();
         }
 
         static void Main(string[] args)

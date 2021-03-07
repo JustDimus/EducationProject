@@ -1,5 +1,5 @@
 ﻿using ConsoleInterface.Interfaces;
-using Infrastructure.BLL;
+using EducationProject.Infrastructure.BLL;
 using System;
 using System.Collections.Generic;
 using System.Text;

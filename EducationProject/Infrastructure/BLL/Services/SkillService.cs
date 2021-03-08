@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
 using EducationProject.Infrastructure.BLL.Mappings;
+using System;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -41,19 +42,90 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.serviceResultMessages = serviceResultMessageCollection;
         }
 
-        public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<SkillDTO> createEntity)
+        public async Task<IServiceResult> CreateSkillAsync(SkillDTO skill)
         {
-            var isSkillExist = await this.skillRepository
-                .AnyAsync(s => s.Title == createEntity.Entity.Title);
-
-            if (isSkillExist)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isSkillExist = await this.skillRepository
+                .AnyAsync(s => s.Title == skill.Title);
+
+                if (isSkillExist)
+                {
+                    return this.GetDefaultActionResult(
+                        false,
+                        this.serviceResultMessages.SkillTitleExist);
+                }
+
+                await this.skillRepository.CreateAsync(this.skillMapping.Map(skill));
+
+                return ServiceResult.GetDefault(true);
             }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(false, ex.Message);
+            }
+        }
 
-            await this.skillRepository.CreateAsync(this.skillMapping.Map(createEntity.Entity));
+        public async Task<IServiceResult<SkillDTO>> GetSkillAsync(int skillId)
+        {
+            try
+            {
+                var skill = await this.skillRepository.GetAsync<SkillDTO>(
+                    s => s.Id == skillId,
+                    this.skillMapping.ConvertExpression);
 
-            return this.GetDefaultActionResult(true);
+                return new ServiceResult<SkillDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = skill
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<SkillDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult> UpdateSkillAsync(SkillDTO skill)
+        {
+            try
+            {
+                var isSkillExist = await this.skillRepository
+                .AnyAsync(s => s.Id == skill.Id);
+
+                if (!isSkillExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        serviceResultMessages.SkillNotExist);
+                }
+
+                await this.skillRepository.UpdateAsync(this.skillMapping.Map(skill));
+
+                return this.GetDefaultActionResult(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(false, ex.Message);
+            }
+        }
+
+        public async Task<IServiceResult> DeleteSkillAsync(int id)
+        {
+            try
+            {
+                await this.skillRepository.DeleteAsync(s => s.Id == id);
+
+                return ServiceResult.GetDefault(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(false, ex.Message);
+            }
         }
 
         public async Task<IServiceResult<IEnumerable<SkillDTO>>> GetAsync(PageInfoDTO pageInfo)

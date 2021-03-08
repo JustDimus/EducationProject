@@ -15,5 +15,9 @@ namespace EducationProject.BLL
         public string PermissionDenied => "PermissionDenied";
 
         public string AccountNotExist => "AccountExist";
+
+        public string SkillTitleExist => "SkillTitleExist";
+
+        public string SkillNotExist => "SkillNotExist";
     }
 }

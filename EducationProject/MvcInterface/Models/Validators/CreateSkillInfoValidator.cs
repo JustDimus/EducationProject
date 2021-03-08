@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MvcInterface.Models.Validators
 {
-    public class EditSkillInfoValidator : AbstractValidator<CreateSkillViewModel>
+    public class CreateSkillInfoValidator : AbstractValidator<CreateSkillViewModel>
     {
-        public EditSkillInfoValidator()
+        public CreateSkillInfoValidator()
         {
             this.RuleFor(s => s.Title)
                 .NotEmpty()

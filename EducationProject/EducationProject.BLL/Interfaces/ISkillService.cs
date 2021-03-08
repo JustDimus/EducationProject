@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface ISkillService : IBusinessService<SkillDTO>
+    public interface ISkillService// : IBusinessService<SkillDTO>
     {
         Task<IServiceResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills);
 
         Task<IServiceResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills);
 
-        Task<IServiceResult> CreateSkillAsync(SkillDTO createSkill);
+        Task<IServiceResult> CreateSkillAsync(SkillDTO skill);
+
+        Task<IServiceResult<SkillDTO>> GetSkillAsync(int skillId);
+
+        Task<IServiceResult> UpdateSkillAsync(SkillDTO skill);
+
+        Task<IServiceResult> DeleteSkillAsync(int id);
     }
 }

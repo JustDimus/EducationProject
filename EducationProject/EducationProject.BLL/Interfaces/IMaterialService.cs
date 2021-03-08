@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface IMaterialService : IBusinessService<MaterialDTO>
+    public interface IMaterialService// : IBusinessService<MaterialDTO>
     {
         Task<IServiceResult<MaterialDTO>> GetMaterialInfoAsync(int id);
 

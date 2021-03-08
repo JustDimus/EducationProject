@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface ICourseService : IBusinessService<ShortCourseInfoDTO>
+    public interface ICourseService// : IBusinessService<ShortCourseInfoDTO>
     {
         Task<IServiceResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id);
 

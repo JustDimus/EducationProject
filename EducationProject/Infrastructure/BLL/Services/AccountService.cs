@@ -224,6 +224,24 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
+        public async Task<IServiceResult> DeleteAccountAsync()
+        {
+            try
+            {
+                var accountId = this.GetAccountId();
+
+                await this.accountRepository.DeleteAsync(a => a.Id == accountId);
+
+                await this.accountRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(false, ex.Message);
+            }
+        }
+
         public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
         {
             var isEmailAlreadyExist = await this.accountRepository.AnyAsync(a =>
@@ -506,6 +524,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
         */
+        /*
         private async Task<bool> ValidateAccountMaterialAsync(ChangeAccountMaterialDTO changeAccountMaterial)
         {
             var isMaterialExist = await this.materialService.IsExistAsync(new MaterialDTO()
@@ -541,7 +560,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             return true;
         }
-
+        */
         private int GetAccountId()
         {
             var accountIdValue = this.httpContext.HttpContext.User.Claims

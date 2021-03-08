@@ -35,6 +35,8 @@ namespace MvcInterface
                 options => options.UseSqlServer(
                     this.Configuration.GetConnectionString("DefaultDbConnection")));
 
+            services.AddHttpContextAccessor();
+
             services.AddScoped<DbContext>(
                 c => c.GetService<EducationProjectDbContext>());
 

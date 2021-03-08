@@ -11,5 +11,7 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills);
 
         Task<IServiceResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills);
+
+        Task<IServiceResult> CreateSkillAsync(SkillDTO createSkill);
     }
 }

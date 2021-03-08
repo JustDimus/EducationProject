@@ -27,5 +27,7 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<AccountInfoDTO>> GetAccountInfoAsync(int accountId);
 
         Task<IServiceResult> UpdateAccountAsync(AccountInfoDTO accountInfo);
+
+        Task DeleteAccountAsync();
     }
 }

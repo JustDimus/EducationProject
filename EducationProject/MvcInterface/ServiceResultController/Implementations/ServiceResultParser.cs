@@ -10,13 +10,11 @@ namespace MvcInterface.ServiceResultController.Implementations
     {
         private Dictionary<string, string> blMessages;
 
-        private string defaultErrorMessage;
 
-        public ServiceResultParser(string defaultErrorMessage = "Неизвестная ошибка")
+        public ServiceResultParser()
         {
             this.blMessages = new Dictionary<string, string>();
 
-            this.defaultErrorMessage = defaultErrorMessage;
         }
 
         public string this[string value]
@@ -25,7 +23,7 @@ namespace MvcInterface.ServiceResultController.Implementations
             {
                 if(!blMessages.ContainsKey(value))
                 {
-                    return defaultErrorMessage;
+                    return value;
                 }
                 else
                 {

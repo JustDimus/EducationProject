@@ -57,6 +57,14 @@ namespace MvcInterface.Controllers
             return this.View(accountViewModel);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete()
+        {
+            await this.accountService.DeleteAccountAsync();
+
+            return this.RedirectToAction("LogOut");
+        }
+
         [HttpPost]
         public async Task<IActionResult> Edit([FromForm] EditAccountInfoViewModel accountModel)
         {

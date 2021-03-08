@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EducationProject.BLL;
 using System.Linq;
 using EducationProject.BLL.ActionResultMessages;
+using EducationProject.Infrastructure.BLL.Mappings;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -21,15 +22,14 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IMapping<BaseMaterial, MaterialDTO> materialMapping;
 
-        private MaterialServiceActionResultMessages materialResultMessages;
+        private ServiceResultMessageCollection serviceResultMessages;
 
         public MaterialService(
             IRepository<BaseMaterial> materialRepository,
-            AuthorizationService authorizationService,
-            IMapping<BaseMaterial, MaterialDTO> materialMapping,
+            MaterialMapping materialMapping,
             IRepository<CourseMaterial> courseMaterialRepository,
             IRepository<AccountMaterial> accountMaterialRepository,
-            MaterialServiceActionResultMessages materialActionResultMessages)
+            ServiceResultMessageCollection serviceResultMessageCollection)
         {
             this.materialRepository = materialRepository;
 
@@ -39,7 +39,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.accountMaterialRepository = accountMaterialRepository;
 
-            this.materialResultMessages = materialActionResultMessages;
+            this.serviceResultMessages = serviceResultMessageCollection;
         }
 
         public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
@@ -98,7 +98,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isMaterialExist)
             {
-                return this.GetDefaultActionResult(false, this.materialResultMessages.MaterialNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.materialRepository.UpdateAsync(this.materialMapping.Map(changeEntity.Entity));

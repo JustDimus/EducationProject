@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
+using EducationProject.Infrastructure.BLL.Mappings;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -24,7 +25,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<Course> courseRepository;
 
-        private CourseServiceActionResultMessages courseResultMessages;
+        private ServiceResultMessageCollection serviceResultMessages;
 
         private int defaultPageSize;
 
@@ -34,9 +35,8 @@ namespace EducationProject.Infrastructure.BLL.Services
             ISkillService skillService,
             IRepository<CourseSkill> courseSkillRepository,
             IRepository<CourseMaterial> courseMaterialRepository,
-            IMapping<Course, ShortCourseInfoDTO> courseMapping,
-            CourseServiceActionResultMessages courseActionResultMessages,
-            int defaultPageSize)
+            CourseMapping courseMapping,
+            ServiceResultMessageCollection serviceResultMessageCollection)
         {
             this.materialService = materialService;
 
@@ -50,11 +50,11 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.courseMaterialRepository = courseMaterialRepository;
 
-            this.defaultPageSize = defaultPageSize;
+            this.defaultPageSize = 10;
 
             this.courseMapping = courseMapping;
 
-            this.courseResultMessages = courseActionResultMessages;
+            this.serviceResultMessages = serviceResultMessageCollection;
         }
       
         public async Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
@@ -76,7 +76,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseOrMaterialNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -85,7 +85,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
+                return this.GetDefaultActionResult(false);
             }
 
             var isCourseMaterialAlreadyExist = await this.courseMaterialRepository.AnyAsync(c =>
@@ -94,7 +94,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (isCourseMaterialAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseMaterialExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseMaterialRepository.CreateAsync(new CourseMaterial()
@@ -116,7 +116,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()
@@ -136,7 +136,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseAndSkillExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseOrSkillNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -145,7 +145,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
+                return this.GetDefaultActionResult(false);
             }
 
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(c =>
@@ -154,7 +154,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (isCourseSkillAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseSkillExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseSkillRepository.CreateAsync(new CourseSkill()
@@ -177,7 +177,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseSkillRepository.DeleteAsync(new CourseSkill()
@@ -197,7 +197,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseAndSkillExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseOrSkillNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
@@ -206,7 +206,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             
             if (!isAccountCanChangeCourse)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.AccountCanNotChangeCourse);
+                return this.GetDefaultActionResult(false);
             }
 
             var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(cs =>
@@ -214,7 +214,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseSkillAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseSkillExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseSkillRepository.UpdateAsync(new CourseSkill()
@@ -237,7 +237,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var courseMaterialsCount = await this.courseMaterialRepository.CountAsync(cm =>
@@ -245,7 +245,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (courseMaterialsCount == 0)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseHasNoMaterials);
+                return this.GetDefaultActionResult(false);
             }
 
             var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == visibilityParams.CourseId);
@@ -355,7 +355,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseRepository.UpdateAsync(this.courseMapping.Map(updateEntity.Entity));
@@ -369,7 +369,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.courseResultMessages.CourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.courseRepository.DeleteAsync(this.courseMapping.Map(deleteEntity.Entity));

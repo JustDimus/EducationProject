@@ -9,6 +9,10 @@ using EducationProject.BLL;
 
 using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
 using EducationProject.BLL.ActionResultMessages;
+using EducationProject.Infrastructure.BLL.Mappings;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Security.Claims;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -28,7 +32,11 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IMapping<Account, ShortAccountInfoDTO> accountMapping;
 
-        private AccountServiceActionResultMessages accountResultMessages;
+        private ServiceResultMessageCollection serviceResultMessages;
+
+        private IPasswordHasher passwordHasher;
+
+        private IHttpContextAccessor httpContext;
 
         private int defaultAccountInfoPageSize;
 
@@ -39,9 +47,10 @@ namespace EducationProject.Infrastructure.BLL.Services
             ICourseService courseService,
             IMaterialService materialService,
             ISkillService skillService,
-            IMapping<Account, ShortAccountInfoDTO> accountMapping,
-            AccountServiceActionResultMessages accountActionResultMessages,
-            int accountInfoPageSize)
+            AccountMapping accountMapping,
+            ServiceResultMessageCollection serviceResultMessageCollection,
+            IPasswordHasher passwordHasher,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.accountCourseRepository = accountCoursesRepository;
             this.accountMaterialRepository = accountMaterialsRepository;
@@ -53,9 +62,166 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.accountMapping = accountMapping;
 
-            this.accountResultMessages = accountActionResultMessages;
+            this.serviceResultMessages = serviceResultMessageCollection;
 
-            this.defaultAccountInfoPageSize = accountInfoPageSize;
+            this.passwordHasher = passwordHasher;
+
+            this.httpContext = httpContextAccessor;
+
+            this.defaultAccountInfoPageSize = 10;
+        }
+
+        public async Task<IServiceResult<int>> TryLogInAsync(LogInDTO logInModel)
+        {
+            try
+            {
+                var accountId = await this.accountRepository.GetAsync<int>(
+                    p => p.Email == logInModel.Email
+                    && p.Password == this.passwordHasher.Hash(logInModel.Password),
+                    p => p.Id);
+
+                if (accountId == default)
+                {
+                    return new ServiceResult<int>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = this.serviceResultMessages.LogInError
+                    };
+                }
+                else
+                {
+                    return new ServiceResult<int>()
+                    {
+                        IsSuccessful = true,
+                        Result = accountId
+                    };
+                }
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult<int>> TryRegisterAsync(RegisterDTO registerModel)
+        {
+            try
+            {
+                var isAccountEmailExist = await this.accountRepository.AnyAsync(a => a.Email == registerModel.Email);
+
+                if (isAccountEmailExist)
+                {
+                    return new ServiceResult<int>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = this.serviceResultMessages.EmailExist
+                    };
+                }
+
+                var newAccount = new Account()
+                {
+                    Email = registerModel.Email,
+                    Password = this.passwordHasher.Hash(registerModel.Password)
+                };
+
+                await this.accountRepository.CreateAsync(newAccount);
+
+                await this.accountRepository.SaveAsync();
+
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = true,
+                    Result = newAccount.Id
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult<AccountInfoDTO>> GetAccountInfoAsync()
+        {
+            var accountId = this.GetAccountId();
+
+            return await this.GetAccountInfoAsync(accountId);
+        }
+
+        public async Task<IServiceResult<AccountInfoDTO>> GetAccountInfoAsync(int accountId)
+        {
+            try
+            {
+                return new ServiceResult<AccountInfoDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = await this.accountRepository.GetAsync<AccountInfoDTO>(
+                    p => p.Id == accountId,
+                    p => new AccountInfoDTO()
+                    {
+                        Email = p.Email,
+                        FirstName = p.FirstName,
+                        Id = p.Id,
+                        PhoneNumber = p.PhoneNumber,
+                        SecondName = p.SecondName
+                    })
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<AccountInfoDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult> UpdateAccountAsync(AccountInfoDTO accountInfo)
+        {
+            try
+            {
+                var accountId = this.GetAccountId();
+
+                if (accountId != accountInfo.Id)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                var accountToUpdate = await this.accountRepository.GetAsync(a => a.Id == accountInfo.Id);
+
+                if (accountToUpdate == null)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.AccountNotExist);
+                }
+
+                accountToUpdate.PhoneNumber = accountInfo.PhoneNumber;
+                accountToUpdate.SecondName = accountInfo.SecondName;
+                accountToUpdate.FirstName = accountInfo.FirstName;
+
+                await this.accountRepository.UpdateAsync(accountToUpdate);
+
+                await this.accountRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
+            }
         }
 
         public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
@@ -65,7 +231,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (isEmailAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var account = this.accountMapping.Map(createEntity.Entity);
@@ -86,7 +252,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.accountRepository.UpdateAsync(this.accountMapping.Map(updateEntity.Entity));
@@ -131,7 +297,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrCourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var isAccountCourseAlreadyExist = await this.accountCourseRepository.AnyAsync(ac =>
@@ -140,7 +306,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (isAccountCourseAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.accountCourseRepository.CreateAsync(new AccountCourse()
@@ -161,7 +327,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.accountCourseRepository.DeleteAsync(new AccountCourse()
@@ -181,7 +347,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrCourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var isAccountCourseExist = await this.accountCourseRepository.AnyAsync(ac =>
@@ -191,7 +357,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountCourseExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             if (accountCourseChange.Status == CourseStatus.Passed)
@@ -203,7 +369,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 if (!isAccountPassedAllCourseMaterials)
                 {
-                    return this.GetDefaultActionResult(false, this.accountResultMessages.AccountNotPassedCourseMaterials);
+                    return this.GetDefaultActionResult(false);
                 }
             }
 
@@ -237,7 +403,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrMaterialNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             var isAccountMaterialAlreadyExist = await this.accountMaterialRepository.AnyAsync(am =>
@@ -246,7 +412,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (isAccountMaterialAlreadyExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountMaterialExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.accountMaterialRepository.CreateAsync(new AccountMaterial()
@@ -266,7 +432,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isAccountAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountMaterialNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.accountMaterialRepository.DeleteAsync(new AccountMaterial()
@@ -280,6 +446,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
+        /*
         public async Task<IServiceResult<FullAccountInfoDTO>> GetAccountInfoAsync(int accountId)
         {
             var result = await this.accountRepository.GetAsync<FullAccountInfoDTO>(
@@ -338,7 +505,7 @@ namespace EducationProject.Infrastructure.BLL.Services
                 Result = result
             };
         }
-
+        */
         private async Task<bool> ValidateAccountMaterialAsync(ChangeAccountMaterialDTO changeAccountMaterial)
         {
             var isMaterialExist = await this.materialService.IsExistAsync(new MaterialDTO()
@@ -373,6 +540,16 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
 
             return true;
+        }
+
+        private int GetAccountId()
+        {
+            var accountIdValue = this.httpContext.HttpContext.User.Claims
+                .Where(p => p.Type == ClaimTypes.NameIdentifier)
+                .First()
+                .Value;
+
+            return int.Parse(accountIdValue);
         }
     }
 }

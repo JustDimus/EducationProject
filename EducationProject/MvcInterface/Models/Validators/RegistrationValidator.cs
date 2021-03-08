@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace MvcInterface.Models.Validators
 {
-    public class RegistrationValidator : AbstractValidator<RegistrationViewModel>
+    public class RegistrationValidator : AbstractValidator<RegisterViewModel>
     {
         public RegistrationValidator()
         {
             this.RuleFor(p => p.Email)
                 .NotEmpty()
-                .Matches(@"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$");
+                .Matches(@"^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$");
 
             this.RuleFor(p => p.Password)
                 .NotEmpty()

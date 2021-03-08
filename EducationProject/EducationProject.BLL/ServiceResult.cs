@@ -10,5 +10,14 @@ namespace EducationProject.BLL
         public bool IsSuccessful { get; set; }
 
         public string MessageCode { get; set; }
+
+        public static IServiceResult GetDefault(bool isSuccessful, string messageCode = null)
+        {
+            return new ServiceResult()
+            {
+                IsSuccessful = isSuccessful,
+                MessageCode = messageCode
+            };
+        }
     }
 }

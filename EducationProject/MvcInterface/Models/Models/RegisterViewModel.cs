@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MvcInterface.Models.Models
 {
-    public class RegistrationViewModel
+    public class RegisterViewModel
     {
         public string Email { get; set; }
 

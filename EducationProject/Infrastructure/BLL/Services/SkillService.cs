@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
+using EducationProject.Infrastructure.BLL.Mappings;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -20,14 +21,14 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IMapping<Skill, SkillDTO> skillMapping;
 
-        private SkillServiceActionResultMessages skillResultMessages;
+        private ServiceResultMessageCollection serviceResultMessages;
 
         public SkillService(
             IRepository<Skill> skillRepository,
             IRepository<AccountSkill> accountSkillRepository,
             IRepository<CourseSkill> courseSkillRepository,
-            IMapping<Skill, SkillDTO> skillMapping,
-            SkillServiceActionResultMessages skillActionResultMessages)
+            SkillMapping skillMapping,
+            ServiceResultMessageCollection serviceResultMessageCollection)
         {
             this.accountSkillRepository = accountSkillRepository;
 
@@ -37,7 +38,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.skillMapping = skillMapping;
 
-            this.skillResultMessages = skillActionResultMessages;
+            this.serviceResultMessages = serviceResultMessageCollection;
         }
 
         public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<SkillDTO> createEntity)
@@ -47,7 +48,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (isSkillExist)
             {
-                return this.GetDefaultActionResult(false, this.skillResultMessages.SkillTitleExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.skillRepository.CreateAsync(this.skillMapping.Map(createEntity.Entity));
@@ -75,7 +76,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if (!isSkillExist)
             {
-                return this.GetDefaultActionResult(false, this.skillResultMessages.SkillNotExist);
+                return this.GetDefaultActionResult(false);
             }
 
             await this.skillRepository.UpdateAsync(this.skillMapping.Map(changeEntity.Entity));

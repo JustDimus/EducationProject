@@ -4,33 +4,12 @@ using Microsoft.EntityFrameworkCore;
 namespace EducationProject.EFCore
 {
     public class EducationProjectDbContext: DbContext
-    {
-        private string connectionString;
-
-        public EducationProjectDbContext()
-        {
-            connectionString = @"Data Source=ADMINPC;Initial Catalog=EducationProjectDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-        }
-
+    {        
         public EducationProjectDbContext(DbContextOptions options)
             :base(options)
         {
             
         }
-
-        public EducationProjectDbContext(string dbConnectionString)
-            :base()
-        {
-            connectionString = dbConnectionString;
-        }
-
-        public DbSet<Account> Accounts { get; set; }
-
-        public DbSet<Course> Courses { get; set; }
-
-        public DbSet<Skill> Skills { get; set; }
-
-        public DbSet<BaseMaterial> Materials { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,7 +29,7 @@ namespace EducationProject.EFCore
                 entity.ToTable("AccountCourses");
 
                 entity.HasKey(p => new { p.AccountId, p.CourseId });
-                
+
                 entity.HasOne(ac => ac.Account)
                 .WithMany(a => a.AccountCourses)
                 .HasForeignKey(ac => ac.AccountId);
@@ -77,21 +56,21 @@ namespace EducationProject.EFCore
             {
                 entity.ToTable("CourseSkills");
                 entity.HasKey(cs => new { cs.CourseId, cs.SkillId });
-                
+
                 entity.HasOne(cs => cs.Skill)
                 .WithMany(s => s.CourseSkills)
                 .HasForeignKey(cs => cs.SkillId);
                 entity.HasOne(cs => cs.Course)
                 .WithMany(c => c.CourseSkills)
                 .HasForeignKey(cs => cs.CourseId);
-                
+
             });
-            
+
             modelBuilder.Entity<AccountSkill>(entity =>
             {
                 entity.ToTable("AccountSkills");
                 entity.HasKey(acs => new { acs.AccountId, acs.SkillId });
-                
+
                 entity.HasOne(cs => cs.Skill)
                 .WithMany(s => s.AccountSkills)
                 .HasForeignKey(cs => cs.SkillId);
@@ -110,28 +89,28 @@ namespace EducationProject.EFCore
             {
                 entity.ToTable("CourseMaterials");
                 entity.HasKey(cm => new { cm.CourseId, cm.MaterialId });
-                
+
                 entity.HasOne(cm => cm.Course)
                 .WithMany(c => c.CourseMaterials)
                 .HasForeignKey(cm => cm.CourseId);
                 entity.HasOne(cm => cm.Material)
                 .WithMany(m => m.CourseMaterials)
                 .HasForeignKey(cm => cm.MaterialId);
-                
+
             });
 
             modelBuilder.Entity<AccountMaterial>(entity =>
             {
                 entity.ToTable("AccountMaterials");
                 entity.HasKey(am => new { am.AccountId, am.MaterialId });
-                
+
                 entity.HasOne(am => am.Account)
                 .WithMany(a => a.AccountMaterials)
                 .HasForeignKey(am => am.AccountId);
                 entity.HasOne(am => am.Material)
                 .WithMany(m => m.AccountMaterials)
                 .HasForeignKey(am => am.MaterialId);
-                
+
             });
 
             modelBuilder.Entity<BaseMaterial>(entity =>
@@ -147,18 +126,13 @@ namespace EducationProject.EFCore
 
             modelBuilder.Entity<ArticleMaterial>(entity =>
             {
-                entity.ToTable("ArticleMaterials");                
+                entity.ToTable("ArticleMaterials");
             });
 
             modelBuilder.Entity<VideoMaterial>(entity =>
             {
                 entity.ToTable("VideoMaterials");
             });
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(connectionString);
         }
     }
 }

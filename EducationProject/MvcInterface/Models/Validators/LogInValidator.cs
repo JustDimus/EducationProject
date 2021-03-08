@@ -13,11 +13,13 @@ namespace MvcInterface.Models.Validators
         {
             this.RuleFor(p => p.Email)
                 .NotEmpty()
-                .Matches(@"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$");
+                .Matches(@"^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$")
+                .WithMessage("Email введен неверно");
 
             this.RuleFor(p => p.Password)
                 .NotEmpty()
-                .MinimumLength(4);
+                .MinimumLength(4)
+                .WithMessage("Минимальная длинна пароля: 4 символа");
         }
     }
 }

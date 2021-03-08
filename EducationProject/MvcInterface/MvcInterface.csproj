@@ -6,12 +6,23 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EducationProject.DAL\EducationProject.DAL.csproj" />
     <ProjectReference Include="..\EducationProject.EFCore\EducationProject.EFCore.csproj" />
     <ProjectReference Include="..\Infrastructure\EducationProject.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Material\" />
+    <Folder Include="Views\Course\" />
+    <Folder Include="Views\Skill\" />
   </ItemGroup>
 
 </Project>

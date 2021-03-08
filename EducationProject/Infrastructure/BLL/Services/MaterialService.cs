@@ -1,167 +1,150 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
-using EducationProject.Core.DAL.EF;
+using EducationProject.BLL.DTO;
+using EducationProject.Core.Models;
 using EducationProject.DAL.Interfaces;
-using Infrastructure.DAL.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-
-using MaterialType = EducationProject.Core.DAL.EF.Enums.MaterialType;
+using System.Threading.Tasks;
+using EducationProject.BLL;
+using System.Linq;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace Infrastructure.BLL.Services
 {
-    public class MaterialService : BaseService<BaseMaterialDBO, MaterialDTO>, IMaterialService
+    public class MaterialService : BaseService, IMaterialService
     {
-        public MaterialService(IRepository<BaseMaterialDBO> baseEntityRepository,
-            AuthorizationService authorisztionService)
-            : base(baseEntityRepository, authorisztionService)
+        private IRepository<BaseMaterial> materialRepository;
+
+        private IRepository<CourseMaterial> courseMaterialRepository;
+
+        private IRepository<AccountMaterial> accountMaterialRepository;
+
+        private IMapping<BaseMaterial, MaterialDTO> materialMapping;
+
+        private MaterialServiceActionResultMessages materialResultMessages;
+
+        public MaterialService(
+            IRepository<BaseMaterial> materialRepository,
+            AuthorizationService authorizationService,
+            IMapping<BaseMaterial, MaterialDTO> materialMapping,
+            IRepository<CourseMaterial> courseMaterialRepository,
+            IRepository<AccountMaterial> accountMaterialRepository,
+            MaterialServiceActionResultMessages materialActionResultMessages)
         {
-            
+            this.materialRepository = materialRepository;
+
+            this.materialMapping = materialMapping;
+
+            this.courseMaterialRepository = courseMaterialRepository;
+
+            this.accountMaterialRepository = accountMaterialRepository;
+
+            this.materialResultMessages = materialActionResultMessages;
         }
 
-        public MaterialDTO GetMaterialInfo(int id)
+        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
         {
-            return entity.Get<MaterialDTO>(m => m.Id == id, FromBOMapping);
+            var newMaterial = this.materialMapping.Map(createEntity.Entity);
+
+            await this.materialRepository.CreateAsync(newMaterial);
+
+            return this.GetDefaultActionResult(true);
         }
 
-        protected override Expression<Func<BaseMaterialDBO, MaterialDTO>> FromBOMapping
+        public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            get => bm => bm.Type == MaterialType.ArticleMaterial ? (MaterialDTO)new ArticleMaterialDTO()
+            return new ActionResult<IEnumerable<MaterialDTO>>()
             {
-                Id = bm.Id,
-                Description = bm.Description,
-                Title = bm.Title,
-                Type = bm.Type,
-                URI = ((ArticleMaterialDBO)bm).URI,
-                PublicationDate = ((ArticleMaterialDBO)bm).PublicationDate
-            } :
-            bm.Type == MaterialType.BookMaterial ? (MaterialDTO)new BookMaterialDTO()
-            {
-                Id = bm.Id,
-                Description = bm.Description,
-                Title = bm.Title,
-                Type = bm.Type,
-                Author = ((BookMaterialDBO)bm).Author,
-                Pages = ((BookMaterialDBO)bm).Pages
-            } :
-            bm.Type == MaterialType.VideoMaterial ? (MaterialDTO)new VideoMaterialDTO()
-            {
-                Id = bm.Id,
-                Description = bm.Description,
-                Title = bm.Title,
-                Type = bm.Type,
-                URI = ((VideoMaterialDBO)bm).URI,
-                Duration = ((VideoMaterialDBO)bm).Duration,
-                Quality = ((VideoMaterialDBO)bm).Quality
-            } :
-            null;
+                IsSuccessful = true,
+                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
+                    m => true,
+                    this.materialMapping.ConvertExpression, 
+                    pageInfo.PageNumber, 
+                    pageInfo.PageSize)
+            };
         }
 
-        protected override BaseMaterialDBO Map(MaterialDTO entity)
+        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<MaterialDTO> deleteEntity)
         {
-            BaseMaterialDBO material = null;
+            await this.materialRepository.DeleteAsync(this.materialMapping.Map(deleteEntity.Entity));
 
-            switch(entity)
+            return this.GetDefaultActionResult(true);
+        }
+
+        public async Task<IActionResult<MaterialDTO>> GetMaterialInfoAsync(int id)
+        {
+            return new ActionResult<MaterialDTO>()
             {
-                case ArticleMaterialDTO article:
-                    material = new ArticleMaterialDBO()
-                    {
-                        Id = article.Id,
-                        Description = article.Description,
-                        Title = article.Title,
-                        Type = article.Type,
-                        URI = article.URI,
-                        PublicationDate = article.PublicationDate
-                    };
-                    break;
-                case BookMaterialDTO book:
-                    material = new BookMaterialDBO()
-                    {
-                        Id = book.Id,
-                        Description = book.Description,
-                        Title = book.Title,
-                        Type = book.Type,
-                        Author = book.Author,
-                        Pages = book.Pages
-                    };
-                    break;
-                case VideoMaterialDTO video:
-                    material = new VideoMaterialDBO()
-                    {
-                        Id = video.Id,
-                        Description = video.Description,
-                        Title = video.Title,
-                        Type = video.Type,
-                        URI = video.URI,
-                        Duration = video.Duration,
-                        Quality = video.Quality
-                    };
-                    break;
+                IsSuccessful = true,
+                Result = await this.materialRepository.GetAsync<MaterialDTO>(
+                    m => m.Id == id,
+                    this.materialMapping.ConvertExpression)
+            };
+        }
+
+        public async Task<IActionResult<bool>> IsExistAsync(MaterialDTO entity)
+        {
+            return new ActionResult<bool>()
+            {
+                IsSuccessful = true,
+                Result = await this.materialRepository.AnyAsync(m => m.Id == entity.Id)
+            };
+        }
+
+        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<MaterialDTO> changeEntity)
+        {
+            var isMaterialExist = await this.materialRepository.AnyAsync(m =>
+                m.Id == changeEntity.Entity.Id);
+
+            if (!isMaterialExist)
+            {
+                return this.GetDefaultActionResult(false, this.materialResultMessages.MaterialNotExist);
             }
 
-            return material;
+            await this.materialRepository.UpdateAsync(this.materialMapping.Map(changeEntity.Entity));
+
+            return this.GetDefaultActionResult(true);
         }
 
-        protected override bool ValidateEntity(MaterialDTO entity)
+        public async Task<IActionResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId)
         {
-            if(String.IsNullOrEmpty(entity.Title) == true)
-            {
-                return false;
-            }
+            var i = await this.courseMaterialRepository.GetPageAsync<int>(
+                cm => cm.CourseId == courseId,
+                cm => cm.MaterialId, 
+                0, 
+                await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId));
 
-            switch(entity.Type)
+            return new ActionResult<IEnumerable<MaterialDTO>>()
             {
-                case MaterialType.ArticleMaterial:
-                    if(entity is ArticleMaterialDTO article)
-                    {
-                        if(String.IsNullOrEmpty(article.URI) == true)
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                    break;
-                case MaterialType.BookMaterial:
-                    if(entity is BookMaterialDTO book)
-                    {
-                        if(book.Pages <= 0)
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                    break;
-                case MaterialType.VideoMaterial:
-                    if(entity is VideoMaterialDTO video)
-                    {
-                        if(video.Duration < 0 || video.Quality < 0)
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-
-            return true;
+                IsSuccessful = true,
+                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
+                    m => i.Contains(m.Id), 
+                    this.materialMapping.ConvertExpression, 
+                    0,
+                    await this.materialRepository.CountAsync(m => i.Contains(m.Id)))
+            };
         }
 
-        protected override Expression<Func<BaseMaterialDBO, bool>> IsExistExpression(MaterialDTO entity)
+        public async Task<bool> IsAccountPassedAllCourseMaterials(int accountId, int courseId)
         {
-            return m => m.Id == entity.Id;
+            var courseMaterialsList = await this.courseMaterialRepository.GetPageAsync<int>(
+                c => c.CourseId == courseId,
+                c => c.MaterialId,
+                0, 
+                await this.courseMaterialRepository.CountAsync(c => c.CourseId == courseId));
+            return courseMaterialsList.ToList().TrueForAll(
+                id => this.accountMaterialRepository.AnyAsync(
+                    am => am.AccountId == accountId 
+                    && am.MaterialId == id).Result);
+        }
+
+        private IActionResult GetDefaultActionResult(bool actionStatus, string message = null)
+        {
+            return new ActionResult()
+            {
+                IsSuccessful = actionStatus,
+                MessageCode = message
+            };
         }
     }
 }

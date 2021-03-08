@@ -1,45 +1,62 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using Infrastructure.BLL;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class AddCourseToAccountCommand : ICommand
+    public class AddCourseToAccountCommand : BaseCommand
     {
-        public string Name => "_addCourseToAccount";
+        private IAccountService accountService;
 
-        private IAccountService accounts;
+        private ChangeAccountCourseValidator changeAccountCourseValidator;
 
-        public AddCourseToAccountCommand(IAccountService accountService)
+        public AddCourseToAccountCommand(
+            IAccountService accountService,
+            ChangeAccountCourseValidator changeAccountCourseValidator,
+            string commandName)
+            : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
+
+            this.changeAccountCourseValidator = changeAccountCourseValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int courseId = 0;
-
             Console.WriteLine("Adding course to account");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(this.accounts.AddAccountCourse(new ChangeAccountCourseDTO()
+            var changeAccountCourse = new ChangeAccountCourseDTO()
             {
-                CourseId = courseId,
-                Token = token
-            }) == false)
+                AccountId = accountId,
+                CourseId = courseId
+            };
+
+            if (!this.ValidateEntity(changeAccountCourse))
+            {
+                return;
+            }
+
+            var actionResult = await this.accountService.AddAccountCourseAsync(changeAccountCourse);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
@@ -47,6 +64,21 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeAccountCourseDTO changeAccountCourse)
+        {
+            var validationResult = this.changeAccountCourseValidator.Validate(changeAccountCourse);
+
+            if (!validationResult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationResult.Errors));
+                Console.WriteLine();
+
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -1,45 +1,58 @@
-﻿using ConsoleInterface.Interfaces;
-using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+﻿using EducationProject.BLL.Interfaces;
+using EducationProject.BLL.DTO;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class PassMaterialCommand : ICommand
+    public class PassMaterialCommand : BaseCommand
     {
-        public string Name => "_passMaterial";
+        private IAccountService accountService;
 
-        private IAccountService accounts;
+        private ChangeAccountMaterialValidator changeAccountMaterialValidator;
 
-        public PassMaterialCommand(IAccountService accountService)
+        public PassMaterialCommand(
+            IAccountService accountService,
+            ChangeAccountMaterialValidator changeAccountMaterialValidator,
+            string commandName)
+            : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
+
+            this.changeAccountMaterialValidator = changeAccountMaterialValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int materialId = 0;
-
             Console.WriteLine("Passing material");
 
             Console.Write("Material ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out materialId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(accounts.AddAccountMaterial(new ChangeAccountMaterialDTO()
+            var changeAccountMaterial = new ChangeAccountMaterialDTO()
             {
                 MaterialId = materialId,
-                Token = token
-            }) == false)
+                AccountId = accountId
+            };
+
+            if (!this.ValidateEntity(changeAccountMaterial))
+            {
+                return;
+            }
+
+            var actionResult = await this.accountService.AddAccountMaterialAsync(changeAccountMaterial);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
@@ -47,6 +60,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        public bool ValidateEntity(ChangeAccountMaterialDTO changeAccountMaterial)
+        {
+            var validationresult = this.changeAccountMaterialValidator.Validate(changeAccountMaterial);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

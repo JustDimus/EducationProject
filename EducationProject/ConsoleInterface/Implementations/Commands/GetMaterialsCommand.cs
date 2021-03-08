@@ -1,65 +1,102 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class GetMaterialsCommand : ICommand
+    public class GetMaterialsCommand : BaseCommand
     {
-        public string Name => "_getMaterials";
-
-        private IMaterialService materials;
+        private IMaterialService materialService;
 
         private int pageSize;
 
-        public GetMaterialsCommand(IMaterialService materialService, int defaultPageSize)
+        private PageInfoValidator pageInfoValidator;
+
+        public GetMaterialsCommand(IMaterialService materialService,
+            PageInfoValidator pageInfoValidator,
+            int defaultPageSize, string commandName)
+            : base(commandName)
         {
-            this.materials = materialService;
+            this.materialService = materialService;
 
             this.pageSize = defaultPageSize;
+
+            this.pageInfoValidator = pageInfoValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int pageNumber = 0;
-
             Console.WriteLine("Getting materials");
 
             Console.Write("Enter the page: ");
 
-            Int32.TryParse(Console.ReadLine(), out pageNumber);
+            if (!Int32.TryParse(Console.ReadLine(), out int pageNumber))
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
-            var materialsData = materials.Get(new PageInfoDTO()
+            var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize
-            });
+            };
+
+            if(!this.ValidateEntity(pageInfo))
+            {
+                return;
+            }
+
+            var materialsData = await materialService.GetAsync(pageInfo);
+
+            if(!materialsData.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(materialsData.ResultMessage);
+                Console.WriteLine();
+            }
 
             StringBuilder builder = new StringBuilder();
 
-            foreach(var material in materialsData)
-            {
-                switch(material)
+            builder.AppendJoin("\n",
+                materialsData.Result.Select(m => m switch
                 {
-                    case ArticleMaterialDTO article:
-                        builder.Append($"{article.Id}: {article.Title}. Type: Article.\n");
-                        builder.Append($"\tURI: {article.URI}.\n");
-                        break;
-                    case BookMaterialDTO book:
-                        builder.Append($"{book.Id}: {book.Title}. Type: Book.\n");
-                        builder.Append($"\tAuthor: {book.Author}. Pages: {book.Pages}\n");
-                        break;
-                    case VideoMaterialDTO video:
-                        builder.Append($"{video.Id}: {video.Title}. Type: Video.\n");
-                        builder.Append($"\tURI: {video.URI}. Duration: {video.Duration}s.\n");
-                        break;
-                }
-            }
+                    ArticleMaterialDTO article => new StringBuilder()
+                        .Append($"{article.Id}: {article.Title}. Type: Article.\n")
+                        .Append($"\tURI: {article.URI}."),
+
+                    BookMaterialDTO book => new StringBuilder()
+                        .Append($"{book.Id}: {book.Title}. Type: Book.\n")
+                        .Append($"\tAuthor: {book.Author}. Pages: {book.Pages}"),
+
+                    VideoMaterialDTO video => new StringBuilder()
+                        .Append($"{video.Id}: {video.Title}. Type: Video.\n")
+                        .Append($"\tURI: {video.URI}. Duration: {video.Duration}s."),
+
+                    _ => null
+                }));
 
             Console.WriteLine(builder);
+        }
+
+        private bool ValidateEntity(PageInfoDTO pageInfo)
+        {
+            var validationresult = this.pageInfoValidator.Validate(pageInfo);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(String.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

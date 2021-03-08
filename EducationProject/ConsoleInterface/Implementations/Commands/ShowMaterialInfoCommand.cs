@@ -1,43 +1,51 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class ShowMaterialInfoCommand : ICommand
+    public class ShowMaterialInfoCommand : BaseCommand
     {
-        public string Name => "_getMaterial";
+        private IMaterialService materialService;
 
-        private IMaterialService materials;
-
-        public ShowMaterialInfoCommand(IMaterialService materialService)
+        public ShowMaterialInfoCommand(
+            IMaterialService materialService,
+            string commandName)
+            : base(commandName)
         {
-            this.materials = materialService;
+            this.materialService = materialService;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int materialId = 0;
-
             Console.WriteLine("Showing material data");
 
             Console.Write("Material ID: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out materialId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            var material = materials.GetMaterialInfo(materialId);
+            var actionResult = await this.materialService.GetMaterialInfoAsync(materialId);
+
+            if (!actionResult.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
+                Console.WriteLine();
+                return;
+            }
 
             StringBuilder builder = new StringBuilder();
 
-            switch (material)
+            switch (actionResult.Result)
             {
                 case ArticleMaterialDTO article:
                     builder.Append($"{article.Id}: {article.Title}.\n");
@@ -54,6 +62,7 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine(builder);
+            Console.WriteLine();
         }
     }
 }

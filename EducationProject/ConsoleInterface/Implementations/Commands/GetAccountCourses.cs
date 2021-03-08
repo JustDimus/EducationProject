@@ -1,62 +1,96 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class GetAccountCourses : ICommand
-    {
-        public string Name => "_getMyCourses";
-        
-        private ICourseService courses;
+    public class GetAccountCourses : BaseCommand
+    {        
+        private ICourseService courseService;
 
         private int pageSize;
 
-        public GetAccountCourses(ICourseService courseService, int defaultPageSize)
+        private GetCoursesByCreatorValidator getCoursesByCreatorValidator;
+
+        public GetAccountCourses(
+            ICourseService courseService,
+            GetCoursesByCreatorValidator getCoursesByCreatorValidator,
+            int defaultPageSize, 
+            string commandName)
+            : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
 
             this.pageSize = defaultPageSize;
+
+            this.getCoursesByCreatorValidator = getCoursesByCreatorValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int pageNumber = 0;
-
             Console.WriteLine("Getting courses");
 
             Console.Write("Enter the page: ");
 
-            Int32.TryParse(Console.ReadLine(), out pageNumber);
-
-            var coursesData = courses.GetMyCourses(new GetCoursesByCreator()
-            {
-                Token = token,
-                PageInfo = new PageInfoDTO()
-                {
-                    PageSize = pageSize,
-                    PageNumber = pageNumber
-                }
-            });
-
-            if(coursesData is null)
+            if (!int.TryParse(Console.ReadLine(), out int pageNumber))
             {
                 Console.WriteLine("Error");
+                Console.WriteLine();
+            }
+
+            var getCourses = new GetCoursesByCreatorDTO()
+            {
+                AccountId = accountId,
+                PageInfo = new PageInfoDTO()
+                {
+                    PageSize = this.pageSize,
+                    PageNumber = pageNumber
+                }
+            };
+
+            if (!this.ValidateEntity(getCourses))
+            {
+                return;
+            }
+
+            var coursesData = await this.courseService.GetCoursesByCreatorIdAsync(getCourses);
+
+            if (!coursesData.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(coursesData.ResultMessage);
                 Console.WriteLine();
                 return;
             }
 
             StringBuilder builder = new StringBuilder();
 
-            foreach (var course in coursesData)
-            {
-                builder.Append($"{course.Id}: {course.Title}.\n\tDescription: {course.Description}\n");
-            }
+            builder.AppendJoin(
+                "\n",
+                coursesData.Result.Select(c => $"{c.Id}: {c.Title}.\n\tDescription: {c.Description}"));
 
             Console.WriteLine(builder);
+            Console.WriteLine();
+        }
+
+        private bool ValidateEntity(GetCoursesByCreatorDTO getCourses)
+        {
+            var validationresult = this.getCoursesByCreatorValidator.Validate(getCourses);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -1,14 +1,15 @@
-﻿using EducationProject.BLL.Models;
+﻿using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface ISkillService : IBusinessService<SkillDTO>
     {
-        IEnumerable<AccountSkillDTO> GetAccountSkills(GetAccountSkillsDTO accountSkills);
+        Task<IActionResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills);
 
-        bool AddSkilsToAccountByCourseId(AddSkillsToAccountByCourseDTO changeSkills);
+        Task<IActionResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills);
     }
 }

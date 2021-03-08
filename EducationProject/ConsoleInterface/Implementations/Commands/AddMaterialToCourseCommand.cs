@@ -1,33 +1,38 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class AddMaterialToCourseCommand : ICommand
+    public class AddMaterialToCourseCommand : BaseCommand
     {
-        public string Name => "_addMaterialToCourse";
+        private ICourseService courseService;
 
-        private ICourseService courses;
+        private ChangeCourseMaterialValidator changeCourseMaterialValidator;
 
-        public AddMaterialToCourseCommand(ICourseService courseService)
+        public AddMaterialToCourseCommand(
+            ICourseService courseService,
+            ChangeCourseMaterialValidator changeCourseMaterialValidator,
+            string commandName)
+            : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
+
+            this.changeCourseMaterialValidator = changeCourseMaterialValidator;
         }
-        public void Run(ref string token)
+
+        public async override Task Run(int accountId)
         {
-            int courseId = 0;
-
-            int materialId = 0;
-
             Console.WriteLine("Adding skill to course");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -36,21 +41,31 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("Material ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out materialId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int materialId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if (courses.AddCourseMaterial(new ChangeCourseMaterialDTO()
+            var changeCourseMaterial = new ChangeCourseMaterialDTO()
             {
-                Token = token,
+                AccountId = accountId,
                 CourseId = courseId,
                 MaterialId = materialId
-            }) == false)
+            };
+
+            if (!this.ValidateEntity(changeCourseMaterial))
+            {
+                return;
+            }
+
+            var actionResult = await this.courseService.AddCourseMaterialAsync(changeCourseMaterial);
+
+            if (!actionResult.IsSuccessful)
             {
                 Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
@@ -58,6 +73,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeCourseMaterialDTO changeCourseMaterial)
+        {
+            var validationresult = this.changeCourseMaterialValidator.Validate(changeCourseMaterial);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

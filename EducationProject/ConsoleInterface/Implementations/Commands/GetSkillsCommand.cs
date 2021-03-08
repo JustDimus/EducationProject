@@ -1,51 +1,90 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class GetSkillsCommand : ICommand
+    public class GetSkillsCommand : BaseCommand
     {
-        public string Name => "_getSkills";
-
-        private ISkillService skills;
+        private ISkillService skillService;
 
         private int pageSize;
 
-        public GetSkillsCommand(ISkillService skillService, int defaultPageSize)
+        private PageInfoValidator pageInfoValidator;
+
+        public GetSkillsCommand(
+            ISkillService skillService,
+            PageInfoValidator pageInfoValidator,
+            int defaultPageSize, 
+            string commandName)
+            : base(commandName)
         {
-            this.skills = skillService;
+            this.skillService = skillService;
 
             this.pageSize = defaultPageSize;
+
+            this.pageInfoValidator = pageInfoValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int pageNumber = 0;
-
             Console.WriteLine("Getting skills");
 
             Console.Write("Enter the page: ");
 
-            Int32.TryParse(Console.ReadLine(), out pageNumber);
+            if (!int.TryParse(Console.ReadLine(), out int pageNumber))
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine();
+            }
 
-            var skillsData = skills.Get(new PageInfoDTO()
+            var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber,
-                PageSize = pageSize
-            });
+                PageSize = this.pageSize
+            };
+
+            if (!this.ValidateEntity(pageInfo))
+            {
+                return;
+            }
+
+            var skillsData = await this.skillService.GetAsync(pageInfo);
+
+            if (!skillsData.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(skillsData.ResultMessage);
+                Console.WriteLine();
+            }
 
             StringBuilder builder = new StringBuilder();
 
-            foreach(var skill in skillsData)
-            {
-                builder.Append($"{skill.Id}: {skill.Title}. Max value: {skill.MaxValue}\n");
-            }
+            builder.AppendJoin(
+                "\n",
+                skillsData.Result.Select(s => $"{s.Id}: {s.Title}. Max value: {s.MaxValue}\n"));
 
             Console.WriteLine(builder);
+        }
+
+        private bool ValidateEntity(PageInfoDTO pageInfo)
+        {
+            var validationresult = this.pageInfoValidator.Validate(pageInfo);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -1,70 +1,76 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class CreateMaterialCommand : ICommand
+    public class CreateMaterialCommand : BaseCommand
     {
-        public string Name => "_createMaterial";
+        private IMaterialService materialService;
 
-        private IMaterialService materials;
+        private ChangeEntityValidator<MaterialDTO> changeEntityValidator;
 
-        public CreateMaterialCommand(IMaterialService materialService)
+        public CreateMaterialCommand(
+            IMaterialService materialService,
+            ChangeEntityValidator<MaterialDTO> changeEntityValidator,
+            string commandName)
+            : base(commandName)
         {
-            materials = materialService;
+            this.materialService = materialService;
+
+            this.changeEntityValidator = changeEntityValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int type = 0;
-
-            MaterialDTO material = null;
-
             Console.WriteLine("Creating material");
 
             Console.WriteLine("Enter the type of material: 1 - Artcle, 2 - Book, 3 - Video");
 
-            Int32.TryParse(Console.ReadLine(), out type);
-
-            switch(type)
+            if (!int.TryParse(Console.ReadLine(), out int type))
             {
-                case 1:
-                    material = GetArticleMaterial();
-                    break;
-                case 2:
-                    material = GetBookMaterial();
-                    break;
-                case 3:
-                    material = GetVideoMaterial();
-                    break;
-                default:
-                    Console.WriteLine("Error. Enter the number!");
-                    Console.WriteLine();
-                    return;
+                Console.WriteLine("Error. Enter the number!");
+                Console.WriteLine();
             }
 
-            if(material is null)
+            var changeEntity = new ChangeEntityDTO<MaterialDTO>()
             {
-                Console.WriteLine("Error. Invalid data!");
-                Console.WriteLine();
+                AccountId = accountId
+            };
+
+            switch (type)
+            {
+                case 1:
+                    changeEntity.Entity = this.GetArticleMaterial();
+                    break;
+                case 2:
+                    changeEntity.Entity = this.GetBookMaterial();
+                    break;
+                case 3:
+                    changeEntity.Entity = this.GetVideoMaterial();
+                    break;
+            }
+
+            if (!this.ValidateEntity(changeEntity))
+            {
                 return;
             }
 
-            if(materials.Create(new ChangeEntityDTO<MaterialDTO>()
+            var actionResult = await this.materialService.CreateAsync(changeEntity);
+
+            if (!actionResult.IsSuccessful)
             {
-                Token = token,
-                Entity = material
-            }) == true)
-            {
-                Console.WriteLine("Successful");
+                Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();
@@ -72,30 +78,31 @@ namespace ConsoleInterface.Implementations.Commands
 
         private MaterialDTO GetArticleMaterial()
         {
-            string title = null;
-
-            string description = null;
-
-            string URI = null;
-
-            DateTime publicationDate = default;
-
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("URI: ");
 
-            URI = Console.ReadLine();
+            var URI = Console.ReadLine();
 
-            Console.Write("Publication date (dd.MM.yyyy)");
+            Console.Write("Publication date. Enter date in next format (dd.mm.yyyy)");
 
-            if (DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy",
-                null, System.Globalization.DateTimeStyles.None, out publicationDate) == false)
+            if (!DateTime.TryParseExact(
+                Console.ReadLine(), 
+                "dd.MM.yyyy",
+                null, 
+                System.Globalization.DateTimeStyles.None, 
+                out DateTime publicationDate))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(URI))
             {
                 return null;
             }
@@ -104,7 +111,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.EF.Enums.MaterialType.ArticleMaterial,
+                Type = EducationProject.Core.Models.Enums.MaterialType.ArticleMaterial,
                 URI = URI,
                 PublicationDate = publicationDate
             };
@@ -112,29 +119,26 @@ namespace ConsoleInterface.Implementations.Commands
 
         private MaterialDTO GetBookMaterial()
         {
-            string title = null;
-
-            string description = null;
-
-            string Author = null;
-
-            int pages = 0;
-
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("Author: ");
 
-            Author = Console.ReadLine();
+            var Author = Console.ReadLine();
 
             Console.Write("Pages: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out pages) == false)
+            if (!int.TryParse(Console.ReadLine(), out int pages))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(title))
             {
                 return null;
             }
@@ -143,7 +147,7 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.EF.Enums.MaterialType.BookMaterial,
+                Type = EducationProject.Core.Models.Enums.MaterialType.BookMaterial,
                 Author = Author,
                 Pages = pages
             };
@@ -151,38 +155,33 @@ namespace ConsoleInterface.Implementations.Commands
 
         private MaterialDTO GetVideoMaterial()
         {
-            string title = null;
-
-            string description = null;
-
-            string URI = null;
-
-            int duration = 0;
-
-            int quality = 0;
-
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("URI: ");
 
-            URI = Console.ReadLine();
+            var URI = Console.ReadLine();
 
             Console.Write("Duration: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out duration) == false)
+            if (!int.TryParse(Console.ReadLine(), out int duration))
             {
                 return null;
             }
 
             Console.Write("Quality: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out quality) == false)
+            if (!int.TryParse(Console.ReadLine(), out int quality))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(URI))
             {
                 return null;
             }
@@ -191,11 +190,25 @@ namespace ConsoleInterface.Implementations.Commands
             {
                 Title = title,
                 Description = description,
-                Type = EducationProject.Core.DAL.EF.Enums.MaterialType.VideoMaterial,
+                Type = EducationProject.Core.Models.Enums.MaterialType.VideoMaterial,
                 URI = URI,
                 Duration = duration,
                 Quality = quality
             };
+        }
+
+        private bool ValidateEntity(ChangeEntityDTO<MaterialDTO> changeEntity)
+        {
+            var validationresult = this.changeEntityValidator.Validate(changeEntity);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

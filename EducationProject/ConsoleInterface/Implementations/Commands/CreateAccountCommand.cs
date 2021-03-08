@@ -1,57 +1,85 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class CreateAccountCommand : ICommand
+    public class CreateAccountCommand : BaseCommand
     {
-        public string Name => "_createAccount";
+        private IAccountService accountService;
 
-        private IAccountService accounts;
+        private ChangeEntityValidator<ShortAccountInfoDTO> changeEntityValidator;
 
-        public CreateAccountCommand(IAccountService accountService)
+        public CreateAccountCommand(
+            IAccountService accountService,
+            ChangeEntityValidator<ShortAccountInfoDTO> changeEntityValidator,
+            string commandName)
+            : base(commandName)
         {
-            accounts = accountService;
+            this.accountService = accountService;
+
+            this.changeEntityValidator = changeEntityValidator;
         }
 
-        public void Run(ref string token)
-        {
-            string email = null;
-
-            string password = null;
-            
+        public async override Task Run(int accountId)
+        {            
             Console.WriteLine("Creating new account");
 
             Console.Write("Email: ");
 
-            email = Console.ReadLine();
+            var email = Console.ReadLine();
 
             Console.Write("Password: ");
 
-            password = Console.ReadLine();
+            var password = Console.ReadLine();
 
-            if(accounts.Create(new ChangeEntityDTO<ShortAccountInfoDTO>()
+            var changeEntity = new ChangeEntityDTO<ShortAccountInfoDTO>()
             {
-                Token = token,
+                AccountId = accountId,
                 Entity = new ShortAccountInfoDTO()
                 {
                     Email = email,
                     Password = password
                 }
-            }) == true)
+            };
+
+            if (!this.ValidateEntity(changeEntity))
             {
-                Console.WriteLine("Succesful");
+                return;
+            }
+
+            var actionResult = await this.accountService.CreateAsync(changeEntity);
+
+            if (!actionResult.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Succesful");
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeEntityDTO<ShortAccountInfoDTO> changeEntity)
+        {
+            var validationresult = this.changeEntityValidator.Validate(changeEntity);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

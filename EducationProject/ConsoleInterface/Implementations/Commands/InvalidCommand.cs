@@ -2,14 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class InvalidCommand : ICommand
+    public class InvalidCommand : BaseCommand
     {
-        public string Name => "InvalidCommand";
+        public InvalidCommand(string commandName)
+            : base(commandName)
+        {
+        }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
             Console.WriteLine("Invalid command");
         }

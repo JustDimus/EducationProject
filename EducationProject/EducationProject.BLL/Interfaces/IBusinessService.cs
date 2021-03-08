@@ -1,25 +1,22 @@
-﻿using EducationProject.BLL.Models;
+﻿using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface IBusinessService<TEntity>
     {
-        bool Create(ChangeEntityDTO<TEntity> createEntity);
+        Task<IActionResult> CreateAsync(ChangeEntityDTO<TEntity> createEntity);
 
-        bool Update(ChangeEntityDTO<TEntity> updateEntity);
+        Task<IActionResult> UpdateAsync(ChangeEntityDTO<TEntity> updateEntity);
 
-        bool Delete(ChangeEntityDTO<TEntity> deleteEntity);
+        Task<IActionResult> DeleteAsync(ChangeEntityDTO<TEntity> deleteEntity);
 
-        bool IsExist(TEntity checkEntity);
+        Task<IActionResult<bool>> IsExistAsync(TEntity checkEntity);
 
-        IEnumerable<TEntity> Get(PageInfoDTO pageInfo);
-
-        string LogIn(AccountAuthorizationDataDTO authData);
-
-        bool LogOut(string token);
+        Task<IActionResult<IEnumerable<TEntity>>> GetAsync(PageInfoDTO pageInfo);
     }
 }

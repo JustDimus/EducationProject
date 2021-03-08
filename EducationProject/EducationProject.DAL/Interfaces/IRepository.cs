@@ -4,38 +4,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.DAL.Interfaces
 {
     public interface IRepository<TEntity>
     {
-        void Create(TEntity entity);
+        Task CreateAsync(TEntity entity);
 
-        void Update(TEntity entity);
+        Task UpdateAsync(TEntity entity);
 
-        void Delete(TEntity entity);
+        Task DeleteAsync(TEntity entity);
 
-        int Count(Expression<Func<TEntity, bool>> condition);
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> condition);
 
-        TEntity Get(Expression<Func<TEntity, bool>> condition);
+        Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> condition);
 
-        TResult Get<TResult>(Expression<Func<TEntity, bool>> condition, 
+        Task<TResult> GetAsync<TResult>(
+            Expression<Func<TEntity, bool>> condition, 
             Expression<Func<TEntity, TResult>> selector);
 
-        IEnumerable<TEntity> GetPage(Expression<Func<TEntity, bool>> condition, 
+        Task<IEnumerable<TEntity>> GetPageAsync(Expression<Func<TEntity, bool>> condition, 
             int pageNumber, int pageSize);
 
-        IEnumerable<TResult> GetPage<TResult>(Expression<Func<TEntity, bool>> condition,
+        Task<IEnumerable<TResult>> GetPageAsync<TResult>(Expression<Func<TEntity, bool>> condition,
             Expression<Func<TEntity, TResult>> selector, int pageNumber, int pageSize);
 
-        void Delete(Expression<Func<TEntity, bool>> condition);
+        Task DeleteAsync(Expression<Func<TEntity, bool>> condition);
 
-        void Delete(int id);
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> condition);
 
-        bool Any(Expression<Func<TEntity, bool>> condition);
+        Task<bool> ContainsAsync(TEntity entity);
 
-        bool Contains(TEntity entity);
-
-        void Save();
+        Task SaveAsync();
     }
 }

@@ -1,8 +1,5 @@
-﻿using EducationProject.Core.DAL.EF;
+﻿using EducationProject.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EducationProject.EFCore
 {
@@ -27,19 +24,19 @@ namespace EducationProject.EFCore
             connectionString = dbConnectionString;
         }
 
-        public DbSet<AccountDBO> Accounts { get; set; }
+        public DbSet<Account> Accounts { get; set; }
 
-        public DbSet<CourseDBO> Courses { get; set; }
+        public DbSet<Course> Courses { get; set; }
 
-        public DbSet<SkillDBO> Skills { get; set; }
+        public DbSet<Skill> Skills { get; set; }
 
-        public DbSet<BaseMaterialDBO> Materials { get; set; }
+        public DbSet<BaseMaterial> Materials { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<AccountDBO>(entity =>
+            modelBuilder.Entity<Account>(entity =>
             {
                 entity.ToTable("Accounts");
                 entity.HasKey(a => a.Id);
@@ -48,7 +45,7 @@ namespace EducationProject.EFCore
                 .IsUnique(true);
             });
 
-            modelBuilder.Entity<AccountCourseDBO>(entity =>
+            modelBuilder.Entity<AccountCourse>(entity =>
             {
                 entity.ToTable("AccountCourses");
 
@@ -62,7 +59,7 @@ namespace EducationProject.EFCore
                 .HasForeignKey(ac => ac.CourseId);
             });
 
-            modelBuilder.Entity<CourseDBO>(entity =>
+            modelBuilder.Entity<Course>(entity =>
             {
                 entity.ToTable("Courses");
                 entity.HasKey(c => c.Id);
@@ -76,7 +73,7 @@ namespace EducationProject.EFCore
                 .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<CourseSkillDBO>(entity =>
+            modelBuilder.Entity<CourseSkill>(entity =>
             {
                 entity.ToTable("CourseSkills");
                 entity.HasKey(cs => new { cs.CourseId, cs.SkillId });
@@ -90,7 +87,7 @@ namespace EducationProject.EFCore
                 
             });
             
-            modelBuilder.Entity<AccountSkillDBO>(entity =>
+            modelBuilder.Entity<AccountSkill>(entity =>
             {
                 entity.ToTable("AccountSkills");
                 entity.HasKey(acs => new { acs.AccountId, acs.SkillId });
@@ -103,13 +100,13 @@ namespace EducationProject.EFCore
                 .HasForeignKey(cs => cs.AccountId);
             });
 
-            modelBuilder.Entity<SkillDBO>(entity =>
+            modelBuilder.Entity<Skill>(entity =>
             {
                 entity.ToTable("Skills");
                 entity.HasKey(s => s.Id);
             });
 
-            modelBuilder.Entity<CourseMaterialDBO>(entity =>
+            modelBuilder.Entity<CourseMaterial>(entity =>
             {
                 entity.ToTable("CourseMaterials");
                 entity.HasKey(cm => new { cm.CourseId, cm.MaterialId });
@@ -123,7 +120,7 @@ namespace EducationProject.EFCore
                 
             });
 
-            modelBuilder.Entity<AccountMaterialDBO>(entity =>
+            modelBuilder.Entity<AccountMaterial>(entity =>
             {
                 entity.ToTable("AccountMaterials");
                 entity.HasKey(am => new { am.AccountId, am.MaterialId });
@@ -137,23 +134,23 @@ namespace EducationProject.EFCore
                 
             });
 
-            modelBuilder.Entity<BaseMaterialDBO>(entity =>
+            modelBuilder.Entity<BaseMaterial>(entity =>
             {
                 entity.ToTable("BaseMaterials");
                 entity.HasKey(bm => bm.Id);
             });
 
-            modelBuilder.Entity<BookMaterialDBO>(entity =>
+            modelBuilder.Entity<BookMaterial>(entity =>
             {
                 entity.ToTable("BookMaterials");
             });
 
-            modelBuilder.Entity<ArticleMaterialDBO>(entity =>
+            modelBuilder.Entity<ArticleMaterial>(entity =>
             {
                 entity.ToTable("ArticleMaterials");                
             });
 
-            modelBuilder.Entity<VideoMaterialDBO>(entity =>
+            modelBuilder.Entity<VideoMaterial>(entity =>
             {
                 entity.ToTable("VideoMaterials");
             });

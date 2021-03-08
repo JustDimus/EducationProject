@@ -20,7 +20,7 @@ namespace ADODataContext.DataContext
             entityDictionary = new Dictionary<Type, IDbSet>();
         }
 
-        public IDbSet<T> Entity<T>() where T : BaseEntity
+        public IDbSet<T> Entity<T>() where T : class
         {
             IDbSet result = null;
 

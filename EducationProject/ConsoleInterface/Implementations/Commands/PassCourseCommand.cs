@@ -1,53 +1,83 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class PassCourseCommand : ICommand
+    public class PassCourseCommand : BaseCommand
     {
-        public string Name => "_passCourse";
+        private IAccountService accountService;
 
-        private IAccountService accounts;
+        private ChangeAccountCourseValidator changeAccountCourseValidator;
 
-        public PassCourseCommand(IAccountService accountService)
+        public PassCourseCommand(
+            IAccountService accountService,
+            ChangeAccountCourseValidator changeAccountCourseValidator,
+            string commandName)
+            : base(commandName)
         {
-            this.accounts = accountService;
+            this.accountService = accountService;
+
+            this.changeAccountCourseValidator = changeAccountCourseValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int courseId = 0;
-
             Console.WriteLine("Passing the course");
 
             Console.Write("Course ID: ");
 
-            if (Int32.TryParse(Console.ReadLine(), out courseId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if (accounts.ChangeAccountCourseStatus(new ChangeAccountCourseDTO()
+            var changeAccountCourse = new ChangeAccountCourseDTO()
             {
-                Token = token,
-                Status = EducationProject.Core.DAL.EF.Enums.ProgressStatus.Passed,
+                AccountId = accountId,
+                Status = EducationProject.Core.Models.Enums.ProgressStatus.Passed,
                 CourseId = courseId
-            }) == true)
+            };
+
+            if (!this.ValidateEntity(changeAccountCourse))
             {
-                Console.WriteLine("Successful");
+                return;
+            }
+
+            var actionResult = await this.accountService.ChangeAccountCourseStatusAsync(changeAccountCourse);
+
+            if (!actionResult.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeAccountCourseDTO changeAccountCourse)
+        {
+            var validationresult = this.changeAccountCourseValidator.Validate(changeAccountCourse);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

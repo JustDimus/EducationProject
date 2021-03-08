@@ -1,34 +1,38 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class ChangeCourseStateCommand : ICommand
+    public class ChangeCourseStateCommand : BaseCommand
     {
-        public string Name => "_changeCourseVisibility";
+        private ICourseService courseService;
 
-        private ICourseService courses;
+        private CourseVisibilityValidator courseVisibilityValidator;
 
-        public ChangeCourseStateCommand(ICourseService courseService)
+        public ChangeCourseStateCommand(
+            ICourseService courseService,
+            CourseVisibilityValidator courseVisibilityValidator,
+            string commandName)
+            : base(commandName)
         {
-            this.courses = courseService;
+            this.courseService = courseService;
+
+            this.courseVisibilityValidator = courseVisibilityValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            int courseId = 0;
-
-            int state = 0;
-
             Console.WriteLine("Changing course state");
 
             Console.Write("Course ID: ");
 
-            if (int.TryParse(Console.ReadLine(), out courseId) == false)
+            if (!int.TryParse(Console.ReadLine(), out int courseId))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
@@ -37,28 +41,38 @@ namespace ConsoleInterface.Implementations.Commands
 
             Console.Write("New state 0 - hide, 1 - publish: ");
 
-            if(int.TryParse(Console.ReadLine(), out state) == false)
+            if (!int.TryParse(Console.ReadLine(), out int courseVisibilityState))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(state != 0 & state != 1)
+            if (courseVisibilityState != 0 & courseVisibilityState != 1)
             {
                 Console.WriteLine("Error. Enter the 0 or 1");
                 Console.WriteLine();
                 return;
             }
 
-            if(courses.ChangeCourseVisibility(new CourseVisibilityDTO()
+            var courseVisibility = new CourseVisibilityDTO()
             {
-                Token = token,
+                AccountId = accountId,
                 CourseId = courseId,
-                Visibility = state == 0? false : true
-            }) == false)
+                Visibility = courseVisibilityState == 0 ? false : true
+            };
+
+            if (!this.ValidateEntity(courseVisibility))
             {
-                Console.WriteLine("Error.");
+                return;
+            }
+
+            var actionResult = await this.courseService.ChangeCourseVisibilityAsync(courseVisibility);
+
+            if (!actionResult.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
@@ -66,6 +80,20 @@ namespace ConsoleInterface.Implementations.Commands
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(CourseVisibilityDTO courseVisibility)
+        {
+            var validationresult = this.courseVisibilityValidator.Validate(courseVisibility);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

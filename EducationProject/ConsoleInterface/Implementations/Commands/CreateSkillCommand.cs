@@ -1,69 +1,96 @@
 ﻿using ConsoleInterface.Interfaces;
 using EducationProject.BLL.Interfaces;
-using EducationProject.BLL.Models;
+using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleInterface.Validators;
+using System.Threading.Tasks;
 
 namespace ConsoleInterface.Implementations.Commands
 {
-    public class CreateSkillCommand : ICommand
+    public class CreateSkillCommand : BaseCommand
     {
-        public string Name => "_createSkill";
+        private ISkillService skillService;
 
-        private ISkillService skills;
+        private ChangeEntityValidator<SkillDTO> changeEntityValidator;
 
-        public CreateSkillCommand(ISkillService skillService)
+        public CreateSkillCommand(
+            ISkillService skillService,
+            ChangeEntityValidator<SkillDTO> changeEntityValidator,
+            string commandName)
+            : base(commandName)
         {
-            skills = skillService;
+            this.skillService = skillService;
+
+            this.changeEntityValidator = changeEntityValidator;
         }
 
-        public void Run(ref string token)
+        public async override Task Run(int accountId)
         {
-            string title = null;
-
-            string description = null;
-
-            int maxValue = 0;
-
             Console.WriteLine("Creating new skill");
 
             Console.Write("Title: ");
 
-            title = Console.ReadLine();
+            var title = Console.ReadLine();
 
             Console.Write("Description: ");
 
-            description = Console.ReadLine();
+            var description = Console.ReadLine();
 
             Console.Write("Max value: ");
 
-            if(Int32.TryParse(Console.ReadLine(), out maxValue) == false)
+            if (!int.TryParse(Console.ReadLine(), out int maxValue))
             {
                 Console.WriteLine("Error. Enter the number!");
                 Console.WriteLine();
                 return;
             }
 
-            if(skills.Create(new ChangeEntityDTO<SkillDTO>()
+            var changeEntity = new ChangeEntityDTO<SkillDTO>()
             {
-                Token = token,
+                AccountId = accountId,
                 Entity = new SkillDTO()
                 {
                     Title = title,
                     MaxValue = maxValue,
                     Description = description
                 }
-            }) == true)
+            };
+
+            if (!this.ValidateEntity(changeEntity))
             {
-                Console.WriteLine("Successful");
+                Console.WriteLine();
+                return;
+            }
+
+            var actionResult = await this.skillService.CreateAsync(changeEntity);
+
+            if (!actionResult.IsSuccessful)
+            {
+                Console.WriteLine("Error");
+                Console.WriteLine(actionResult.ResultMessage);
             }
             else
             {
-                Console.WriteLine("Error");
+                Console.WriteLine("Successful");
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidateEntity(ChangeEntityDTO<SkillDTO> changeEntity)
+        {
+            var validationresult = this.changeEntityValidator.Validate(changeEntity);
+
+            if (!validationresult.IsValid)
+            {
+                Console.WriteLine(string.Join("\n", validationresult.Errors));
+                Console.WriteLine();
+                return false;
+            }
+
+            return true;
         }
     }
 }

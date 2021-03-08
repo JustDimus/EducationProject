@@ -9,15 +9,23 @@ namespace ConsoleInterface.Implementations
     {
         private Dictionary<string, ICommand> commandList;
 
-        private string helpCommand = "_help";
+        private string helpCommand;
+        private string invalidCommand;
 
-        public CommandHandler(IEnumerable<ICommand> commands)
+        public CommandHandler(
+            IEnumerable<ICommand> commands,
+            string helpCommand,
+            string invalidCommand)
         {
-            commandList = new Dictionary<string, ICommand>();
+            this.helpCommand = helpCommand;
 
-            foreach(var command in commands)
+            this.invalidCommand = invalidCommand;
+
+            this.commandList = new Dictionary<string, ICommand>();
+
+            foreach (var command in commands)
             {
-                commandList.Add(command.Name, command);
+                this.commandList.Add(command.Name, command);
             }
         }
 
@@ -25,18 +33,18 @@ namespace ConsoleInterface.Implementations
         {
             get
             {
-                if(value == helpCommand)
+                if (value == this.helpCommand)
                 {
-                    Console.WriteLine(String.Join("\n", commandList.Keys));
+                    Console.WriteLine(string.Join("\n", this.commandList.Keys));
                 }
 
-                if(commandList.ContainsKey(value) == true)
+                if (this.commandList.ContainsKey(value))
                 {
-                    return commandList[value];
+                    return this.commandList[value];
                 }
                 else
                 {
-                    return commandList["InvalidCommand"];
+                    return this.commandList[this.invalidCommand];
                 }
             }
         }

@@ -1,167 +1,221 @@
 ﻿using EducationProject.BLL.Interfaces;
-using EducationProject.Core.DAL.EF;
-using Infrastructure.DAL.Repositories;
+using EducationProject.Core.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using EducationProject.BLL.Models;
-using CourseStatus = EducationProject.Core.DAL.EF.Enums.ProgressStatus;
-using System.Linq.Expressions;
+using EducationProject.BLL.DTO;
 using EducationProject.DAL.Interfaces;
+using System.Threading.Tasks;
+using EducationProject.BLL;
+
+using CourseStatus = EducationProject.Core.Models.Enums.ProgressStatus;
+using EducationProject.BLL.ActionResultMessages;
 
 namespace Infrastructure.BLL.Services
 {
-    public class AccountService : BaseService<AccountDBO, ShortAccountInfoDTO>, IAccountService
+    public class AccountService : BaseService, IAccountService
     {
-        private IRepository<AccountCourseDBO> accountCourses { get; set; }
+        private IRepository<AccountCourse> accountCourseRepository;
 
-        private IRepository<AccountMaterialDBO> accountMaterials { get; set; }
+        private IRepository<AccountMaterial> accountMaterialRepository;
 
-        private ICourseService courses;
+        private IRepository<Account> accountRepository;
 
-        private IMaterialService materials;
+        private ICourseService courseService;
 
-        private ISkillService skills;
+        private IMaterialService materialService;
 
-        public AccountService(IRepository<AccountDBO> baseEntityRepository, 
-            AuthorizationService authorisztionService,
-            IRepository<AccountCourseDBO> accountCoursesRepository,
-            IRepository<AccountMaterialDBO> accountMaterialsRepository,
+        private ISkillService skillService;
+
+        private IMapping<Account, ShortAccountInfoDTO> accountMapping;
+
+        private AccountServiceActionResultMessages accountResultMessages;
+
+        private int defaultAccountInfoPageSize;
+
+        public AccountService(
+            IRepository<Account> accountRepository,
+            IRepository<AccountCourse> accountCoursesRepository,
+            IRepository<AccountMaterial> accountMaterialsRepository,
             ICourseService courseService,
             IMaterialService materialService,
-            ISkillService skillService) 
-            : base(baseEntityRepository, authorisztionService)
+            ISkillService skillService,
+            IMapping<Account, ShortAccountInfoDTO> accountMapping,
+            AccountServiceActionResultMessages accountActionResultMessages,
+            int accountInfoPageSize)
         {
-            this.accountCourses = accountCoursesRepository;
-            this.accountMaterials = accountMaterialsRepository;
+            this.accountCourseRepository = accountCoursesRepository;
+            this.accountMaterialRepository = accountMaterialsRepository;
+            this.accountRepository = accountRepository;
 
-            this.courses = courseService;
-            this.skills = skillService;
-            this.materials = materialService;
+            this.courseService = courseService;
+            this.skillService = skillService;
+            this.materialService = materialService;
 
+            this.accountMapping = accountMapping;
+
+            this.accountResultMessages = accountActionResultMessages;
+
+            this.defaultAccountInfoPageSize = accountInfoPageSize;
         }
 
-        protected override Expression<Func<AccountDBO, ShortAccountInfoDTO>> FromBOMapping
+        public async Task<IActionResult> CreateAsync(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
         {
-            get => a => new ShortAccountInfoDTO()
+            var isEmailAlreadyExist = await this.accountRepository.AnyAsync(a =>
+                a.Email == createEntity.Entity.Email);
+
+            if (isEmailAlreadyExist)
             {
-                Email = a.Email,
-                RegistrationDate = a.RegistrationDate,
-                FirstName = a.FirstName,
-                Password = a.Password,
-                PhoneNumber = a.PhoneNumber,
-                SecondName = a.SecondName
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountExist);
+            }
+
+            var account = this.accountMapping.Map(createEntity.Entity);
+
+            account.RegistrationDate = DateTime.Now;
+
+            await this.accountRepository.CreateAsync(account);
+
+            await this.accountRepository.SaveAsync();
+
+            return this.GetDefaultActionResult(true);
+        }
+
+        public async Task<IActionResult> UpdateAsync(ChangeEntityDTO<ShortAccountInfoDTO> updateEntity)
+        {
+            var isAccountExist = await this.accountRepository.AnyAsync(a =>
+                a.Id == updateEntity.Entity.Id);
+
+            if (!isAccountExist)
+            {
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountNotExist);
+            }
+
+            await this.accountRepository.UpdateAsync(this.accountMapping.Map(updateEntity.Entity));
+
+            await this.accountRepository.SaveAsync();
+
+            return this.GetDefaultActionResult(true);
+        }
+
+        public async Task<IActionResult> DeleteAsync(ChangeEntityDTO<ShortAccountInfoDTO> deleteEntity)
+        {
+            await this.accountRepository.DeleteAsync(this.accountMapping.Map(deleteEntity.Entity));
+
+            return this.GetDefaultActionResult(true);
+        }
+
+        public async Task<IActionResult<bool>> IsExistAsync(ShortAccountInfoDTO checkEntity)
+        {
+            return new ActionResult<bool>()
+            {
+                IsSuccessful = true,
+                Result = await this.accountRepository.AnyAsync(a => a.Id == checkEntity.Id)
             };
         }
 
-        protected override Expression<Func<AccountDBO, bool>> IsExistExpression(ShortAccountInfoDTO entity)
+        public async Task<IActionResult<IEnumerable<ShortAccountInfoDTO>>> GetAsync(PageInfoDTO pageInfo)
         {
-            return a => a.Id == entity.Id;
+            return new ActionResult<IEnumerable<ShortAccountInfoDTO>>()
+            {
+                IsSuccessful = true,
+                Result = await this.accountRepository.GetPageAsync<ShortAccountInfoDTO>(
+                    a => true,
+                    this.accountMapping.ConvertExpression,
+                    pageInfo.PageNumber, 
+                    pageInfo.PageSize)
+            };
         }
 
-        public bool AddAccountCourse(ChangeAccountCourseDTO accountCourseChange)
+        public async Task<IActionResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
-            int accountId = this.Authenticate(accountCourseChange.Token);
+            var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
-            if(accountId == 0)
+            if (!isAccountAndCourseExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrCourseNotExist);
             }
 
-            accountCourseChange.AccountId = accountId;
+            var isAccountCourseAlreadyExist = await this.accountCourseRepository.AnyAsync(ac =>
+                ac.CourseId == accountCourseChange.CourseId
+                && ac.AccountId == accountCourseChange.AccountId);
 
-            if(ValidateAccountCourse(accountCourseChange) == false)
+            if (isAccountCourseAlreadyExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseExist);
             }
 
-            if(accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId 
-            && ac.CourseId == accountCourseChange.CourseId) == true)
-            {
-                return false;
-            }
-
-            this.accountCourses.Create(new AccountCourseDBO()
+            await this.accountCourseRepository.CreateAsync(new AccountCourse()
             {
                 AccountId = accountCourseChange.AccountId,
                 CourseId = accountCourseChange.CourseId,
                 Status = CourseStatus.InProgress
             });
 
-            this.accountCourses.Save();
+            await this.accountCourseRepository.SaveAsync();
 
-            return true;
+            return this.GetDefaultActionResult(true);
         }
 
-        public bool RemoveAccountCourse(ChangeAccountCourseDTO accountCourseChange)
+        public async Task<IActionResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
-            int accountId = this.Authenticate(accountCourseChange.Token);
+            var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
-            if (accountId == 0)
+            if (!isAccountAndCourseExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseNotExist);
             }
 
-            accountCourseChange.AccountId = accountId;
-
-            if (ValidateAccountCourse(accountCourseChange) == false)
+            await this.accountCourseRepository.DeleteAsync(new AccountCourse()
             {
-                return false;
-            }
+                AccountId = accountCourseChange.AccountId,
+                CourseId = accountCourseChange.CourseId
+            });
 
-            this.accountCourses.Delete(ac => ac.AccountId == accountCourseChange.AccountId
-            && ac.CourseId == accountCourseChange.CourseId);
+            await this.accountCourseRepository.SaveAsync();
 
-            this.accountCourses.Save();
-
-            return true;
+            return this.GetDefaultActionResult(true);
         }
 
-        public bool ChangeAccountCourseStatus(ChangeAccountCourseDTO accountCourseChange)
+        public async Task<IActionResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange)
         {
-            int accountId = this.Authenticate(accountCourseChange.Token);
+            var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
-            if (accountId == 0 || accountCourseChange.Status is null)
+            if (!isAccountAndCourseExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrCourseNotExist);
             }
 
-            accountCourseChange.AccountId = accountId;
+            var isAccountCourseExist = await this.accountCourseRepository.AnyAsync(ac =>
+                (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == accountCourseChange.AccountId)
+                && (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == accountCourseChange.AccountId
+                && ac.Status != accountCourseChange.Status));
 
-            if (accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId
-             && ac.CourseId == accountCourseChange.CourseId) == false)
+            if (!isAccountCourseExist)
             {
-                return false;
-            }
-
-            if (accountCourses.Any(ac => ac.AccountId == accountCourseChange.AccountId
-             && ac.CourseId == accountCourseChange.CourseId && ac.Status == accountCourseChange.Status.Value) == true)
-            {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountCourseNotExist);
             }
 
             if (accountCourseChange.Status == CourseStatus.Passed)
             {
-                var idList = this.courses.GetAllCourseMaterialsId(accountCourseChange.CourseId).ToList();
-                foreach (var materialId in idList)
+                var isAccountPassedAllCourseMaterials = await this.materialService
+                    .IsAccountPassedAllCourseMaterials(
+                    accountCourseChange.AccountId,
+                    accountCourseChange.CourseId);
+
+                if (!isAccountPassedAllCourseMaterials)
                 {
-                    if(this.accountMaterials.Any(am => am.AccountId == accountCourseChange.AccountId
-                    && am.MaterialId == materialId) == false)
-                    {
-                        return false;
-                    }
+                    return this.GetDefaultActionResult(false, this.accountResultMessages.AccountNotPassedCourseMaterials);
                 }
             }
 
-            var accountCourse = this.accountCourses.Get(ac => ac.AccountId == accountCourseChange.AccountId
-            && ac.CourseId == accountCourseChange.CourseId);
+            var accountCourse = await this.accountCourseRepository.GetAsync(ac =>
+                ac.AccountId == accountCourseChange.AccountId
+                && ac.CourseId == accountCourseChange.CourseId);
 
-            if(accountCourse.OncePassed == false && accountCourseChange.Status == CourseStatus.Passed)
+            if (!accountCourse.OncePassed && accountCourseChange.Status == CourseStatus.Passed)
             {
                 accountCourse.OncePassed = true;
 
-                skills.AddSkilsToAccountByCourseId(new AddSkillsToAccountByCourseDTO()
+                await this.skillService.AddSkilsToAccountByCourseIdAsync(new AddSkillsToAccountByCourseDTO()
                 {
                     AccountId = accountCourseChange.AccountId,
                     CourseId = accountCourseChange.CourseId
@@ -170,187 +224,132 @@ namespace Infrastructure.BLL.Services
 
             accountCourse.Status = accountCourseChange.Status.Value;
 
-            this.accountCourses.Update(accountCourse);
+            await this.accountCourseRepository.UpdateAsync(accountCourse);
 
-            this.accountCourses.Save();
+            await this.accountCourseRepository.SaveAsync();
 
-            return true;
+            return this.GetDefaultActionResult(true);
         }
 
-        public bool AddAccountMaterial(ChangeAccountMaterialDTO accountMaterialChange)
+        public async Task<IActionResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
         {
-            int accountId = this.Authenticate(accountMaterialChange.Token);
+            var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
-            if (accountId == 0)
+            if (!isAccountAndMaterialExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountOrMaterialNotExist);
             }
 
-            accountMaterialChange.AccountId = accountId;
+            var isAccountMaterialAlreadyExist = await this.accountMaterialRepository.AnyAsync(am =>
+                am.AccountId == accountMaterialChange.AccountId
+                && am.MaterialId == accountMaterialChange.MaterialId);
 
-            if (ValidateAccountMaterial(accountMaterialChange) == false)
+            if (isAccountMaterialAlreadyExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountMaterialExist);
             }
 
-            if(this.accountMaterials.Any(am => am.AccountId == accountMaterialChange.AccountId
-            && am.MaterialId == accountMaterialChange.MaterialId) == true)
-            {
-                return false;
-            }
-
-            this.accountMaterials.Create(new AccountMaterialDBO()
+            await this.accountMaterialRepository.CreateAsync(new AccountMaterial()
             {
                 AccountId = accountMaterialChange.AccountId,
                 MaterialId = accountMaterialChange.MaterialId
             });
 
-            this.accountMaterials.Save();
+            await this.accountMaterialRepository.SaveAsync();
 
-            return true;
+            return this.GetDefaultActionResult(true);
         }
 
-        public bool RemoveAccountMaterial(ChangeAccountMaterialDTO accountMaterialChange)
+        public async Task<IActionResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
         {
-            int accountId = this.Authenticate(accountMaterialChange.Token);
+            var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
-            if (accountId == 0 || accountId != accountMaterialChange.AccountId)
+            if (!isAccountAndMaterialExist)
             {
-                return false;
+                return this.GetDefaultActionResult(false, this.accountResultMessages.AccountMaterialNotExist);
             }
 
-
-            if (ValidateAccountMaterial(accountMaterialChange) == false)
+            await this.accountMaterialRepository.DeleteAsync(new AccountMaterial()
             {
-                return false;
-            }
-
-            this.accountMaterials.Delete(am => am.AccountId == accountMaterialChange.AccountId
-            && am.MaterialId == accountMaterialChange.MaterialId);
-
-            this.accountCourses.Save();
-
-            return true;
-        }
-
-        public override bool Create(ChangeEntityDTO<ShortAccountInfoDTO> createEntity)
-        {
-            if (ValidateEntity(createEntity.Entity) == false || String.IsNullOrEmpty(createEntity.Entity.Password))
-            {
-                return false;
-            }
-
-            if (entity.Any(a => a.Email == createEntity.Entity.Email) == true)
-            {
-                return false;
-            }
-
-            var account = Map(createEntity.Entity);
-
-            account.RegistrationDate = DateTime.Now;
-
-            entity.Create(account);
-
-            entity.Save();
-
-            return true;
-        }
-
-        public FullAccountInfoDTO GetAccountInfo(int id)
-        {
-            var result = entity.Get<FullAccountInfoDTO>(a => a.Id == id, a => new FullAccountInfoDTO()
-            {
-                Id = a.Id,
-                RegistrationDate = a.RegistrationDate,
-                Email = a.Email,
-                Password = null,
-                SecondName = a.SecondName,
-                FirstName = a.FirstName,
-                PhoneNumber = a.PhoneNumber
+                AccountId = accountMaterialChange.AccountId,
+                MaterialId = accountMaterialChange.MaterialId
             });
 
-            result.PassedCoursesCount = accountCourses.Count(ac => ac.AccountId == id
-            && ac.Status == CourseStatus.Passed);
+            await this.accountMaterialRepository.SaveAsync();
 
-            result.PassedCourses = accountCourses.GetPage<AccountCourseDTO>(ac => ac.AccountId == id
-            && ac.Status == CourseStatus.Passed, ac => new AccountCourseDTO()
+            return this.GetDefaultActionResult(true);
+        }
+
+        public async Task<IActionResult<FullAccountInfoDTO>> GetAccountInfoAsync(int accountId)
+        {
+            var result = await this.accountRepository.GetAsync<FullAccountInfoDTO>(
+                a => a.Id == accountId,
+                a => new FullAccountInfoDTO()
+                {
+                    Id = a.Id,
+                    RegistrationDate = a.RegistrationDate,
+                    Email = a.Email,
+                    Password = null,
+                    SecondName = a.SecondName,
+                    FirstName = a.FirstName,
+                    PhoneNumber = a.PhoneNumber
+                });
+
+            result.PassedCoursesCount = await this.accountCourseRepository.CountAsync(ac =>
+                ac.AccountId == accountId && ac.Status == CourseStatus.Passed);
+
+            result.PassedCourses = await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(
+                ac => ac.AccountId == accountId && ac.Status == CourseStatus.Passed,
+                ac => new AccountCourseDTO()
+                {
+                    Title = ac.Course.Title,
+                    CourseId = ac.CourseId,
+                    Status = CourseStatus.Passed,
+                }, 
+                0, 
+                this.defaultAccountInfoPageSize);
+
+            result.CoursesInProgressCount = await this.accountCourseRepository.CountAsync(ac => 
+                ac.AccountId == accountId && ac.Status == CourseStatus.InProgress);
+
+            result.CoursesInProgress = await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(
+                ac => ac.AccountId == accountId && ac.Status == CourseStatus.InProgress,
+                ac => new AccountCourseDTO()
+                {
+                    Title = ac.Course.Title,
+                    CourseId = ac.CourseId,
+                    Status = CourseStatus.InProgress
+                }, 
+                0,
+                this.defaultAccountInfoPageSize);
+
+            var accountSkillsResult = await this.skillService.GetAccountSkillsAsync(new GetAccountSkillsDTO()
             {
-                Title = ac.Course.Title,
-                CourseId = ac.CourseId,
-                Status = CourseStatus.Passed
-            }, 0, defaultGetCount);
-
-            result.CoursesInProgressCount = accountCourses.Count(ac => ac.AccountId == id
-            && ac.Status == CourseStatus.InProgress);
-
-            result.CoursesInProgress = accountCourses.GetPage<AccountCourseDTO>(ac => ac.AccountId == id
-            && ac.Status == CourseStatus.InProgress, ac => new AccountCourseDTO()
-            {
-                Title = ac.Course.Title,
-                CourseId = ac.CourseId,
-                Status = CourseStatus.InProgress
-            }, 0, defaultGetCount);
-
-            result.AccountSkills = skills.GetAccountSkills(new GetAccountSkillsDTO()
-            {
-                AccountId = id,
+                AccountId = accountId,
                 PageNumber = 0,
-                PageSize = defaultGetCount
+                PageSize = this.defaultAccountInfoPageSize
             });
 
-            return result;
-        }
+            result.AccountSkills = accountSkillsResult.Result;
 
-        public FullAccountInfoDTO GetAccountInfo(string token)
-        {
-            int accountId = Authenticate(token);
-
-            if(accountId == 0)
+            return new ActionResult<FullAccountInfoDTO>()
             {
-                return null;
-            }
-            else
-            {
-                return this.GetAccountInfo(accountId);
-            }
-        }
-
-        protected override AccountDBO Map(ShortAccountInfoDTO entity)
-        {
-            return new AccountDBO()
-            {
-                Email = entity.Email,
-                RegistrationDate = entity.RegistrationDate,
-                FirstName = entity.FirstName,
-                Id = entity.Id,
-                Password = entity.Password,
-                PhoneNumber = entity.PhoneNumber,
-                SecondName = entity.SecondName
+                IsSuccessful = true,
+                Result = result
             };
         }
 
-        protected override bool ValidateEntity(ShortAccountInfoDTO entity)
+        private async Task<bool> ValidateAccountMaterialAsync(ChangeAccountMaterialDTO changeAccountMaterial)
         {
-            if(String.IsNullOrEmpty(entity.Email))
+            var isMaterialExist = await this.materialService.IsExistAsync(new MaterialDTO()
             {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
+                Id = changeAccountMaterial.MaterialId
+            });
 
-        private bool ValidateAccountMaterial(ChangeAccountMaterialDTO changeAccountMaterial)
-        {
-            if (changeAccountMaterial.MaterialId == 0
-                || changeAccountMaterial.AccountId == 0)
-            {
-                return false;
-            }
+            var isAccountExist = await this.accountRepository.AnyAsync(a =>
+                a.Id == changeAccountMaterial.AccountId);
 
-            if (this.IsExist(a => a.Id == changeAccountMaterial.AccountId) == false
-                || materials.IsExist(new MaterialDTO() { Id = changeAccountMaterial.MaterialId }) == false)
+            if (!isMaterialExist.Result || !isAccountExist)
             {
                 return false;
             }
@@ -358,16 +357,17 @@ namespace Infrastructure.BLL.Services
             return true;
         }
 
-        private bool ValidateAccountCourse(ChangeAccountCourseDTO changeAccountCourse)
+        private async Task<bool> ValidateAccountCourseAsync(ChangeAccountCourseDTO changeAccountCourse)
         {
-            if(changeAccountCourse.CourseId == 0
-                || changeAccountCourse.AccountId == 0)
+            var isCourseExist = await this.courseService.IsExistAsync(new ShortCourseInfoDTO()
             {
-                return false;
-            }
+                Id = changeAccountCourse.CourseId
+            });
 
-            if(this.IsExist(a => a.Id == changeAccountCourse.AccountId) == false
-                || courses.IsExist(new ShortCourseInfoDTO() { Id = changeAccountCourse.CourseId }) == false)
+            var isAccountExist = await this.accountRepository.AnyAsync(a =>
+                a.Id == changeAccountCourse.AccountId);
+
+            if (!isCourseExist.Result || !isAccountExist)
             {
                 return false;
             }

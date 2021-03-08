@@ -1,12 +1,17 @@
-﻿using EducationProject.BLL.Models;
+﻿using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface IMaterialService : IBusinessService<MaterialDTO>
     {
-        MaterialDTO GetMaterialInfo(int id);
+        Task<IActionResult<MaterialDTO>> GetMaterialInfoAsync(int id);
+
+        Task<IActionResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId);
+
+        Task<bool> IsAccountPassedAllCourseMaterials(int accountId, int courseId);
     }
 }

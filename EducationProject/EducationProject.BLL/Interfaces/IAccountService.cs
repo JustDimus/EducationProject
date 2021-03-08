@@ -1,24 +1,23 @@
-﻿using EducationProject.BLL.Models;
+﻿using EducationProject.BLL.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
     public interface IAccountService : IBusinessService<ShortAccountInfoDTO>
     {
-        FullAccountInfoDTO GetAccountInfo(int id);
+        Task<IActionResult<FullAccountInfoDTO>> GetAccountInfoAsync(int id);
 
-        FullAccountInfoDTO GetAccountInfo(string token);
+        Task<IActionResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        bool AddAccountCourse(ChangeAccountCourseDTO accountCourseChange);
+        Task<IActionResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        bool RemoveAccountCourse(ChangeAccountCourseDTO accountCourseChange);
+        Task<IActionResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        bool ChangeAccountCourseStatus(ChangeAccountCourseDTO accountCourseChange);
+        Task<IActionResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
 
-        bool AddAccountMaterial(ChangeAccountMaterialDTO accountMaterialChange);
-
-        bool RemoveAccountMaterial(ChangeAccountMaterialDTO accountMaterialChange);
+        Task<IActionResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
     }
 }

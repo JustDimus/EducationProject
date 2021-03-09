@@ -6,8 +6,14 @@ namespace EducationProject.BLL.DTO
 {
     public class FullCourseInfoDTO : ShortCourseInfoDTO
     {
-        public IEnumerable<CourseSkillDTO> Skills { get; set; }
+        public string CurrentStatus { get; set; }
 
-        public IEnumerable<CourseMaterialDTO> Materials { get; set; }
+        public bool CanBeChanged { get; set; }
+
+        public bool CanBePassed { get; set; }
+
+        public EntityInfoPageDTO<CourseSkillDTO> Skills { get; set; }
+
+        public EntityInfoPageDTO<CourseMaterialDTO> Materials { get; set; }
     }
 }

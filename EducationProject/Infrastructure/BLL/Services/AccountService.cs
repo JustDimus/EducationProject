@@ -34,7 +34,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IPasswordHasher passwordHasher;
 
-        private IHttpContextAccessor httpContext;
+        private IAuthorizationService authorizationService;
 
         private int defaultAccountInfoPageSize;
 
@@ -46,14 +46,15 @@ namespace EducationProject.Infrastructure.BLL.Services
             ISkillService skillService,
             AccountMapping accountMapping,
             ServiceResultMessageCollection serviceResultMessageCollection,
-            IPasswordHasher passwordHasher,
-            IHttpContextAccessor httpContextAccessor)
+            IAuthorizationService authorizationService,
+            IPasswordHasher passwordHasher)
         {
             this.accountCourseRepository = accountCoursesRepository;
             this.accountMaterialRepository = accountMaterialsRepository;
             this.accountRepository = accountRepository;
 
-            //this.courseService = courseService;
+            this.authorizationService = authorizationService;
+
             this.skillService = skillService;
             this.materialService = materialService;
 
@@ -62,8 +63,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.serviceResultMessages = serviceResultMessageCollection;
 
             this.passwordHasher = passwordHasher;
-
-            this.httpContext = httpContextAccessor;
 
             this.defaultAccountInfoPageSize = 10;
         }
@@ -147,7 +146,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         public async Task<IServiceResult<AccountInfoDTO>> GetAccountInfoAsync()
         {
-            var accountId = this.GetAccountId();
+            var accountId = this.authorizationService.GetAccountId();
 
             return await this.GetAccountInfoAsync(accountId);
         }
@@ -185,7 +184,7 @@ namespace EducationProject.Infrastructure.BLL.Services
         {
             try
             {
-                var accountId = this.GetAccountId();
+                var accountId = this.authorizationService.GetAccountId();
 
                 if (accountId != accountInfo.Id)
                 {
@@ -225,7 +224,7 @@ namespace EducationProject.Infrastructure.BLL.Services
         {
             try
             {
-                var accountId = this.GetAccountId();
+                var accountId = this.authorizationService.GetAccountId();
 
                 await this.accountRepository.DeleteAsync(a => a.Id == accountId);
 
@@ -470,16 +469,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             await this.accountMaterialRepository.SaveAsync();
 
             return this.GetDefaultActionResult(true);*/
-        }
-
-        public int GetAccountId()
-        {
-            var accountIdValue = this.httpContext.HttpContext.User.Claims
-                .Where(p => p.Type == ClaimTypes.NameIdentifier)
-                .First()
-                .Value;
-
-            return int.Parse(accountIdValue);
         }
 
         /*

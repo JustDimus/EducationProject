@@ -21,7 +21,9 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<Skill> skillRepository;
 
-        private IMapping<Skill, SkillDTO> skillMapping;
+        private IAuthorizationService authorizationService;
+
+        private SkillMapping skillMapping;
 
         private ServiceResultMessageCollection serviceResultMessages;
 
@@ -29,6 +31,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             IRepository<Skill> skillRepository,
             IRepository<AccountSkill> accountSkillRepository,
             IRepository<CourseSkill> courseSkillRepository,
+            IAuthorizationService authorizationService,
             SkillMapping skillMapping,
             ServiceResultMessageCollection serviceResultMessageCollection)
         {
@@ -38,16 +41,61 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.skillRepository = skillRepository;
 
+            this.authorizationService = authorizationService;
+
             this.skillMapping = skillMapping;
 
             this.serviceResultMessages = serviceResultMessageCollection;
+        }
+
+        public async Task<IServiceResult<EntityInfoPageDTO<CourseSkillDTO>>> GetCourseSkillPageAsync(int courseId, PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.GetCourseSkillPagesCountAsync(
+                    pageInfo.PageSize, 
+                    cs => cs.CourseId == courseId);
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var skillInfoPage = new EntityInfoPageDTO<CourseSkillDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                skillInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
+                skillInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                skillInfoPage.Entities = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(
+                    cs => cs.CourseId == courseId,
+                    this.skillMapping.CourseSkillConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize);
+
+                return new ServiceResult<EntityInfoPageDTO<CourseSkillDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = skillInfoPage
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<CourseSkillDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
         }
 
         public async Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo)
         {
             try
             {
-                var pageCount = await this.GetPagesCountAsync(pageInfo.PageSize, t => true);
+                var pageCount = await this.GetCourseSkillPagesCountAsync(pageInfo.PageSize, t => true);
 
                 if(pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
                 {
@@ -285,6 +333,22 @@ namespace EducationProject.Infrastructure.BLL.Services
         private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<Skill, bool>> skillCondition)
         {
             var result = await this.skillRepository.CountAsync(skillCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
+        }
+   
+        private async Task<int> GetCourseSkillPagesCountAsync(int pageSize, Expression<Func<CourseSkill, bool>> condition)
+        {
+            var result = await this.courseSkillRepository.CountAsync(condition);
 
             if (result % pageSize == 0)
             {

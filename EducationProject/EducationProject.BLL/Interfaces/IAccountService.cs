@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface IAccountService// : IBusinessService<ShortAccountInfoDTO>
+    public interface IAccountService
     {
         Task<IServiceResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange);
 
@@ -29,7 +29,5 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult> UpdateAccountAsync(AccountInfoDTO accountInfo);
 
         Task<IServiceResult> DeleteAccountAsync();
-
-        int GetAccountId();
     }
 }

@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface ICourseService// : IBusinessService<ShortCourseInfoDTO>
+    public interface ICourseService
     {
-        Task<IServiceResult<FullCourseInfoDTO>> GetFullCourseInfoAsync(int id);
+        Task<IServiceResult<FullCourseInfoDTO>> GetFullCourseInfoAsync(
+            int courseId,
+            PageInfoDTO materialPageInfo,
+            PageInfoDTO skillPageInfo);
 
         Task<IServiceResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams);
 

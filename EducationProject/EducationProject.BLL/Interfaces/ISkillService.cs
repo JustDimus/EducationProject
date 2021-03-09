@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface ISkillService// : IBusinessService<SkillDTO>
+    public interface ISkillService
     {
         Task<IServiceResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills);
 
@@ -23,5 +23,9 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo);
 
         Task<bool> IsExistAsync(SkillDTO skill);
+
+        Task<IServiceResult<EntityInfoPageDTO<CourseSkillDTO>>> GetCourseSkillPageAsync(
+            int courseId,
+            PageInfoDTO pageInfo);
     }
 }

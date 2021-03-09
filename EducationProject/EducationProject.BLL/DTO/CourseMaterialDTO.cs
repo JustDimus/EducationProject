@@ -12,5 +12,7 @@ namespace EducationProject.BLL.DTO
         public string MaterialTitle { get; set; }
 
         public MaterialType MaterialType { get; set; }
+
+        public bool IsAccountPassed { get; set; }
     }
 }

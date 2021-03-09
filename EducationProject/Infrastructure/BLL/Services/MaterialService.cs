@@ -21,6 +21,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<AccountMaterial> accountMaterialRepository;
 
+        private IAuthorizationService authorizationService;
+
         private MaterialMapping materialMapping;
 
         private ServiceResultMessageCollection serviceResultMessages;
@@ -30,17 +32,75 @@ namespace EducationProject.Infrastructure.BLL.Services
             MaterialMapping materialMapping,
             IRepository<CourseMaterial> courseMaterialRepository,
             IRepository<AccountMaterial> accountMaterialRepository,
+            IAuthorizationService authorizationService,
             ServiceResultMessageCollection serviceResultMessageCollection)
         {
             this.materialRepository = materialRepository;
 
             this.materialMapping = materialMapping;
 
+            this.authorizationService = authorizationService;
+
             this.courseMaterialRepository = courseMaterialRepository;
 
             this.accountMaterialRepository = accountMaterialRepository;
 
             this.serviceResultMessages = serviceResultMessageCollection;
+        }
+
+        public async Task<IServiceResult<EntityInfoPageDTO<CourseMaterialDTO>>> GetCourseMaterialPageAsync(
+            int courseId, 
+            int accountId, 
+            PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.GetCourseMaterialPagesCount(
+                    pageInfo.PageSize,
+                    cm => cm.CourseId == courseId);
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var courseMaterialInfoPage = new EntityInfoPageDTO<CourseMaterialDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                courseMaterialInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
+                courseMaterialInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                var courseMaterials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(
+                    cm => cm.CourseId == courseId,
+                    this.materialMapping.CourseMaterialDTOExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize);
+
+                foreach(var material in courseMaterials)
+                {
+                    material.IsAccountPassed = await this.accountMaterialRepository.AnyAsync(
+                        am => am.MaterialId == material.MaterialId
+                        && am.AccountId == accountId);
+                }
+
+                courseMaterialInfoPage.Entities = courseMaterials;
+
+                return new ServiceResult<EntityInfoPageDTO<CourseMaterialDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = courseMaterialInfoPage
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<CourseMaterialDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
         }
 
         public async Task<IServiceResult<int>> CreateMaterialAsync(MaterialDTO material)
@@ -237,6 +297,22 @@ namespace EducationProject.Infrastructure.BLL.Services
         private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<BaseMaterial, bool>> materialCondition)
         {
             var result = await this.materialRepository.CountAsync(materialCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
+        }
+    
+        private async Task<int> GetCourseMaterialPagesCount(int pageSize, Expression<Func<CourseMaterial, bool>> condition)
+        {
+            var result = await this.courseMaterialRepository.CountAsync(condition);
 
             if (result % pageSize == 0)
             {

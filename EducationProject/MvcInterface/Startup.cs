@@ -53,6 +53,8 @@ namespace MvcInterface
 
             services.AddTransient<ISkillService, SkillService>();
 
+            services.AddScoped<IAuthorizationService, AuthorizationService>();
+
             services.AddTransient<ServiceResultMessageCollection>();
 
             services.AddTransient<AccountMapping>();            

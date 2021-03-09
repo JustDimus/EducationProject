@@ -119,5 +119,15 @@ namespace EducationProject.Infrastructure.BLL.Mappings
             } :
             null;
         }
+
+        public Expression<Func<CourseMaterial, CourseMaterialDTO>> CourseMaterialDTOExpression
+        {
+            get => cm => new CourseMaterialDTO()
+            {
+                MaterialId = cm.MaterialId,
+                MaterialTitle = cm.Material.Title,
+                MaterialType = cm.Material.Type
+            };
+        }
     }
 }

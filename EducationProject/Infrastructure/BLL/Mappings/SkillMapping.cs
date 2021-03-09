@@ -29,5 +29,15 @@ namespace EducationProject.Infrastructure.BLL.Mappings
                 Title = externalEntity.Title
             };
         }
+
+        public Expression<Func<CourseSkill, CourseSkillDTO>> CourseSkillConvertExpression
+        {
+            get => cs => new CourseSkillDTO()
+            {
+                SkillChange = cs.Change,
+                SkillId = cs.SkillId,
+                SkillTitle = cs.Skill.Title
+            };
+        }
     }
 }

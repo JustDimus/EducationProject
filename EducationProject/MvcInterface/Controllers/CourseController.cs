@@ -125,5 +125,46 @@ namespace MvcInterface.Controllers
 
             return this.RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Show(
+            [FromQuery] int courseId,
+            [FromQuery] int? skillPageNumber,
+            [FromQuery] int? skillPageSize,
+            [FromQuery] int? materialPageNumber,
+            [FromQuery] int? materialPageSize)
+        {
+            var skillPageInfo = new PageInfoDTO()
+            {
+                PageNumber = skillPageNumber ?? 0,
+                PageSize = skillPageSize ?? 4
+            };
+
+            var materialPageInfo = new PageInfoDTO()
+            {
+                PageNumber = materialPageNumber ?? 0,
+                PageSize = materialPageSize ?? 6
+            };
+
+            var courseInfoServiceResult = await this.courseService.GetFullCourseInfoAsync(
+                courseId,
+                materialPageInfo,
+                skillPageInfo);
+
+            if (!courseInfoServiceResult.IsSuccessful)
+            {
+                return this.RedirectToAction("Index", "Home");
+            }
+
+            return this.View(courseInfoServiceResult.Result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ShowPage(
+            [FromQuery] int? pageNumber,
+            [FromQuery] int? pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

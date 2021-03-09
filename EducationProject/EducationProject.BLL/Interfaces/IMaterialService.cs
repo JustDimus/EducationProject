@@ -23,5 +23,10 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<EntityInfoPageDTO<MaterialDTO>>> GetMaterialPageAsync(PageInfoDTO pageInfo);
 
         Task<bool> IsExistAsync(MaterialDTO material);
+
+        Task<IServiceResult<EntityInfoPageDTO<CourseMaterialDTO>>> GetCourseMaterialPageAsync(
+            int courseId,
+            int accountId,
+            PageInfoDTO pageInfo);
     }
 }

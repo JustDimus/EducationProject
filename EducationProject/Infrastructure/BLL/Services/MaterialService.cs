@@ -64,9 +64,11 @@ namespace EducationProject.Infrastructure.BLL.Services
                     pageInfo.PageNumber = 0;
                 }
 
+
                 var courseMaterialInfoPage = new EntityInfoPageDTO<CourseMaterialDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 courseMaterialInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
@@ -210,7 +212,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var materialInfoPage = new EntityInfoPageDTO<MaterialDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 materialInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
@@ -283,6 +286,7 @@ namespace EducationProject.Infrastructure.BLL.Services
                     c => c.MaterialId,
                     0,
                     await this.courseMaterialRepository.CountAsync(c => c.CourseId == courseId));
+
                 return courseMaterialsList.ToList().TrueForAll(
                     id => this.accountMaterialRepository.AnyAsync(
                         am => am.AccountId == accountId

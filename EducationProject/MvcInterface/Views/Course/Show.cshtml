@@ -4,5 +4,129 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Show</h1>
+<div class="w-75 mx-auto shadow p-3 mb-5 bg-white rounded">
+    <div class="row">
+        <div class="col-8">
+            <div class="row d-flex justify-content-between">
+                <div class="col-9 text-center">
+                    <h2>
+                        @Model.Title
+                    </h2>
+                </div>
+                <div class="col-3">
+                    @if (Model.CanBeChanged)
+                    {
+                        <a class="btn btn-danger" asp-controller="Course" asp-action="Edit" asp-route-courseId="@Model.Id">
+                            Изменить
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <h4>
+                    Описание: @Model.Description
+                </h4>
+            </div>
+            <div class="text-center">
+                <h3>
+                    Материалы курса
+                </h3>
+            </div>
+            @if (Model.CanBeChanged)
+            {
+                <div class="text-center">
+                    <a class="btn btn-light" asp-controller="Material" asp-action="AddMaterialToCourse" asp-route-courseId="@Model.Id">
+                        Добавить новый материал
+                    </a>
+                </div>
+            }
+            <table class="table">
+                <thead class="thead-dark">
+                <th>
+                    #
+                </th>
+                <th>
+                    Название
+                </th>
+                <th>
+                </th>
+                @if (Model.CanBeChanged)
+                {
+                    <th>
+                    </th>
+                }
+                </thead>
+                @foreach (var material in Model.Materials.Entities)
+                {
+                    <tr>
+                        <td>
+                            @material.MaterialId
+                        </td>
+                        <td>
+                            @material.MaterialTitle
+                        </td>
+                        <td>
+                            <a class="btn btn-info" asp-controller="Material" asp-action="Show" asp-route-materialId="@material.MaterialId">
+                                Посмотреть
+                            </a>
+                        </td>
+                        @if (Model.CanBeChanged)
+                        {
+                            <td>
+                                <a class="btn btn-danger" asp-controller="Course" asp-action="RemoveMaterial"
+                                   asp-route-materialId="@material.MaterialId" asp-route-courseId="@Model.Id">
+                                    Удалить
+                                </a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Materials.CanMoveBack ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-courseId="@Model.Id"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-materialPageNumber="@(Model.Materials.CurrentPage-1)"
+                           asp-route-materialPageSize="@Model.Materials.CurrentPageSize"
+                           class="page-link">
+                            Предыдущая
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a asp-action="Show"
+                           asp-route-courseId="@Model.Id"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-materialPageNumber="@Model.Materials.CurrentPage"
+                           asp-route-materialPageSize="@Model.Materials.CurrentPageSize" class="page-link">
+                            @(Model.Materials.CurrentPage + 1)
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.Materials.CanMoveForward ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-courseId="@Model.Id"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-materialPageNumber="@(Model.Materials.CurrentPage+1)"
+                           asp-route-materialPageSize="@Model.Materials.CurrentPageSize" class="page-link">
+                            Следующая
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-4">
+            <img src="https://st2.depositphotos.com/3489481/5208/i/600/depositphotos_52086275-stock-photo-book-of-life.jpg"
+                 width="250" height="250" />
+            <div class="text-center">
+                <a class="btn btn-lg btn-primary" 
+                   asp-action="PassCourse" asp-route-courseId="@Model.Id" >
 
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

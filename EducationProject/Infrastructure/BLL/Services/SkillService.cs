@@ -63,7 +63,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var skillInfoPage = new EntityInfoPageDTO<CourseSkillDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 skillInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
@@ -104,7 +105,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var skillInfoPage = new EntityInfoPageDTO<SkillDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 skillInfoPage.CanMoveBack = pageInfo.PageNumber > 0;

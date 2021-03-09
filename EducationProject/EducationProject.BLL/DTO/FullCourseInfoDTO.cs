@@ -8,6 +8,8 @@ namespace EducationProject.BLL.DTO
     {
         public string CurrentStatus { get; set; }
 
+        public bool CanBePublished { get; set; }
+
         public bool CanBeChanged { get; set; }
 
         public bool CanBePassed { get; set; }

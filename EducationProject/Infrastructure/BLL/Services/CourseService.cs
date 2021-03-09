@@ -9,6 +9,7 @@ using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
 using EducationProject.Infrastructure.BLL.Mappings;
 using System.Linq.Expressions;
+using System.Linq;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -143,6 +144,8 @@ namespace EducationProject.Infrastructure.BLL.Services
                     courseId,
                     this.authorizationService.GetAccountId(),
                     materialPageInfo);
+
+                result.CanBePublished = materialServiceResult.Result.Entities.Any();
 
                 if (!materialServiceResult.IsSuccessful)
                 {

@@ -10,6 +10,8 @@ namespace EducationProject.BLL.DTO
 
         public int CurrentPage { get; set; }
 
+        public int CurrentPageSize { get; set; }
+
         public bool CanMoveForward { get; set; }
 
         public bool CanMoveBack { get; set; }

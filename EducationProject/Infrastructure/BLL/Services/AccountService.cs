@@ -24,8 +24,6 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<Account> accountRepository;
 
-        //private ICourseService courseService;
-
         private IMaterialService materialService;
 
         private ISkillService skillService;
@@ -44,7 +42,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             IRepository<Account> accountRepository,
             IRepository<AccountCourse> accountCoursesRepository,
             IRepository<AccountMaterial> accountMaterialsRepository,
-            //ICourseService courseService,
             IMaterialService materialService,
             ISkillService skillService,
             AccountMapping accountMapping,

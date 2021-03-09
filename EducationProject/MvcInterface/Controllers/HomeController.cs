@@ -19,16 +19,21 @@ namespace MvcInterface.Controllers
 
         private ICourseService courseService;
 
+        private IMaterialService materialService;
+
         public HomeController(
             ILogger<HomeController> logger,
-            ICourseService courseService)
+            ICourseService courseService,
+            IMaterialService materialService)
         {
             _logger = logger;
 
             this.courseService = courseService;
+
+            this.materialService = materialService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var defaultCoursePage = new PageInfoDTO()
             {
@@ -36,11 +41,19 @@ namespace MvcInterface.Controllers
                 PageSize = 9
             };
 
-            var courses = this.courseService.GetCoursePageAsync(defaultCoursePage);
+            var defaultMaterialPage = new PageInfoDTO()
+            {
+                PageNumber = 0,
+                PageSize = 15
+            };
 
-            this.ViewBag.defaultCourses = courses;
+            var courses = await this.courseService.GetCoursePageAsync(defaultCoursePage);
 
-            return View();
+            var materials = await this.materialService.GetMaterialPageAsync(defaultMaterialPage);
+
+            this.ViewBag.materials = materials.Result.Entities;
+
+            return View(courses.Result.Entities.ToList());
         }
 
         public IActionResult Privacy()

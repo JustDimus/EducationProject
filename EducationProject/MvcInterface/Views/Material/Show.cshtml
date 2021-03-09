@@ -1,0 +1,91 @@
+﻿@model MvcInterface.Models.Models.EditMaterialViewModel
+
+@{
+    ViewData["Title"] = "Show";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Show</h1>
+
+<div>
+    <h4>EditMaterialViewModel</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        @if (Model.Type != "Book")
+        {
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.URI)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.URI)
+            </dd>
+        }
+        @if (Model.Type == "Article")
+        {
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.PublicationDate)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.PublicationDate)
+            </dd>
+        }
+        @if (Model.Type == "Book")
+        {
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Author)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Author)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Pages)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Pages)
+            </dd>
+        }
+        @if (Model.Type == "Video")
+        {
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Duration)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Duration)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Quality)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Quality)
+            </dd>
+        }
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-materialId="@Model.Id">Изменить</a> |
+    <a asp-action="ShowPage">Показать все</a>
+</div>

@@ -1,8 +1,95 @@
-﻿@{
+﻿@model System.Collections.Generic.List<EducationProject.BLL.DTO.ShortCourseInfoDTO>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="w-auto mx-auto shadow p-3 mb-5 bg-white rounded">
+    <div class="text-center">
+        <h1>
+            Добро пожаловать на сайт Education Project!
+        </h1>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <h4 class="text-center">
+                Наши курсы
+            </h4>
+            <div class="border border-dark">
+                @for (int i = 0; i < 3; i++)
+                {
+                    <div class="row my-3">
+                        @for (int j = 0; j < 3; j++)
+                        {
+                            <div class="col-4">
+                                @if (i * 3 + j < Model.Count)
+                                {
+                                    <div class="row justify-content-center">
+                                        <img src="https://st2.depositphotos.com/3489481/5208/i/600/depositphotos_52086275-stock-photo-book-of-life.jpg"
+                                         class="rounded" width="100" height="100" />
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <b>
+                                            @Model[i * 3 + j].Title
+                                        </b>
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <a class="btn btn-info" asp-controller="Course" asp-action="Show" asp-route-courseId="@Model[i*3 + j].Id">
+                                            Перейти
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    @if (i * 2 >= Model.Count)
+                    {
+                        break;
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-5">
+            <h4 class="text-center">
+                Наши материалы
+            </h4>
+            <div>
+                <table class="table table-dark">
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            Название
+                        </th>
+                        <th>
+                            Описание
+                        </th>
+
+                        <th>
+                        </th>
+                    </tr>
+                    @foreach (var material in ViewBag.materials)
+                    {
+                        <tr>
+                            <td>
+                                @material.Id
+                            </td>
+                            <td>
+                                @material.Title
+                            </td>
+                            <td>
+                                @material.Description
+                            </td>
+                            <td>
+                                <a class="btn btn-primary btn-sm" asp-controller="Material" asp-action="Show" asp-route-materialId="@material.Id">
+                                    Перейти
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

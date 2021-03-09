@@ -131,6 +131,15 @@ namespace EducationProject.Infrastructure.BLL.Services
                     s => s.Id == skillId,
                     this.skillMapping.ConvertExpression);
 
+                if (skill == null)
+                {
+                    return new ServiceResult<SkillDTO>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = this.serviceResultMessages.SkillNotExist
+                    };
+                }
+
                 return new ServiceResult<SkillDTO>()
                 {
                     IsSuccessful = true,

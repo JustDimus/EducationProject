@@ -78,6 +78,7 @@ namespace MvcInterface.Controllers
                 return this.View();
             }
 
+
             var skillVM = new EditSkillViewModel()
             {
                 Description = getSkillServiceResult.Result.Description,
@@ -127,6 +128,30 @@ namespace MvcInterface.Controllers
             await this.skillService.DeleteSkillAsync(skillId);
 
             return this.RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Show([FromQuery] int skillId)
+        {
+            var skillDTO = await this.skillService.GetSkillAsync(skillId);
+
+            return this.View(skillDTO.Result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ShowPage(
+            [FromQuery] int? pageNumber,
+            [FromQuery] int? pageSize)
+        {
+            var pageInfo = new PageInfoDTO()
+            {
+                PageNumber = pageNumber ?? 0,
+                PageSize = pageNumber ?? 10
+            };
+
+            var skillPageServiceResult = await this.skillService.GetSkillPageAsync(pageInfo);
+
+            return this.View(skillPageServiceResult.Result);
         }
     }
 }

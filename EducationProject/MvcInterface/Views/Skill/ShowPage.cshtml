@@ -1,0 +1,56 @@
+﻿@model EducationProject.BLL.DTO.EntityInfoPageDTO<EducationProject.BLL.DTO.SkillDTO> 
+@{
+    ViewData["Title"] = "ShowPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Скиллы</h1>
+    <table class="table table-dark">
+        <tr>
+            <th>#</th>
+            <th>Название</th>
+            <th>Описание</th>
+            <th>Максимальное значение</th>
+            <th></th>
+        </tr>
+        @foreach (var skill in Model.Entities)
+        {
+            <tr>
+                <td>@skill.Id</td>
+                <td>@skill.Title</td>
+                <td>@skill.Description</td>
+                <td>@skill.MaxValue</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" asp-controller="Skill"
+                       asp-action="Show" asp-route-skillId="@skill.Id">
+                        Посмотреть
+                    </a>
+                </td>
+            </tr>
+        }
+    </table>
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.CanMoveBack ? "" : "disabled")">
+                <a asp-action="ShowPage" asp-route-pageNumber="@(Model.CurrentPage-1)"
+                   asp-route-pageSize="10" class="page-link">
+                    Предыдущая
+                </a>
+            </li>
+            <li class="page-item">
+                <a asp-action="ShowPhoneInfo" asp-route-pageNumber="@(Model.CurrentPage)"
+                   asp-route-pageSize="10" class="page-link">
+                    @(Model.CurrentPage+1)
+                </a>
+            </li>
+            <li class="page-item @(Model.CanMoveForward ? "" : "disabled")">
+                <a asp-action="ShowPhoneInfo" asp-route-pageNumber="@(Model.CurrentPage+1)"
+                   asp-route-pageSize="10" class="page-link">
+                    Следующая
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+

@@ -149,6 +149,39 @@ namespace MvcInterface.Controllers
             return this.RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Show([FromQuery] int materialId)
+        {
+            var getMaterialResult = await this.materialService.GetMaterialAsync(materialId);
+
+            if (!getMaterialResult.IsSuccessful)
+            {
+                this.ModelState.AddModelError(
+                    string.Empty,
+                    this.blMessageParser[getMaterialResult.MessageCode]);
+
+                return this.View();
+            }
+
+            return this.View(this.CreateViewModelMaterial(getMaterialResult.Result));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ShowPage(
+            int? pageNumber,
+            int? pageSize)
+        {
+            var pageInfo = new PageInfoDTO()
+            {
+                PageNumber = pageNumber ?? 0,
+                PageSize = pageNumber ?? 10
+            };
+
+            var materialPageServiceResult = await this.materialService.GetMaterialPageAsync(pageInfo);
+
+            return this.View(materialPageServiceResult.Result);
+        }
+
         private MaterialDTO GenerateMaterial(CreateMaterialViewModel materialModel, int typeId)
         {
             switch (typeId)

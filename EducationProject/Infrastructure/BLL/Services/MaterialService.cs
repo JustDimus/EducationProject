@@ -85,6 +85,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 await this.materialRepository.UpdateAsync(this.materialMapping.Map(material));
 
+                await this.materialRepository.SaveAsync();
+
                 return this.GetDefaultActionResult(true);
             }
             catch(Exception ex)

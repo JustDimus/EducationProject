@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
 using EducationProject.Infrastructure.BLL.Mappings;
+using System.Linq.Expressions;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -16,6 +17,8 @@ namespace EducationProject.Infrastructure.BLL.Services
         private IMaterialService materialService;
 
         private ISkillService skillService;
+
+        private IAccountService accountService;
 
         private IRepository<CourseSkill> courseSkillRepository;
 
@@ -33,6 +36,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             IRepository<Course> courseRepository,
             IMaterialService materialService,
             ISkillService skillService,
+            IAccountService accountService,
             IRepository<CourseSkill> courseSkillRepository,
             IRepository<CourseMaterial> courseMaterialRepository,
             CourseMapping courseMapping,
@@ -50,13 +54,265 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.courseMaterialRepository = courseMaterialRepository;
 
+            this.accountService = accountService;
+
             this.defaultPageSize = 10;
 
             this.courseMapping = courseMapping;
 
             this.serviceResultMessages = serviceResultMessageCollection;
         }
-      
+        
+        public async Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.GetPagesCountAsync(pageInfo.PageSize, t => true);
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var courseInfoPage = new EntityInfoPageDTO<ShortCourseInfoDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                courseInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
+                courseInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                courseInfoPage.Entities = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
+                    s => s.IsVisible == true,
+                    this.courseMapping.ConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize);
+
+                return new ServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = courseInfoPage
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult<FullCourseInfoDTO>> GetFullCourseInfoAsync(int id)
+        {
+            try
+            {
+                FullCourseInfoDTO result = await this.courseRepository.GetAsync<FullCourseInfoDTO>(
+                c => c.Id == id,
+                c => new FullCourseInfoDTO()
+                {
+                    Id = c.Id,
+                    Description = c.Description,
+                    Title = c.Title,
+                    CreatorId = c.CreatorId
+                });
+
+                result.Materials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(
+                    cm => cm.CourseId == id,
+                    cm => new CourseMaterialDTO()
+                    {
+                        MaterialTitle = cm.Material.Title,
+                        MaterialId = cm.Material.Id,
+                        MaterialType = cm.Material.Type
+                    },
+                    0,
+                    this.defaultPageSize);
+
+                result.Skills = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(
+                    cs => cs.CourseId == id,
+                    cs => new CourseSkillDTO()
+                    {
+                        SkillId = cs.Skill.Id,
+                        SkillChange = cs.Change,
+                        SkillTitle = cs.Skill.Title
+                    },
+                    0,
+                    this.defaultPageSize);
+
+                return new ServiceResult<FullCourseInfoDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = result
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<FullCourseInfoDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult<int>> CreateCourseAsync(ShortCourseInfoDTO course)
+        {
+            try
+            {
+                var isCourseTitleExist = await this.courseRepository.AnyAsync(c => c.Title == course.Title);
+
+                if (isCourseTitleExist)
+                {
+                    return new ServiceResult<int>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = this.serviceResultMessages.CourseTitleExist
+                    };
+                }
+
+                var creatorId = this.accountService.GetAccountId();
+
+                var courseToCreate = this.courseMapping.Map(course);
+
+                courseToCreate.CreatorId = creatorId;
+                courseToCreate.IsVisible = false;
+
+                await this.courseRepository.CreateAsync(courseToCreate);
+
+                await this.courseRepository.SaveAsync();
+
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = true,
+                    Result = courseToCreate.Id
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult> UpdateCourseAsync(ShortCourseInfoDTO course)
+        {
+            try
+            {
+                var isCourseExist = await this.courseRepository.AnyAsync(c => c.Id == course.Id);
+
+                if(!isCourseExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseNotExist);
+                }
+
+                var isCourseTitleExist = await this.courseRepository.AnyAsync(
+                    c => c.Title == course.Title && c.Id != course.Id);
+
+                if (!isCourseTitleExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseTitleExist);
+                }
+
+                var accountId = this.accountService.GetAccountId();
+
+                var canAccountChangeCourse = await this.courseRepository.AnyAsync(
+                    c => c.CreatorId == accountId && c.Id == course.Id);
+
+                if(!canAccountChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == course.Id);
+
+                courseToUpdate.Title = course.Title;
+                courseToUpdate.Description = course.Description;
+
+                await this.courseRepository.UpdateAsync(courseToUpdate);
+
+                await this.courseRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
+            }
+        }
+
+        public async Task<IServiceResult> DeleteCourseAsync(int courseId)
+        {
+            try
+            {
+                var isCourseExist = await this.courseRepository.AnyAsync(c => c.Id == courseId);
+
+                if (!isCourseExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseNotExist);
+                }
+
+                var accountId = this.accountService.GetAccountId();
+
+                var canAccountChangeCourse = await this.courseRepository.AnyAsync(
+                    c => c.CreatorId == accountId && c.Id == courseId);
+
+                if (!canAccountChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                await this.courseRepository.DeleteAsync(c => c.Id == courseId);
+
+                await this.courseRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
+            }
+        }
+
+        public async Task<IServiceResult<ShortCourseInfoDTO>> GetCourseInfoAsync(int courseId)
+        {
+            try
+            {
+                return new ServiceResult<ShortCourseInfoDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = await this.courseRepository.GetAsync<ShortCourseInfoDTO>(
+                        c => c.Id == courseId,
+                        this.courseMapping.ConvertExpression)
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<ShortCourseInfoDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
         public async Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
         {
             return new ServiceResult<IEnumerable<ShortCourseInfoDTO>>()
@@ -259,47 +515,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IServiceResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id)
-        {
-            FullCourseInfoDTO result = await this.courseRepository.GetAsync<FullCourseInfoDTO>(
-                c => c.Id == id,
-                c => new FullCourseInfoDTO()
-                {
-                    Id = c.Id,
-                    Description = c.Description,
-                    Title = c.Title,
-                    CreatorId = c.CreatorId
-                });
-
-            result.Materials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(
-                cm => cm.CourseId == id,
-                cm => new CourseMaterialDTO()
-                {
-                    MaterialTitle = cm.Material.Title,
-                    MaterialId = cm.Material.Id,
-                    MaterialType = cm.Material.Type
-                }, 
-                0,
-                this.defaultPageSize);
-
-            result.Skills = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(
-                cs => cs.CourseId == id,
-                cs => new CourseSkillDTO()
-                {
-                    SkillId = cs.Skill.Id,
-                    SkillChange = cs.Change,
-                    SkillTitle = cs.Skill.Title
-                }, 
-                0,
-                this.defaultPageSize);
-
-            return new ServiceResult<FullCourseInfoDTO>()
-            {
-                IsSuccessful = true,
-                Result = result
-            };
-        }
-
         public async Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial)
         {
             return new ServiceResult<bool>()
@@ -406,6 +621,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private async Task<bool> CheckCourseMaterialsAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
+            throw new NotImplementedException();
+            /*
             var isCourseExist = await this.courseRepository.AnyAsync(c =>
                 c.Id == courseMaterialChange.CourseId);
 
@@ -419,11 +636,13 @@ namespace EducationProject.Infrastructure.BLL.Services
                 return false;
             }
 
-            return true;
+            return true;*/
         }
 
         private async Task<bool> CheckCourseSkillsAsync(ChangeCourseSkillDTO courseSkillChange)
         {
+            throw new NotImplementedException();
+            /*
             var isCourseExist = await this.courseRepository.AnyAsync(c =>
                 c.Id == courseSkillChange.CourseId);
 
@@ -437,7 +656,23 @@ namespace EducationProject.Infrastructure.BLL.Services
                 return false;
             }
 
-            return true;
+            return true;*/
+        }
+
+        private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<Course, bool>> courseCondition)
+        {
+            var result = await this.courseRepository.CountAsync(courseCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
         }
     }
 }

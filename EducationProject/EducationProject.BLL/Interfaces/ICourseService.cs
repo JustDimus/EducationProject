@@ -8,7 +8,7 @@ namespace EducationProject.BLL.Interfaces
 {
     public interface ICourseService// : IBusinessService<ShortCourseInfoDTO>
     {
-        Task<IServiceResult<FullCourseInfoDTO>> GetCourseInfoAsync(int id);
+        Task<IServiceResult<FullCourseInfoDTO>> GetFullCourseInfoAsync(int id);
 
         Task<IServiceResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams);
 
@@ -27,5 +27,15 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
 
         Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator);
+
+        Task<IServiceResult<int>> CreateCourseAsync(ShortCourseInfoDTO course);
+
+        Task<IServiceResult> UpdateCourseAsync(ShortCourseInfoDTO course);
+
+        Task<IServiceResult> DeleteCourseAsync(int courseId);
+
+        Task<IServiceResult<ShortCourseInfoDTO>> GetCourseInfoAsync(int courseId);
+
+        Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo);
     }
 }

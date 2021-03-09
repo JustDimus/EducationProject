@@ -24,7 +24,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<Account> accountRepository;
 
-        private ICourseService courseService;
+        //private ICourseService courseService;
 
         private IMaterialService materialService;
 
@@ -44,7 +44,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             IRepository<Account> accountRepository,
             IRepository<AccountCourse> accountCoursesRepository,
             IRepository<AccountMaterial> accountMaterialsRepository,
-            ICourseService courseService,
+            //ICourseService courseService,
             IMaterialService materialService,
             ISkillService skillService,
             AccountMapping accountMapping,
@@ -56,7 +56,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.accountMaterialRepository = accountMaterialsRepository;
             this.accountRepository = accountRepository;
 
-            this.courseService = courseService;
+            //this.courseService = courseService;
             this.skillService = skillService;
             this.materialService = materialService;
 
@@ -311,6 +311,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         public async Task<IServiceResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
+            throw new NotImplementedException();
+            /*
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
             if (!isAccountAndCourseExist)
@@ -336,11 +338,13 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             await this.accountCourseRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);
+            return this.GetDefaultActionResult(true);*/
         }
 
         public async Task<IServiceResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
+            throw new NotImplementedException();
+            /*
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
             if (!isAccountAndCourseExist)
@@ -357,10 +361,13 @@ namespace EducationProject.Infrastructure.BLL.Services
             await this.accountCourseRepository.SaveAsync();
 
             return this.GetDefaultActionResult(true);
+            */
         }
 
         public async Task<IServiceResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange)
         {
+            throw new NotImplementedException();
+            /*
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
             if (!isAccountAndCourseExist)
@@ -412,11 +419,13 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             await this.accountCourseRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);
+            return this.GetDefaultActionResult(true);*/
         }
 
         public async Task<IServiceResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
         {
+            throw new NotImplementedException();
+            /*
             var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
             if (!isAccountAndMaterialExist)
@@ -441,11 +450,13 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             await this.accountMaterialRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);
+            return this.GetDefaultActionResult(true);*/
         }
 
         public async Task<IServiceResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
         {
+            throw new NotImplementedException();
+            /*
             var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
 
             if (!isAccountAndMaterialExist)
@@ -461,7 +472,17 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             await this.accountMaterialRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);
+            return this.GetDefaultActionResult(true);*/
+        }
+
+        public int GetAccountId()
+        {
+            var accountIdValue = this.httpContext.HttpContext.User.Claims
+                .Where(p => p.Type == ClaimTypes.NameIdentifier)
+                .First()
+                .Value;
+
+            return int.Parse(accountIdValue);
         }
 
         /*
@@ -561,14 +582,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             return true;
         }
         */
-        private int GetAccountId()
-        {
-            var accountIdValue = this.httpContext.HttpContext.User.Claims
-                .Where(p => p.Type == ClaimTypes.NameIdentifier)
-                .First()
-                .Value;
 
-            return int.Parse(accountIdValue);
-        }
     }
 }

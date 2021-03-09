@@ -1,0 +1,17 @@
+﻿@model MvcInterface.Models.Models.CreateMaterialViewModel
+
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="form-group">
+    <input type="hidden" value="Article" asp-for="Type" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="URI" class="control-label"></label>
+    <input asp-for="URI" class="form-control" />
+    <span asp-validation-for="URI" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="PublicationDate" class="control-label"></label>
+    <input asp-for="PublicationDate" class="form-control" />
+    <span asp-validation-for="PublicationDate" class="text-danger"></span>
+</div>

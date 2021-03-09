@@ -9,6 +9,7 @@ using EducationProject.BLL;
 using EducationProject.BLL.ActionResultMessages;
 using EducationProject.Infrastructure.BLL.Mappings;
 using System;
+using System.Linq.Expressions;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -42,7 +43,48 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.serviceResultMessages = serviceResultMessageCollection;
         }
 
-        public async Task<IServiceResult> CreateSkillAsync(SkillDTO skill)
+        public async Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.GetPagesCountAsync(pageInfo.PageSize, t => true);
+
+                if(pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var skillInfoPage = new EntityInfoPageDTO<SkillDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                skillInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
+                skillInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                skillInfoPage.Entities = await this.skillRepository.GetPageAsync<SkillDTO>(
+                    s => true,
+                    this.skillMapping.ConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize);
+
+                return new ServiceResult<EntityInfoPageDTO<SkillDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = skillInfoPage
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<SkillDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult<int>> CreateSkillAsync(SkillDTO skill)
         {
             try
             {
@@ -51,18 +93,33 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 if (isSkillExist)
                 {
-                    return this.GetDefaultActionResult(
-                        false,
-                        this.serviceResultMessages.SkillTitleExist);
+                    return new ServiceResult<int>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = this.serviceResultMessages.SkillTitleExist
+                    };
                 }
 
-                await this.skillRepository.CreateAsync(this.skillMapping.Map(skill));
+                var skillToCreate = this.skillMapping.Map(skill);
 
-                return ServiceResult.GetDefault(true);
+                await this.skillRepository.CreateAsync(skillToCreate);
+
+                await this.skillRepository.SaveAsync();
+
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = true,
+                    Result = skillToCreate.Id
+                };
             }
             catch(Exception ex)
             {
-                return ServiceResult.GetDefault(false, ex.Message);
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+
             }
         }
 
@@ -238,5 +295,22 @@ namespace EducationProject.Infrastructure.BLL.Services
                 await this.accountSkillRepository.UpdateAsync(accountSkill);
             }
         }
+
+        private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<Skill, bool>> skillCondition)
+        {
+            var result = await this.skillRepository.CountAsync(skillCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
+        }
+
     }
 }

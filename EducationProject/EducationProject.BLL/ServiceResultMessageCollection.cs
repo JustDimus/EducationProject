@@ -19,5 +19,9 @@ namespace EducationProject.BLL
         public string SkillTitleExist => "SkillTitleExist";
 
         public string SkillNotExist => "SkillNotExist";
+
+        public string CourseTitleExist => "CourseTitleExist";
+
+        public string CourseNotExist => "CourseNotExist";
     }
 }

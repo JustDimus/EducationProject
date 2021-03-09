@@ -9,6 +9,7 @@ using EducationProject.BLL;
 using System.Linq;
 using EducationProject.BLL.ActionResultMessages;
 using EducationProject.Infrastructure.BLL.Mappings;
+using System.Linq.Expressions;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -20,7 +21,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<AccountMaterial> accountMaterialRepository;
 
-        private IMapping<BaseMaterial, MaterialDTO> materialMapping;
+        private MaterialMapping materialMapping;
 
         private ServiceResultMessageCollection serviceResultMessages;
 
@@ -42,100 +43,209 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.serviceResultMessages = serviceResultMessageCollection;
         }
 
-        public async Task<IServiceResult> CreateAsync(ChangeEntityDTO<MaterialDTO> createEntity)
+        public async Task<IServiceResult<int>> CreateMaterialAsync(MaterialDTO material)
         {
-            var newMaterial = this.materialMapping.Map(createEntity.Entity);
-
-            await this.materialRepository.CreateAsync(newMaterial);
-
-            return this.GetDefaultActionResult(true);
-        }
-
-        public async Task<IServiceResult<IEnumerable<MaterialDTO>>> GetAsync(PageInfoDTO pageInfo)
-        {
-            return new ServiceResult<IEnumerable<MaterialDTO>>()
+            try
             {
-                IsSuccessful = true,
-                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
-                    m => true,
-                    this.materialMapping.ConvertExpression, 
-                    pageInfo.PageNumber, 
-                    pageInfo.PageSize)
-            };
-        }
+                var newMaterial = this.materialMapping.Map(material);
 
-        public async Task<IServiceResult> DeleteAsync(ChangeEntityDTO<MaterialDTO> deleteEntity)
-        {
-            await this.materialRepository.DeleteAsync(this.materialMapping.Map(deleteEntity.Entity));
+                await this.materialRepository.CreateAsync(newMaterial);
 
-            return this.GetDefaultActionResult(true);
-        }
+                await this.materialRepository.SaveAsync();
 
-        public async Task<IServiceResult<MaterialDTO>> GetMaterialInfoAsync(int id)
-        {
-            return new ServiceResult<MaterialDTO>()
-            {
-                IsSuccessful = true,
-                Result = await this.materialRepository.GetAsync<MaterialDTO>(
-                    m => m.Id == id,
-                    this.materialMapping.ConvertExpression)
-            };
-        }
-
-        public async Task<IServiceResult<bool>> IsExistAsync(MaterialDTO entity)
-        {
-            return new ServiceResult<bool>()
-            {
-                IsSuccessful = true,
-                Result = await this.materialRepository.AnyAsync(m => m.Id == entity.Id)
-            };
-        }
-
-        public async Task<IServiceResult> UpdateAsync(ChangeEntityDTO<MaterialDTO> changeEntity)
-        {
-            var isMaterialExist = await this.materialRepository.AnyAsync(m =>
-                m.Id == changeEntity.Entity.Id);
-
-            if (!isMaterialExist)
-            {
-                return this.GetDefaultActionResult(false);
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = true,
+                    Result = newMaterial.Id
+                };
             }
+            catch(Exception ex)
+            {
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
 
-            await this.materialRepository.UpdateAsync(this.materialMapping.Map(changeEntity.Entity));
+        public async Task<IServiceResult> UpdateMaterialAsync(MaterialDTO material)
+        {
+            try
+            {
+                var isMaterialExist = await this.materialRepository.AnyAsync(m =>
+                m.Id == material.Id);
 
-            return this.GetDefaultActionResult(true);
+                if (!isMaterialExist)
+                {
+                    return this.GetDefaultActionResult(
+                        false,
+                        this.serviceResultMessages.MaterialNotExist);
+                }
+
+                await this.materialRepository.UpdateAsync(this.materialMapping.Map(material));
+
+                return this.GetDefaultActionResult(true);
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<int>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult> DeleteMaterialAsync(int materialId)
+        {
+            try
+            {
+                await this.materialRepository.DeleteAsync(m => m.Id == materialId);
+
+                return this.GetDefaultActionResult(true);
+            }
+            catch(Exception ex)
+            {
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
+            }
+        }
+
+        public async Task<IServiceResult<MaterialDTO>> GetMaterialAsync(int materialId)
+        {
+            try
+            {
+                return new ServiceResult<MaterialDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = await this.materialRepository.GetAsync<MaterialDTO>(
+                    m => m.Id == materialId,
+                    this.materialMapping.ConvertExpression)
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<MaterialDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<IServiceResult<EntityInfoPageDTO<MaterialDTO>>> GetMaterialPageAsync(PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.GetPagesCountAsync(pageInfo.PageSize, t => true);
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var materialInfoPage = new EntityInfoPageDTO<MaterialDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                materialInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
+                materialInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                materialInfoPage.Entities = await this.materialRepository.GetPageAsync<MaterialDTO>(
+                    s => true,
+                    this.materialMapping.ConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize);
+
+                return new ServiceResult<EntityInfoPageDTO<MaterialDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = materialInfoPage
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<MaterialDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
+        public async Task<bool> IsExistAsync(MaterialDTO material)
+        {
+            try
+            {
+                return await this.materialRepository.AnyAsync(m => m.Id == material.Id);
+            }
+            catch(Exception)
+            {
+                return false;
+            }   
         }
 
         public async Task<IServiceResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId)
         {
-            var i = await this.courseMaterialRepository.GetPageAsync<int>(
-                cm => cm.CourseId == courseId,
-                cm => cm.MaterialId, 
-                0, 
-                await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId));
-
-            return new ServiceResult<IEnumerable<MaterialDTO>>()
+            try
             {
-                IsSuccessful = true,
-                Result = await this.materialRepository.GetPageAsync<MaterialDTO>(
-                    m => i.Contains(m.Id), 
-                    this.materialMapping.ConvertExpression, 
-                    0,
-                    await this.materialRepository.CountAsync(m => i.Contains(m.Id)))
-            };
+                return new ServiceResult<IEnumerable<MaterialDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = await this.courseMaterialRepository.GetPageAsync<MaterialDTO>(
+                        cm => cm.CourseId == courseId,
+                        this.materialMapping.CourseMaterialExpression,
+                        0,
+                        await this.courseMaterialRepository.CountAsync(cm => cm.CourseId == courseId))
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<IEnumerable<MaterialDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
         }
 
-        public async Task<bool> IsAccountPassedAllCourseMaterials(int accountId, int courseId)
+        public async Task<bool> IsAccountPassedAllCourseMaterialsAsync(int accountId, int courseId)
         {
-            var courseMaterialsList = await this.courseMaterialRepository.GetPageAsync<int>(
-                c => c.CourseId == courseId,
-                c => c.MaterialId,
-                0, 
-                await this.courseMaterialRepository.CountAsync(c => c.CourseId == courseId));
-            return courseMaterialsList.ToList().TrueForAll(
-                id => this.accountMaterialRepository.AnyAsync(
-                    am => am.AccountId == accountId 
-                    && am.MaterialId == id).Result);
+            try
+            {
+                var courseMaterialsList = await this.courseMaterialRepository.GetPageAsync<int>(
+                    c => c.CourseId == courseId,
+                    c => c.MaterialId,
+                    0,
+                    await this.courseMaterialRepository.CountAsync(c => c.CourseId == courseId));
+                return courseMaterialsList.ToList().TrueForAll(
+                    id => this.accountMaterialRepository.AnyAsync(
+                        am => am.AccountId == accountId
+                        && am.MaterialId == id).Result);
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
+
+        private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<BaseMaterial, bool>> materialCondition)
+        {
+            var result = await this.materialRepository.CountAsync(materialCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
         }
     }
 }

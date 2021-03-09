@@ -23,5 +23,7 @@ namespace EducationProject.BLL
         public string CourseTitleExist => "CourseTitleExist";
 
         public string CourseNotExist => "CourseNotExist";
+
+        public string MaterialNotExist => "MaterialNotExist";
     }
 }

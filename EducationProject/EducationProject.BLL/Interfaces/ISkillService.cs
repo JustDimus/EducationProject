@@ -21,5 +21,7 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult> DeleteSkillAsync(int id);
 
         Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo);
+
+        Task<bool> IsExistAsync(SkillDTO skill);
     }
 }

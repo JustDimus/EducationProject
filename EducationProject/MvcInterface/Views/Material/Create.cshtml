@@ -4,26 +4,37 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<h1>Создать новый материал</h1>
+<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Article">
+    Статья
+</a>
+<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Book">
+    Книга
+</a>
+<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Video">
+    Видео
+</a>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <form asp-action="Create">
     @switch ((int)ViewBag.MaterialType)
     {
-
         case 0:
-            await Html.PartialAsync("CreateVideo");
+            <h3>Текущий выбор: Видео</h3>
+            await Html.RenderPartialAsync("CreateVideo");
             break;
         case 1:
-            await Html.PartialAsync("CreateBook");
+            <h3>Текущий выбор: Книга</h3>
+            await Html.RenderPartialAsync("CreateBook");
             break;
         case 2:
-            await Html.PartialAsync("CreateArticle");
+            <h3>Текущий выбор: Статья</h3>
+            await Html.RenderPartialAsync("CreateArticle");
             break;
     }
     <div class="form-group">
         <input type="submit" value="Create" class="btn btn-primary" />
     </div>
 </form>
-
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

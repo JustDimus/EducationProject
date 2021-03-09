@@ -86,5 +86,38 @@ namespace EducationProject.Infrastructure.BLL.Mappings
 
             return material;
         }
+
+        public Expression<Func<CourseMaterial, MaterialDTO>> CourseMaterialExpression
+        {
+            get => bm => bm.Material.Type == MaterialType.ArticleMaterial ? (MaterialDTO)new ArticleMaterialDTO()
+            {
+                Id = bm.Material.Id,
+                Description = bm.Material.Description,
+                Title = bm.Material.Title,
+                Type = bm.Material.Type,
+                URI = ((ArticleMaterial)bm.Material).URI,
+                PublicationDate = ((ArticleMaterial)bm.Material).PublicationDate
+            } :
+            bm.Material.Type == MaterialType.BookMaterial ? (MaterialDTO)new BookMaterialDTO()
+            {
+                Id = bm.Material.Id,
+                Description = bm.Material.Description,
+                Title = bm.Material.Title,
+                Type = bm.Material.Type,
+                Author = ((BookMaterial)bm.Material).Author,
+                Pages = ((BookMaterial)bm.Material).Pages
+            } :
+            bm.Material.Type == MaterialType.VideoMaterial ? (MaterialDTO)new VideoMaterialDTO()
+            {
+                Id = bm.Material.Id,
+                Description = bm.Material.Description,
+                Title = bm.Material.Title,
+                Type = bm.Material.Type,
+                URI = ((VideoMaterial)bm.Material).URI,
+                Duration = ((VideoMaterial)bm.Material).Duration,
+                Quality = ((VideoMaterial)bm.Material).Quality
+            } :
+            null;
+        }
     }
 }

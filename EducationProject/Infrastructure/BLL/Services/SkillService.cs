@@ -185,34 +185,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
-        public async Task<IServiceResult<IEnumerable<SkillDTO>>> GetAsync(PageInfoDTO pageInfo)
-        {
-            return new ServiceResult<IEnumerable<SkillDTO>>()
-            {
-                IsSuccessful = true,
-                Result = await this.skillRepository.GetPageAsync<SkillDTO>(
-                   s => true,
-                   this.skillMapping.ConvertExpression, 
-                   pageInfo.PageNumber, 
-                   pageInfo.PageSize)
-            };
-        }
-
-        public async Task<IServiceResult> UpdateAsync(ChangeEntityDTO<SkillDTO> changeEntity)
-        {
-            var isSkillExist = await this.skillRepository
-                .AnyAsync(s => s.Id == changeEntity.Entity.Id);
-
-            if (!isSkillExist)
-            {
-                return this.GetDefaultActionResult(false);
-            }
-
-            await this.skillRepository.UpdateAsync(this.skillMapping.Map(changeEntity.Entity));
-
-            return this.GetDefaultActionResult(true);
-        }
-
         public async Task<IServiceResult> DeleteAsync(ChangeEntityDTO<SkillDTO> changeEntity)
         {
             await this.skillRepository.DeleteAsync(this.skillMapping.Map(changeEntity.Entity));
@@ -220,13 +192,16 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IServiceResult<bool>> IsExistAsync(SkillDTO entity)
+        public async Task<bool> IsExistAsync(SkillDTO skill)
         {
-            return new ServiceResult<bool>()
+            try
             {
-                IsSuccessful = true,
-                Result = await this.skillRepository.AnyAsync(s => s.Id == entity.Id)
-            };
+                return await this.skillRepository.AnyAsync(s => s.Id == skill.Id);
+            }
+            catch(Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<IServiceResult> AddSkilsToAccountByCourseIdAsync(AddSkillsToAccountByCourseDTO changeSkills)
@@ -311,6 +286,5 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             return result;
         }
-
     }
 }

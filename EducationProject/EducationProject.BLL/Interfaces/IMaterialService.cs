@@ -6,12 +6,22 @@ using System.Threading.Tasks;
 
 namespace EducationProject.BLL.Interfaces
 {
-    public interface IMaterialService// : IBusinessService<MaterialDTO>
+    public interface IMaterialService
     {
-        Task<IServiceResult<MaterialDTO>> GetMaterialInfoAsync(int id);
-
         Task<IServiceResult<IEnumerable<MaterialDTO>>> GetAllCourseMaterialsAsync(int courseId);
 
-        Task<bool> IsAccountPassedAllCourseMaterials(int accountId, int courseId);
+        Task<bool> IsAccountPassedAllCourseMaterialsAsync(int accountId, int courseId);
+
+        Task<IServiceResult<int>> CreateMaterialAsync(MaterialDTO material);
+
+        Task<IServiceResult> UpdateMaterialAsync(MaterialDTO material);
+
+        Task<IServiceResult> DeleteMaterialAsync(int materialId);
+
+        Task<IServiceResult<MaterialDTO>> GetMaterialAsync(int materialId);
+
+        Task<IServiceResult<EntityInfoPageDTO<MaterialDTO>>> GetMaterialPageAsync(PageInfoDTO pageInfo);
+
+        Task<bool> IsExistAsync(MaterialDTO material);
     }
 }

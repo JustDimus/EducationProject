@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="w-75 mx-auto shadow p-3 mb-5 bg-white rounded">
+<div class="w-auto mx-auto shadow p-3 mb-5 bg-white rounded">
     <div class="row">
         <div class="col-8">
             <div class="row d-flex justify-content-between">
@@ -22,25 +22,25 @@
                     }
                 </div>
             </div>
-            <div class="row">
+            <div class="row my-1">
                 <h4>
                     Описание: @Model.Description
                 </h4>
             </div>
-            <div class="text-center">
+            <div class="text-center my-1">
                 <h3>
                     Материалы курса
                 </h3>
             </div>
             @if (Model.CanBeChanged)
             {
-                <div class="text-center">
-                    <a class="btn btn-light" asp-controller="Material" asp-action="AddMaterialToCourse" asp-route-courseId="@Model.Id">
+                <div class="text-center my-1">
+                    <a class="btn btn-light" asp-controller="Material" asp-action="AddMaterial" asp-route-courseId="@Model.Id">
                         Добавить новый материал
                     </a>
                 </div>
             }
-            <table class="table">
+            <table class="table mt-1">
                 <thead class="thead-dark">
                 <th>
                     #
@@ -58,7 +58,7 @@
                 </thead>
                 @foreach (var material in Model.Materials.Entities)
                 {
-                    <tr>
+                    <tr @(material.IsAccountPassed ? "class=\"table-success\"" : "")>
                         <td>
                             @material.MaterialId
                         </td>
@@ -119,14 +119,128 @@
             </nav>
         </div>
         <div class="col-4">
-            <img src="https://st2.depositphotos.com/3489481/5208/i/600/depositphotos_52086275-stock-photo-book-of-life.jpg"
-                 width="250" height="250" />
             <div class="text-center">
-                <a class="btn btn-lg btn-primary" 
-                   asp-action="PassCourse" asp-route-courseId="@Model.Id" >
-
-                </a>
+                <img src="https://st2.depositphotos.com/3489481/5208/i/600/depositphotos_52086275-stock-photo-book-of-life.jpg"
+                     width="250" height="250" />
             </div>
+            <div class="text-center mt-1">
+                @if (Model.CurrentStatus == "None")
+                {
+                    <a class="btn btn-success" asp-action="AddCourse" asp-controller="Account"
+                       asp-route-courseId="@Model.Id">
+                        Начать прохождение
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="PassCourse" asp-route-courseId="@Model.Id">
+                        <button class="btn btn-lg btn-primary" @(Model.CanBePassed == true ? "" : "disabled")>
+                            @(Model.CanBePassed ? "Пройти" : "Невозможно")
+                        </button>
+                    </a>
+                }
+            </div>
+            @if (Model.CanBeChanged)
+            {
+                <div class="text-center my-1">
+                    <a class="btn btn-light" asp-controller="Skill" asp-action="AddSkill" asp-route-courseId="@Model.Id">
+                        Добавить новый скилл
+                    </a>
+                </div>
+            }
+            <table class="table mt-1 table-sm">
+                <thead class="thead-dark">
+                <th>
+                    #
+                </th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Изменение
+                </th>
+                <th>
+                </th>
+                @if (Model.CanBeChanged)
+                {
+                    <th>
+                    </th>
+                    <th>
+                    </th>
+                }
+                </thread>
+                @foreach (var skill in Model.Skills.Entities)
+                {
+                    <tr>
+                        <td>
+                            @skill.SkillId
+                        </td>
+                        <td>
+                            @skill.SkillTitle
+                        </td>
+                        <td>
+                            @skill.SkillChange
+                        </td>
+                        <td>
+                            <a class="btn btn-info" asp-controller="Skill" asp-action="Show" asp-route-skillId="@skill.SkillId">
+                                Посмотреть
+                            </a>
+                        </td>
+                        @if (Model.CanBeChanged)
+                        {
+                            <td>
+                                <a class="btn btn-success" asp-controller="Course"
+                                   asp-action="ChangeSkill" asp-route-courseId="@Model.Id"
+                                   asp-route-skillId="@skill.SkillId">
+                                    Изменить
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn-danger" asp-controller="Course"
+                                   asp-action="RemoveSkill" asp-route-courseId="@Model.Id"
+                                   asp-route-skillId="@skill.SkillId">
+                                    Удалить
+                                </a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Skills.CanMoveBack ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-courseId="@Model.Id"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage-1"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-materialPageNumber="@(Model.Materials.CurrentPage)"
+                           asp-route-materialPageSize="@Model.Materials.CurrentPageSize"
+                           class="page-link">
+                            Предыдущая
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a asp-action="Show"
+                           asp-route-courseId="@Model.Id"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-materialPageNumber="@Model.Materials.CurrentPage"
+                           asp-route-materialPageSize="@Model.Materials.CurrentPageSize" class="page-link">
+                            @(Model.Skills.CurrentPage + 1)
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.Skills.CanMoveForward ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-courseId="@Model.Id"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage+1"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-materialPageNumber="@(Model.Materials.CurrentPage)"
+                           asp-route-materialPageSize="@Model.Materials.CurrentPageSize" class="page-link">
+                            Следующая
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

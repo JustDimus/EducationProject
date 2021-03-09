@@ -1,6 +1,7 @@
 ﻿using EducationProject.BLL.DTO;
 using EducationProject.BLL.Interfaces;
 using EducationProject.Core.Models;
+using EducationProject.Core.Models.Enums;
 using System;
 using System.Linq.Expressions;
 
@@ -30,6 +31,21 @@ namespace EducationProject.Infrastructure.BLL.Mappings
                 CreatorId = externalEntity.CreatorId,
                 IsVisible = externalEntity.IsVisible
             };
+        }
+
+        public string ConvertCourseStatus(ProgressStatus status)
+        {
+            switch (status)
+            {
+                case ProgressStatus.InProgress:
+                    return "InProgress";
+                case ProgressStatus.None:
+                    return "None";
+                case ProgressStatus.Passed:
+                    return "Passed";
+                default:
+                    return "Error";
+            }
         }
     }
 }

@@ -25,9 +25,11 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private IRepository<CourseMaterial> courseMaterialRepository;
 
-        private IMapping<Course, ShortCourseInfoDTO> courseMapping;
+        private CourseMapping courseMapping;
 
         private IRepository<Course> courseRepository;
+
+        private IRepository<AccountCourse> accountCourseRepository;
 
         private ServiceResultMessageCollection serviceResultMessages;
 
@@ -39,6 +41,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             ISkillService skillService,
             IAccountService accountService,
             IRepository<CourseSkill> courseSkillRepository,
+            IRepository<AccountCourse> accountCourseRepository,
             IAuthorizationService authorizationService,
             IRepository<CourseMaterial> courseMaterialRepository,
             CourseMapping courseMapping,
@@ -55,6 +58,8 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.skillService = skillService;
 
             this.courseSkillRepository = courseSkillRepository;
+
+            this.accountCourseRepository = accountCourseRepository;
 
             this.courseMaterialRepository = courseMaterialRepository;
 
@@ -158,9 +163,23 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 result.Materials = materialServiceResult.Result;
 
-                result.CanBePassed = await this.materialService.IsAccountPassedAllCourseMaterialsAsync(
-                    this.authorizationService.GetAccountId(),
-                    courseId);
+                var isPassed = await this.accountCourseRepository.GetAsync(
+                    c => c.CourseId == courseId
+                    && c.AccountId == this.authorizationService.GetAccountId(),
+                    c => c.Status);
+
+                result.CurrentStatus = this.courseMapping.ConvertCourseStatus(isPassed);
+
+                if (result.CurrentStatus == "Passed")
+                {
+                    result.CanBePassed = false;
+                }
+                else
+                {
+                    result.CanBePassed = await this.materialService.IsAccountPassedAllCourseMaterialsAsync(
+                        this.authorizationService.GetAccountId(),
+                        courseId);
+                }
 
                 return new ServiceResult<FullCourseInfoDTO>()
                 {

@@ -19,9 +19,4 @@
     <ProjectReference Include="..\Infrastructure\EducationProject.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Course\" />
-    <Folder Include="Views\Skill\" />
-  </ItemGroup>
-
 </Project>

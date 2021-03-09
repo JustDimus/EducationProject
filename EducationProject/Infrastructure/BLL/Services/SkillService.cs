@@ -163,6 +163,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 await this.skillRepository.UpdateAsync(this.skillMapping.Map(skill));
 
+                await this.skillRepository.SaveAsync();
+
                 return this.GetDefaultActionResult(true);
             }
             catch(Exception ex)

@@ -214,7 +214,7 @@ namespace EducationProject.Infrastructure.BLL.Services
                 var isCourseTitleExist = await this.courseRepository.AnyAsync(
                     c => c.Title == course.Title && c.Id != course.Id);
 
-                if (!isCourseTitleExist)
+                if (isCourseTitleExist)
                 {
                     return ServiceResult.GetDefault(
                         false,

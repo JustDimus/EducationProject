@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
-    public class CourseService : BaseService, ICourseService
+    public class CourseService : ICourseService
     {
         private IMaterialService materialService;
 
@@ -395,19 +395,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
-        public async Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator)
-        {
-            return new ServiceResult<IEnumerable<ShortCourseInfoDTO>>()
-            {
-                IsSuccessful = true,
-                Result = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
-                    c => c.CreatorId == courseCreator.AccountId,
-                    this.courseMapping.ConvertExpression, 
-                    courseCreator.PageInfo.PageNumber, 
-                    courseCreator.PageInfo.PageSize)
-            };
-        }
-
         public async Task<IServiceResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
             try
@@ -712,15 +699,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             {
                 IsSuccessful = true,
                 Result = true
-            };
-        }
-
-        public async Task<IServiceResult<bool>> IsExistAsync(ShortCourseInfoDTO checkEntity)
-        {
-            return new ServiceResult<bool>()
-            {
-                IsSuccessful = true,
-                Result = await this.courseRepository.AnyAsync(c => c.Id == checkEntity.Id)
             };
         }
 

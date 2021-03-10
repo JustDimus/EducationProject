@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
-    public class SkillService : BaseService, ISkillService
+    public class SkillService : ISkillService
     {
         private IRepository<AccountSkill> accountSkillRepository;
 
@@ -267,7 +267,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 await this.skillRepository.SaveAsync();
 
-                return this.GetDefaultActionResult(true);
+                return ServiceResult.GetDefault(true);
             }
             catch(Exception ex)
             {
@@ -293,7 +293,7 @@ namespace EducationProject.Infrastructure.BLL.Services
         {
             await this.skillRepository.DeleteAsync(this.skillMapping.Map(changeEntity.Entity));
 
-            return this.GetDefaultActionResult(true);
+            return ServiceResult.GetDefault(true);
         }
 
         public async Task<bool> IsExistAsync(SkillDTO skill)
@@ -314,7 +314,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             if(courseSkillsCount == 0)
             {
-                return this.GetDefaultActionResult(true);
+                return ServiceResult.GetDefault(true);
             }
 
             var skillsToAdd = (await this.courseSkillRepository.GetPageAsync(
@@ -333,7 +333,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             await this.accountSkillRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);
+            return ServiceResult.GetDefault(true);
         }
 
         public async Task<IServiceResult<IEnumerable<AccountSkillDTO>>> GetAccountSkillsAsync(GetAccountSkillsDTO accountSkills)
@@ -378,22 +378,6 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 await this.accountSkillRepository.UpdateAsync(accountSkill);
             }
-        }
-
-        private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<Skill, bool>> skillCondition)
-        {
-            var result = await this.skillRepository.CountAsync(skillCondition);
-
-            if (result % pageSize == 0)
-            {
-                result = result / pageSize;
-            }
-            else
-            {
-                result = (result / pageSize) + 1;
-            }
-
-            return result;
         }
 
         private async Task<int> GetAccountSkillPageCountAsync(int pageSize, Expression<Func<AccountSkill, bool>> accountSkillCondition)

@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
-    public class MaterialService : BaseService, IMaterialService
+    public class MaterialService : IMaterialService
     {
         private IRepository<BaseMaterial> materialRepository;
 
@@ -140,7 +140,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 if (!isMaterialExist)
                 {
-                    return this.GetDefaultActionResult(
+                    return ServiceResult.GetDefault(
                         false,
                         this.serviceResultMessages.MaterialNotExist);
                 }
@@ -149,7 +149,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 await this.materialRepository.SaveAsync();
 
-                return this.GetDefaultActionResult(true);
+                return ServiceResult.GetDefault(true);
             }
             catch(Exception ex)
             {
@@ -167,7 +167,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             {
                 await this.materialRepository.DeleteAsync(m => m.Id == materialId);
 
-                return this.GetDefaultActionResult(true);
+                return ServiceResult.GetDefault(true);
             }
             catch(Exception ex)
             {

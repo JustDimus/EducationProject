@@ -328,7 +328,31 @@ namespace MvcInterface.Controllers
             [FromQuery] int? pageNumber,
             [FromQuery] int? pageSize)
         {
-            throw new NotImplementedException();
+            var pageInfo = new PageInfoDTO()
+            {
+                PageNumber = pageNumber ?? 0,
+                PageSize = pageNumber ?? 10
+            };
+
+            var coursePageServiceResult = await this.courseService.GetCoursePageAsync(pageInfo);
+
+            return this.View(coursePageServiceResult.Result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ShowMyPage(
+            [FromQuery] int? pageNumber,
+            [FromQuery] int? pageSize)
+        {
+            var pageInfo = new PageInfoDTO()
+            {
+                PageNumber = pageNumber ?? 0,
+                PageSize = pageNumber ?? 10
+            };
+
+            var coursePageServiceResult = await this.courseService.GetAccountCourses(pageInfo);
+
+            return this.View(coursePageServiceResult.Result);
         }
     }
 }

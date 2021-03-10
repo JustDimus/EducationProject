@@ -1,0 +1,71 @@
+﻿@model EducationProject.BLL.DTO.EntityInfoPageDTO<EducationProject.BLL.DTO.ShortCourseInfoDTO>
+@{
+    ViewData["Title"] = "ShowPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Опубликованные курсы</h1>
+    <div class="row text-left mb-3">
+        <div class="col-7">
+            <div class="row text-left bm-3">
+                <h3>Создать новый:</h3>
+                <a class="btn btn-primary btn-lg ml-3" asp-action="Create">
+                    Создать
+                </a>
+            </div>
+        </div>
+        <div class="col-5">
+            <a class="btn btn-primary btn-lg ml-3" asp-action="ShowMyPage">
+                Мои курсы
+            </a>
+        </div>
+    </div>
+    <table class="table table-dark">
+        <tr>
+            <th>#</th>
+            <th>Название</th>
+            <th>Описание</th>
+            <th></th>
+        </tr>
+        @foreach (var course in Model.Entities)
+        {
+            <tr>
+                <td>@course.Id</td>
+                <td>@course.Title</td>
+                <td>@course.Description</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" asp-controller="Course"
+                       asp-action="Show" asp-route-courseId="@course.Id">
+                        Посмотреть
+                    </a>
+                </td>
+            </tr>
+        }
+    </table>
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.CanMoveBack ? "" : "disabled")">
+                <a asp-action="ShowPage" asp-route-pageNumber="@(Model.CurrentPage-1)"
+                   asp-route-pageSize="@Model.CurrentPageSize"
+                   class="page-link">
+                    Предыдущая
+                </a>
+            </li>
+            <li class="page-item">
+                <a asp-action="ShowPhoneInfo" asp-route-pageNumber="@(Model.CurrentPage)"
+                   asp-route-pageSize="@Model.CurrentPageSize"
+                   class="page-link">
+                    @(Model.CurrentPage+1)
+                </a>
+            </li>
+            <li class="page-item @(Model.CanMoveForward ? "" : "disabled")">
+                <a asp-action="ShowPhoneInfo" asp-route-pageNumber="@(Model.CurrentPage+1)"
+                   asp-route-pageSize="@Model.CurrentPageSize"
+                   class="page-link">
+                    Следующая
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>

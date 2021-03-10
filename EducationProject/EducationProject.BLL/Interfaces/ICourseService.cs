@@ -41,8 +41,6 @@ namespace EducationProject.BLL.Interfaces
 
         Task<IServiceResult<CourseSkillDTO>> GetCourseSkillAsync(int courseId, int skillId);
 
-        Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo);
-
         Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCourses(PageInfoDTO pageInfo);
 
         Task<bool> IsExistAsync(int courseId);

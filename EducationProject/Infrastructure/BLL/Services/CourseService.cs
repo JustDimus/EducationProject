@@ -70,45 +70,9 @@ namespace EducationProject.Infrastructure.BLL.Services
             return this.courseRepository.AnyAsync(c => c.Id == courseId);
         }
 
-        public async Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo)
+        public Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo)
         {
-            try
-            {
-                var pageCount = await this.GetPagesCountAsync(pageInfo.PageSize, t => true);
-
-                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
-                {
-                    pageInfo.PageNumber = 0;
-                }
-
-                var courseInfoPage = new EntityInfoPageDTO<ShortCourseInfoDTO>()
-                {
-                    CurrentPage = pageInfo.PageNumber
-                };
-
-                courseInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
-                courseInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
-
-                courseInfoPage.Entities = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
-                    s => s.IsVisible == true,
-                    this.courseMapping.ConvertExpression,
-                    pageInfo.PageNumber,
-                    pageInfo.PageSize);
-
-                return new ServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>()
-                {
-                    IsSuccessful = true,
-                    Result = courseInfoPage
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>()
-                {
-                    IsSuccessful = false,
-                    MessageCode = ex.Message
-                };
-            }
+            return this.GetCoursePageAsync(pageInfo, c => c.IsVisible == true);
         }
 
         public async Task<IServiceResult<FullCourseInfoDTO>> GetFullCourseInfoAsync(
@@ -201,14 +165,12 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
-        public Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCourses(PageInfoDTO pageInfo)
         {
-            throw new NotImplementedException();
+            return this.GetCoursePageAsync(
+                pageInfo, 
+                c => c.CreatorId == this.authorizationService.GetAccountId());
         }
 
         public async Task<IServiceResult<CourseSkillDTO>> GetCourseSkillAsync(int courseId, int skillId)
@@ -775,6 +737,47 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
 
             return result;
+        }
+    
+        private async Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo, Expression<Func<Course, bool>> condition)
+        {
+            try
+            {
+                var pageCount = await this.GetPagesCountAsync(pageInfo.PageSize, condition);
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var courseInfoPage = new EntityInfoPageDTO<ShortCourseInfoDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                courseInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
+                courseInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                courseInfoPage.Entities = await this.courseRepository.GetPageAsync<ShortCourseInfoDTO>(
+                    condition,
+                    this.courseMapping.ConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize);
+
+                return new ServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = courseInfoPage
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
         }
     }
 }

@@ -44,22 +44,22 @@
             </div>
             <table class="table mt-1">
                 <thead class="table-dark">
-                    <th>
-                        #
-                    </th>
-                    <th>
-                        Название
-                    </th>
-                    <th>
-                        Уровень
-                    </th>
-                    <th>
-                        Текущий прогресс
-                    </th>
-                    <th>
-                    </th>
+                <th>
+                    #
+                </th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Уровень
+                </th>
+                <th>
+                    Текущий прогресс
+                </th>
+                <th>
+                </th>
                 </thead>
-                @foreach(var skill in Model.Skills.Entities)
+                @foreach (var skill in Model.Skills.Entities)
                 {
                     <tr>
                         <td>
@@ -87,6 +87,38 @@
                     </tr>
                 }
             </table>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Skills.CanMoveBack ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-skillPageNumber="@(Model.Skills.CurrentPage-1)"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-coursePageNumber="@Model.Courses.CurrentPage"
+                           asp-route-coursePageSize="@Model.Courses.CurrentPageSize"
+                           class="page-link">
+                            Предыдущая
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a asp-action="Show"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-coursePageNumber="@Model.Courses.CurrentPage"
+                           asp-route-coursePageSize="@Model.Courses.CurrentPageSize" class="page-link">
+                            @(Model.Skills.CurrentPage + 1)
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.Skills.CanMoveForward ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-skillPageNumber="@(Model.Skills.CurrentPage+1)"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-coursePageNumber="@Model.Courses.CurrentPage"
+                           asp-route-coursePageSize="@Model.Courses.CurrentPageSize" class="page-link">
+                            Следующая
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
         <div class="col-6">
             <div class="row justify-content-center">
@@ -94,6 +126,73 @@
                     Мои курсы
                 </h2>
             </div>
+            <table class="table mt-1">
+                <thead class="table-dark">
+                <th>
+                    #
+                </th>
+                <th>
+                    Название
+                </th>
+                <th>
+                    Статус
+                </th>
+                <th>
+                </th>
+                </thead>
+                @foreach (var course in Model.Courses.Entities)
+                {
+                    <tr>
+                        <td>
+                            @course.CourseId
+                        </td>
+                        <td>
+                            @course.Title
+                        </td>
+                        <td>
+                            @(course.Status == EducationProject.Core.Models.Enums.ProgressStatus.InProgress ? "В процессе" : "Пройден")
+                        </td>
+                        <td>
+                            <a class="btn btn-info" asp-controller="Course" asp-action="Show"
+                               asp-route-courseId="@course.CourseId">
+                                Посмотреть
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Courses.CanMoveBack ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-coursePageNumber="@(Model.Courses.CurrentPage - 1)"
+                           asp-route-coursePageSize="@Model.Courses.CurrentPageSize"
+                           class="page-link">
+                            Предыдущая
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a asp-action="Show"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-coursePageNumber="@Model.Courses.CurrentPage"
+                           asp-route-coursePageSize="@Model.Courses.CurrentPageSize" class="page-link">
+                            @(Model.Skills.CurrentPage + 1)
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.Courses.CanMoveForward ? "" : "disabled")">
+                        <a asp-action="Show"
+                           asp-route-skillPageNumber="@Model.Skills.CurrentPage"
+                           asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
+                           asp-route-coursePageNumber="@(Model.Courses.CurrentPage + 1)"
+                           asp-route-coursePageSize="@Model.Courses.CurrentPageSize" class="page-link">
+                            Следующая
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

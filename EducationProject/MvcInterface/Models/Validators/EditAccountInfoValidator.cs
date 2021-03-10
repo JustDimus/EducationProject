@@ -14,6 +14,10 @@ namespace MvcInterface.Models.Validators
             this.RuleFor(a => a.Id).NotEmpty();
 
             this.RuleFor(a => a.Email).NotEmpty();
+
+            this.RuleFor(a => a.PhoneNumber)
+                .Matches(@"^\+[0-9]{12,12}$")
+                .When(a => !string.IsNullOrWhiteSpace(a.PhoneNumber));
         }
     }
 }

@@ -52,7 +52,7 @@ namespace EducationProject.Infrastructure.BLL.Services
         {
             try
             {
-                var pageCount = await this.accountSkillRepository.CountAsync(
+                var pageCount = await this.GetAccountSkillPageCountAsync(pageInfo.PageSize,
                     ac => ac.AccountId == this.authorizationService.GetAccountId());
 
                 if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
@@ -62,7 +62,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var accountCourseResult = new EntityInfoPageDTO<AccountSkillDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 accountCourseResult.CanMoveBack = pageInfo.PageNumber > 0;
@@ -394,7 +395,23 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             return result;
         }
-   
+
+        private async Task<int> GetAccountSkillPageCountAsync(int pageSize, Expression<Func<AccountSkill, bool>> accountSkillCondition)
+        {
+            var result = await this.accountSkillRepository.CountAsync(accountSkillCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
+        }
+
         private async Task<int> GetCourseSkillPagesCountAsync(int pageSize, Expression<Func<CourseSkill, bool>> condition)
         {
             var result = await this.courseSkillRepository.CountAsync(condition);

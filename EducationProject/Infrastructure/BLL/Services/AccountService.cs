@@ -97,6 +97,8 @@ namespace EducationProject.Infrastructure.BLL.Services
                     };
                 }
 
+                result.Courses = accountCoursesServiceResult.Result;
+
                 var accountSkillsServiceResult = await this.skillService.GetAccountSkillProgressPageAsync(skillPageInfo);
 
                 if(!accountSkillsServiceResult.IsSuccessful)

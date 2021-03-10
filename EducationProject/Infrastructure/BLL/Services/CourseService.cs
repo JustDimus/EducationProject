@@ -69,7 +69,7 @@ namespace EducationProject.Infrastructure.BLL.Services
         {
             try
             {
-                var pageCount = await this.accountCourseRepository.CountAsync(
+                var pageCount = await this.GetAccountCoursePagesCountAsync(pageInfo.PageSize,
                     ac => ac.AccountId == this.authorizationService.GetAccountId());
 
                 if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
@@ -79,7 +79,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var accountCourseResult = new EntityInfoPageDTO<AccountCourseDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 accountCourseResult.CanMoveBack = pageInfo.PageNumber > 0;
@@ -776,7 +777,23 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             return result;
         }
-    
+
+        private async Task<int> GetAccountCoursePagesCountAsync(int pageSize, Expression<Func<AccountCourse, bool>> accountCourseCondition)
+        {
+            var result = await this.accountCourseRepository.CountAsync(accountCourseCondition);
+
+            if (result % pageSize == 0)
+            {
+                result = result / pageSize;
+            }
+            else
+            {
+                result = (result / pageSize) + 1;
+            }
+
+            return result;
+        }
+
         private async Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo, Expression<Func<Course, bool>> condition)
         {
             try
@@ -790,7 +807,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var courseInfoPage = new EntityInfoPageDTO<ShortCourseInfoDTO>()
                 {
-                    CurrentPage = pageInfo.PageNumber
+                    CurrentPage = pageInfo.PageNumber,
+                    CurrentPageSize = pageInfo.PageSize
                 };
 
                 courseInfoPage.CanMoveBack = pageInfo.PageNumber > 0;

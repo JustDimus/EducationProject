@@ -255,7 +255,7 @@ namespace MvcInterface.Controllers
             var skillPageInfo = new PageInfoDTO()
             {
                 PageNumber = skillPageNumber ?? 0,
-                PageSize = skillPageSize ?? 10
+                PageSize = skillPageSize ?? 5
             };
 
             var accountInfoServiceResult = await this.accountService.GetAccountFullInfoAsync(

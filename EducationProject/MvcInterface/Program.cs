@@ -20,6 +20,7 @@ namespace MvcInterface
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                   
                     webBuilder.UseStartup<Startup>();
                 });
     }

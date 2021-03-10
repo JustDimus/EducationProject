@@ -1,4 +1,5 @@
-﻿using MvcInterface.ServiceResultController.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
+using MvcInterface.ServiceResultController.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,9 @@ namespace MvcInterface.ServiceResultController.Implementations
     {
         private Dictionary<string, string> blMessages;
 
-
-        public ServiceResultParser()
+        public ServiceResultParser(IConfiguration configuration)
         {
-            this.blMessages = new Dictionary<string, string>();
-
+            blMessages = configuration.GetSection("BlMessages").GetChildren().ToDictionary(p => p.Key, p => p.Value);
         }
 
         public string this[string value]

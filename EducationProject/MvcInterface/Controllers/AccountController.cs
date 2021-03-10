@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MvcInterface.Models.Models;
 using MvcInterface.ServiceResultController.Interfaces;
 
@@ -21,14 +22,26 @@ namespace MvcInterface.Controllers
 
         private IServiceResultParser blMessageParser;
 
+        private int defaultPageNumber;
+
+        private int defaultAccountSkillPageSize;
+
+        private int defaultAccountCoursePageSize;
+
         public AccountController(
             IAccountService accountService,
-            IServiceResultParser blServiceResultMessageParser)
+            IServiceResultParser blServiceResultMessageParser,
+            IConfiguration configuration)
         {
             this.accountService = accountService;
 
             this.blMessageParser = blServiceResultMessageParser;
 
+            this.defaultPageNumber = int.Parse(configuration["DefaultControllerValues:DefaultPageNumber"]);
+
+            this.defaultAccountSkillPageSize = int.Parse(configuration["DefaultControllerValues:DefaultAccountSkillPageSize"]);
+
+            this.defaultAccountCoursePageSize = int.Parse(configuration["DefaultControllerValues:DefaultAccountCoursePageSize"]);
         }
 
         [HttpGet]
@@ -248,14 +261,14 @@ namespace MvcInterface.Controllers
         {
             var coursePageInfo = new PageInfoDTO()
             {
-                PageNumber = coursePageNumber ?? 0,
-                PageSize = coursePageSize ?? 10
+                PageNumber = coursePageNumber ?? defaultPageNumber,
+                PageSize = coursePageSize ?? defaultAccountCoursePageSize
             };
 
             var skillPageInfo = new PageInfoDTO()
             {
-                PageNumber = skillPageNumber ?? 0,
-                PageSize = skillPageSize ?? 5
+                PageNumber = skillPageNumber ?? defaultPageNumber,
+                PageSize = skillPageSize ?? defaultAccountSkillPageSize
             };
 
             var accountInfoServiceResult = await this.accountService.GetAccountFullInfoAsync(

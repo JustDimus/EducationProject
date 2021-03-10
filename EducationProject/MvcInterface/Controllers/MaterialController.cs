@@ -7,6 +7,7 @@ using EducationProject.BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
 using MvcInterface.Models.Models;
 using MvcInterface.ServiceResultController.Interfaces;
 
@@ -21,9 +22,14 @@ namespace MvcInterface.Controllers
 
         private Dictionary<string, int> materialTypes = new Dictionary<string, int>();
 
+        private int defaultPageNumber;
+
+        private int defaultPageSize;
+
         public MaterialController(
             IMaterialService materialService,
-            IServiceResultParser blServiceResultMessageParser)
+            IServiceResultParser blServiceResultMessageParser,
+            IConfiguration configuration)
         {
             this.materialService = materialService;
 
@@ -32,6 +38,10 @@ namespace MvcInterface.Controllers
             this.materialTypes.Add("Video", 0);
             this.materialTypes.Add("Book", 1);
             this.materialTypes.Add("Article", 2);
+
+            this.defaultPageNumber = int.Parse(configuration["DefaultControllerValues:DefaultPageNumber"]);
+
+            this.defaultPageSize = int.Parse(configuration["DefaultControllerValues:DefaultPageSize"]);
         }
 
         [HttpGet]
@@ -192,8 +202,8 @@ namespace MvcInterface.Controllers
         {
             var pageInfo = new PageInfoDTO()
             {
-                PageNumber = pageNumber ?? 0,
-                PageSize = pageNumber ?? 10
+                PageNumber = pageNumber ?? defaultPageNumber,
+                PageSize = pageNumber ?? defaultPageSize
             };
 
             var materialPageServiceResult = await this.materialService.GetMaterialPageAsync(pageInfo);

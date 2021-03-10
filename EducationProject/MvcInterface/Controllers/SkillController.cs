@@ -6,6 +6,7 @@ using EducationProject.BLL.DTO;
 using EducationProject.BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MvcInterface.Models.Models;
 using MvcInterface.ServiceResultController.Interfaces;
 
@@ -18,13 +19,22 @@ namespace MvcInterface.Controllers
 
         private IServiceResultParser blMessageParser;
 
+        private int defaultPageNumber;
+
+        private int defaultPageSize;
+
         public SkillController(
             ISkillService skillService,
-            IServiceResultParser blServiceResultMessageParser)
+            IServiceResultParser blServiceResultMessageParser,
+            IConfiguration configuration)
         {
             this.skillService = skillService;
 
             this.blMessageParser = blServiceResultMessageParser;
+
+            this.defaultPageNumber = int.Parse(configuration["DefaultControllerValues:DefaultPageNumber"]);
+
+            this.defaultPageSize = int.Parse(configuration["DefaultControllerValues:DefaultPageSize"]);
         }
 
         [HttpGet]
@@ -160,8 +170,8 @@ namespace MvcInterface.Controllers
         {
             var pageInfo = new PageInfoDTO()
             {
-                PageNumber = pageNumber ?? 0,
-                PageSize = pageSize ?? 10
+                PageNumber = pageNumber ?? defaultPageNumber,
+                PageSize = pageSize ?? defaultPageSize
             };
 
             var skillPageServiceResult = await this.skillService.GetSkillPageAsync(pageInfo);

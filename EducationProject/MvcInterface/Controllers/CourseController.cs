@@ -6,6 +6,7 @@ using EducationProject.BLL.DTO;
 using EducationProject.BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MvcInterface.Models.Models;
 using MvcInterface.ServiceResultController.Interfaces;
 
@@ -18,13 +19,30 @@ namespace MvcInterface.Controllers
 
         private IServiceResultParser blMessageParser;
 
+        private int defaultPageNumber;
+
+        private int defaultPageSize;
+
+        private int defaultCourseSkillPageSize;
+
+        private int defaultCourseMaterialPageSize;
+
         public CourseController(
             ICourseService courseService,
-            IServiceResultParser blServiceResultMessageParser)
+            IServiceResultParser blServiceResultMessageParser,
+            IConfiguration configuration)
         {
             this.courseService = courseService;
 
             this.blMessageParser = blServiceResultMessageParser;
+
+            this.defaultPageNumber = int.Parse(configuration["DefaultControllerValues:DefaultPageNumber"]);
+
+            this.defaultPageSize = int.Parse(configuration["DefaultControllerValues:DefaultPageSize"]);
+
+            this.defaultCourseSkillPageSize = int.Parse(configuration["DefaultControllerValues:DefaultCourseSkillPageSize"]);
+
+            this.defaultCourseMaterialPageSize = int.Parse(configuration["DefaultControllerValues:DefaultCourseMaterialPageSize"]);
         }
 
         [HttpGet]
@@ -300,14 +318,14 @@ namespace MvcInterface.Controllers
         {
             var skillPageInfo = new PageInfoDTO()
             {
-                PageNumber = skillPageNumber ?? 0,
-                PageSize = skillPageSize ?? 4
+                PageNumber = skillPageNumber ?? defaultPageNumber,
+                PageSize = skillPageSize ?? defaultCourseSkillPageSize
             };
 
             var materialPageInfo = new PageInfoDTO()
             {
-                PageNumber = materialPageNumber ?? 0,
-                PageSize = materialPageSize ?? 6
+                PageNumber = materialPageNumber ?? defaultPageNumber,
+                PageSize = materialPageSize ?? defaultCourseMaterialPageSize
             };
 
             var courseInfoServiceResult = await this.courseService.GetFullCourseInfoAsync(
@@ -330,8 +348,8 @@ namespace MvcInterface.Controllers
         {
             var pageInfo = new PageInfoDTO()
             {
-                PageNumber = pageNumber ?? 0,
-                PageSize = pageNumber ?? 10
+                PageNumber = pageNumber ?? defaultPageNumber,
+                PageSize = pageNumber ?? defaultPageSize
             };
 
             var coursePageServiceResult = await this.courseService.GetCoursePageAsync(pageInfo);
@@ -346,8 +364,8 @@ namespace MvcInterface.Controllers
         {
             var pageInfo = new PageInfoDTO()
             {
-                PageNumber = pageNumber ?? 0,
-                PageSize = pageNumber ?? 10
+                PageNumber = pageNumber ?? defaultPageNumber,
+                PageSize = pageNumber ?? defaultPageSize
             };
 
             var coursePageServiceResult = await this.courseService.GetAccountCoursePageAsync(pageInfo);

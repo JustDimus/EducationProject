@@ -296,7 +296,7 @@ namespace MvcInterface.Controllers
             }
             else
             {
-                return this.RedirectToAction("Index", "Home");
+                return this.RedirectToAction("Show", new { courseId = courseModel.Id });
             }
         }
 

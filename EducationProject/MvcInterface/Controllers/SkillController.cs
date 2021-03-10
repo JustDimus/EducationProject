@@ -46,7 +46,8 @@ namespace MvcInterface.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromQuery] int? addToCourseId,
+        public async Task<IActionResult> Create(
+            [FromQuery] int? addToCourseId,
             [FromForm] CreateSkillViewModel skillModel)
         {
             if(!this.ModelState.IsValid)
@@ -151,7 +152,7 @@ namespace MvcInterface.Controllers
         {
             await this.skillService.DeleteSkillAsync(skillId);
 
-            return this.RedirectToAction("Index", "Home");
+            return this.RedirectToAction("ShowPage");
         }
 
         [HttpGet]

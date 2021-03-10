@@ -254,6 +254,14 @@
                     </li>
                 </ul>
             </nav>
+            @if (Model.CanBeChanged)
+            {
+                <div class="row justify-content-center">
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-courseId="@Model.Id">
+                        Удалить курс
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>

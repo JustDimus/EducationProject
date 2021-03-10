@@ -281,6 +281,8 @@ namespace EducationProject.Infrastructure.BLL.Services
             {
                 await this.skillRepository.DeleteAsync(s => s.Id == id);
 
+                await this.skillRepository.SaveAsync();
+
                 return ServiceResult.GetDefault(true);
             }
             catch(Exception ex)

@@ -167,6 +167,8 @@ namespace EducationProject.Infrastructure.BLL.Services
             {
                 await this.materialRepository.DeleteAsync(m => m.Id == materialId);
 
+                await this.materialRepository.SaveAsync();
+
                 return ServiceResult.GetDefault(true);
             }
             catch(Exception ex)

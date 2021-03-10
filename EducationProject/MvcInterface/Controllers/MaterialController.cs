@@ -174,7 +174,7 @@ namespace MvcInterface.Controllers
         {
             await this.materialService.DeleteMaterialAsync(materialId);
 
-            return this.RedirectToAction("Index", "Home");
+            return this.RedirectToAction("ShowPage");
         }
 
         [HttpGet]

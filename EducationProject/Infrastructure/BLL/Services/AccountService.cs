@@ -373,40 +373,43 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         public async Task<IServiceResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange)
         {
-            throw new NotImplementedException();
-            /*
             var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
 
             if (!isAccountAndCourseExist)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    this.serviceResultMessages.AccountOrCourseNotExist);
             }
 
             var isAccountCourseExist = await this.accountCourseRepository.AnyAsync(ac =>
-                (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == accountCourseChange.AccountId)
-                && (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == accountCourseChange.AccountId
+                (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == this.authorizationService.GetAccountId())
+                && (ac.CourseId == accountCourseChange.CourseId && ac.AccountId == this.authorizationService.GetAccountId()
                 && ac.Status != accountCourseChange.Status));
 
             if (!isAccountCourseExist)
             {
-                return this.GetDefaultActionResult(false);
+                return this.GetDefaultActionResult(
+                    false,
+                    this.serviceResultMessages.AccountCourseNotExist);
             }
 
             if (accountCourseChange.Status == CourseStatus.Passed)
             {
-                var isAccountPassedAllCourseMaterials = await this.materialService
-                    .IsAccountPassedAllCourseMaterials(
-                    accountCourseChange.AccountId,
+                var isAccountPassedAllCourseMaterials = await this.materialService.IsAccountPassedAllCourseMaterialsAsync(
+                    this.authorizationService.GetAccountId(),
                     accountCourseChange.CourseId);
 
                 if (!isAccountPassedAllCourseMaterials)
                 {
-                    return this.GetDefaultActionResult(false);
+                    return this.GetDefaultActionResult(
+                        false,
+                        this.serviceResultMessages.AccountDidNotPassCourseMaterials);
                 }
             }
 
             var accountCourse = await this.accountCourseRepository.GetAsync(ac =>
-                ac.AccountId == accountCourseChange.AccountId
+                ac.AccountId == this.authorizationService.GetAccountId()
                 && ac.CourseId == accountCourseChange.CourseId);
 
             if (!accountCourse.OncePassed && accountCourseChange.Status == CourseStatus.Passed)
@@ -415,7 +418,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 await this.skillService.AddSkilsToAccountByCourseIdAsync(new AddSkillsToAccountByCourseDTO()
                 {
-                    AccountId = accountCourseChange.AccountId,
+                    AccountId = this.authorizationService.GetAccountId(),
                     CourseId = accountCourseChange.CourseId
                 });
             }
@@ -426,38 +429,40 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             await this.accountCourseRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);*/
+            return this.GetDefaultActionResult(true);
         }
 
-        public async Task<IServiceResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
+        public async Task<IServiceResult> AddAccountMaterialAsync(int materialId)
         {
-            throw new NotImplementedException();
-            /*
-            var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(accountMaterialChange);
+            var isAccountAndMaterialExist = await this.ValidateAccountMaterialAsync(materialId);
 
             if (!isAccountAndMaterialExist)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    this.serviceResultMessages.AccountOrMaterialNotExist);
             }
 
             var isAccountMaterialAlreadyExist = await this.accountMaterialRepository.AnyAsync(am =>
-                am.AccountId == accountMaterialChange.AccountId
-                && am.MaterialId == accountMaterialChange.MaterialId);
+                am.AccountId == this.authorizationService.GetAccountId()
+                && am.MaterialId == materialId);
 
             if (isAccountMaterialAlreadyExist)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    this.serviceResultMessages.AccountMaterialExist);
             }
 
             await this.accountMaterialRepository.CreateAsync(new AccountMaterial()
             {
-                AccountId = accountMaterialChange.AccountId,
-                MaterialId = accountMaterialChange.MaterialId
+                AccountId = this.authorizationService.GetAccountId(),
+                MaterialId = materialId
             });
 
             await this.accountMaterialRepository.SaveAsync();
 
-            return this.GetDefaultActionResult(true);*/
+            return ServiceResult.GetDefault(true);
         }
 
         public async Task<IServiceResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange)
@@ -542,25 +547,22 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
         */
-        /*
-        private async Task<bool> ValidateAccountMaterialAsync(ChangeAccountMaterialDTO changeAccountMaterial)
+        
+        private async Task<bool> ValidateAccountMaterialAsync(int materialId)
         {
-            var isMaterialExist = await this.materialService.IsExistAsync(new MaterialDTO()
-            {
-                Id = changeAccountMaterial.MaterialId
-            });
+            var isMaterialExist = await this.materialService.IsExistAsync(materialId);
 
             var isAccountExist = await this.accountRepository.AnyAsync(a =>
-                a.Id == changeAccountMaterial.AccountId);
+                a.Id == this.authorizationService.GetAccountId());
 
-            if (!isMaterialExist.Result || !isAccountExist)
+            if (!isMaterialExist || !isAccountExist)
             {
                 return false;
             }
 
             return true;
         }
-        */
+        
         private async Task<bool> ValidateAccountCourseAsync(ChangeAccountCourseDTO changeAccountCourse)
         {
             var isCourseExist = await this.courseService.IsExistAsync(changeAccountCourse.CourseId);

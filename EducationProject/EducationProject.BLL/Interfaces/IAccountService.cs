@@ -14,7 +14,7 @@ namespace EducationProject.BLL.Interfaces
 
         Task<IServiceResult> ChangeAccountCourseStatusAsync(ChangeAccountCourseDTO accountCourseChange);
 
-        Task<IServiceResult> AddAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
+        Task<IServiceResult> AddAccountMaterialAsync(int materialId);
 
         Task<IServiceResult> RemoveAccountMaterialAsync(ChangeAccountMaterialDTO accountMaterialChange);
 

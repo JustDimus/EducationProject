@@ -83,6 +83,11 @@
                 @Html.DisplayFor(model => model.Quality)
             </dd>
         }
+        <a asp-controller="Account" asp-action="PassMaterial" asp-route-materialId="@Model.Id">
+            <button class="btn btn-info btn-lg" @(Model.IsAccountPassed ? "disabled" : "")>
+                @(Model.IsAccountPassed ? "Пройдено" : "Пройти")
+            </button>
+        </a>
     </dl>
 </div>
 <div>

@@ -204,7 +204,7 @@ namespace MvcInterface.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddToCourse([FromQuery] int courseId)
+        public IActionResult AddToCourse([FromQuery] int courseId)
         {
             return this.RedirectToAction("ShowPage", new { addToCourseId = courseId });
         }
@@ -298,7 +298,8 @@ namespace MvcInterface.Controllers
                         Description = article.Description,
                         PublicationDate = article.PublicationDate,
                         Type = "Article",
-                        Title = article.Title
+                        Title = article.Title,
+                        IsAccountPassed = article.IsAccountPassed
                     };
                 case BookMaterialDTO book:
                     return new EditMaterialViewModel()
@@ -308,7 +309,8 @@ namespace MvcInterface.Controllers
                         Author = book.Author,
                         Type = "Book",
                         Title = book.Title,
-                        Pages = book.Pages
+                        Pages = book.Pages,
+                        IsAccountPassed = book.IsAccountPassed
                     };
                 case VideoMaterialDTO video:
                     return new EditMaterialViewModel()
@@ -319,7 +321,8 @@ namespace MvcInterface.Controllers
                         Title = video.Title,
                         URI = video.URI,
                         Duration = video.Duration,
-                        Quality = video.Quality
+                        Quality = video.Quality,
+                        IsAccountPassed = video.IsAccountPassed
                     };
                 default:
                     return null;

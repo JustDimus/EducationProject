@@ -26,5 +26,7 @@ namespace MvcInterface.Models.Models
         public int Duration { get; set; }
 
         public int Quality { get; set; }
+
+        public bool IsAccountPassed { get; set; }
     }
 }

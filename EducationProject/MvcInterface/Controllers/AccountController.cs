@@ -34,13 +34,37 @@ namespace MvcInterface.Controllers
         [HttpGet]
         public async Task<IActionResult> PassCourse([FromQuery] int courseId)
         {
-            throw new NotImplementedException();
+            var accountCourseDTO = new ChangeAccountCourseDTO()
+            {
+                CourseId = courseId,
+                Status = EducationProject.Core.Models.Enums.ProgressStatus.Passed
+            };
+
+            var serviceResult = await this.accountService.ChangeAccountCourseStatusAsync(accountCourseDTO);
+
+            if (!serviceResult.IsSuccessful)
+            {
+                this.ModelState.AddModelError(
+                    string.Empty,
+                    this.blMessageParser[serviceResult.MessageCode]);
+            }
+
+            return this.RedirectToAction("Show", "Course", new { courseId = courseId });
         }
 
         [HttpGet]
         public async Task<IActionResult> PassMaterial([FromQuery] int materialId)
         {
-            throw new NotImplementedException();
+            var serviceResult = await this.accountService.AddAccountMaterialAsync(materialId);
+
+            if(!serviceResult.IsSuccessful)
+            {
+                this.ModelState.AddModelError(
+                    string.Empty,
+                    this.blMessageParser[serviceResult.MessageCode]);
+            }
+
+            return this.RedirectToAction("Show", "Material", new { materialId = materialId });
         }
 
         [HttpGet]

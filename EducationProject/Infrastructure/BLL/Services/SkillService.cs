@@ -274,14 +274,19 @@ namespace EducationProject.Infrastructure.BLL.Services
                 return this.GetDefaultActionResult(true);
             }
 
-            var skillsToAdd = await this.courseSkillRepository.GetPageAsync(
+            var skillsToAdd = (await this.courseSkillRepository.GetPageAsync(
                 cs => cs.CourseId == changeSkills.CourseId,
                 cs => new { cs.Change, cs.SkillId }, 
                 0,
-                courseSkillsCount);
+                courseSkillsCount)).ToList();
 
-            skillsToAdd.ToList().ForEach(s =>
-                this.AddSkillValueToAccountAsync(s.SkillId, changeSkills.AccountId, s.Change));
+            foreach(var skill in skillsToAdd)
+            {
+                await this.AddSkillValueToAccountAsync(
+                    skill.SkillId,
+                    changeSkills.AccountId,
+                    skill.Change);
+            }
 
             await this.accountSkillRepository.SaveAsync();
 
@@ -308,7 +313,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             };
         }
 
-        private async void AddSkillValueToAccountAsync(int skillId, int accountId, int value)
+        private async Task AddSkillValueToAccountAsync(int skillId, int accountId, int value)
         {
             var isAccountSkillExists = await this.accountSkillRepository
                 .AnyAsync(a => a.AccountId == accountId && a.SkillId == skillId);

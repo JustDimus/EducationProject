@@ -146,7 +146,7 @@
                 }
                 else
                 {
-                    <a asp-action="PassCourse" asp-route-courseId="@Model.Id">
+                    <a asp-action="PassCourse" asp-controller="Account" asp-route-courseId="@Model.Id">
                         <button class="btn btn-lg btn-primary" @(Model.CanBePassed == true ? "" : "disabled")>
                             @(Model.CanBePassed ? "Пройти" : "Невозможно завершить")
                         </button>

@@ -692,10 +692,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             var isCourseExist = await this.courseRepository.AnyAsync(c =>
                 c.Id == courseMaterialChange.CourseId);
 
-            var isMaterialExist = await this.materialService.IsExistAsync(new MaterialDTO()
-            {
-                Id = courseMaterialChange.MaterialId
-            });
+            var isMaterialExist = await this.materialService.IsExistAsync(courseMaterialChange.MaterialId);
 
             if (!isCourseExist || !isMaterialExist)
             {

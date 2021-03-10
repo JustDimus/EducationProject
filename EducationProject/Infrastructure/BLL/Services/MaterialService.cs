@@ -181,12 +181,19 @@ namespace EducationProject.Infrastructure.BLL.Services
         {
             try
             {
+                var result = await this.materialRepository.GetAsync<MaterialDTO>(
+                    m => m.Id == materialId,
+                    this.materialMapping.ConvertExpression);
+
+                result.IsAccountPassed = await this.accountMaterialRepository.AnyAsync(
+                    am => am.AccountId == this.authorizationService.GetAccountId()
+                    && am.MaterialId == materialId);
+                
+
                 return new ServiceResult<MaterialDTO>()
                 {
                     IsSuccessful = true,
-                    Result = await this.materialRepository.GetAsync<MaterialDTO>(
-                    m => m.Id == materialId,
-                    this.materialMapping.ConvertExpression)
+                    Result = result
                 };
             }
             catch(Exception ex)
@@ -241,11 +248,11 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
-        public async Task<bool> IsExistAsync(MaterialDTO material)
+        public async Task<bool> IsExistAsync(int materialId)
         {
             try
             {
-                return await this.materialRepository.AnyAsync(m => m.Id == material.Id);
+                return await this.materialRepository.AnyAsync(m => m.Id == materialId);
             }
             catch(Exception)
             {

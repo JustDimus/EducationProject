@@ -350,7 +350,7 @@ namespace MvcInterface.Controllers
                 PageSize = pageNumber ?? 10
             };
 
-            var coursePageServiceResult = await this.courseService.GetAccountCourses(pageInfo);
+            var coursePageServiceResult = await this.courseService.GetAccountCoursePageAsync(pageInfo);
 
             return this.View(coursePageServiceResult.Result);
         }

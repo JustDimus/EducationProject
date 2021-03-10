@@ -48,6 +48,48 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.serviceResultMessages = serviceResultMessageCollection;
         }
 
+        public async Task<IServiceResult<EntityInfoPageDTO<AccountSkillDTO>>> GetAccountSkillProgressPageAsync(PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.accountSkillRepository.CountAsync(
+                    ac => ac.AccountId == this.authorizationService.GetAccountId());
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var accountCourseResult = new EntityInfoPageDTO<AccountSkillDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                accountCourseResult.CanMoveBack = pageInfo.PageNumber > 0;
+                accountCourseResult.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                accountCourseResult.Entities = (await this.accountSkillRepository.GetPageAsync<AccountSkillDTO>(
+                    ac => ac.AccountId == this.authorizationService.GetAccountId(),
+                    this.skillMapping.AccountSkillConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize)).ToList();
+
+                return new ServiceResult<EntityInfoPageDTO<AccountSkillDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = accountCourseResult
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<AccountSkillDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
         public async Task<IServiceResult<EntityInfoPageDTO<CourseSkillDTO>>> GetCourseSkillPageAsync(int courseId, PageInfoDTO pageInfo)
         {
             try

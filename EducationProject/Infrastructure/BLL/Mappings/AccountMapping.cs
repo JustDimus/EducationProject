@@ -36,5 +36,19 @@ namespace EducationProject.Infrastructure.BLL.Mappings
                 SecondName = externalEntity.SecondName
             };
         }
+
+        public Expression<Func<Account, FullAccountInfoDTO>> FullInfoConvertExpression
+        {
+            get => a => new FullAccountInfoDTO()
+            {
+                Id = a.Id,
+                RegistrationDate = a.RegistrationDate,
+                Email = a.Email,
+                Password = null,
+                SecondName = a.SecondName,
+                FirstName = a.FirstName,
+                PhoneNumber = a.PhoneNumber
+            };
+        }
     }
 }

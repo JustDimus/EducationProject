@@ -134,7 +134,7 @@
 
             <div class="text-center">
                 <img src="https://st2.depositphotos.com/3489481/5208/i/600/depositphotos_52086275-stock-photo-book-of-life.jpg"
-                     width="250" height="250" />
+                     width="250" height="250" class="rounded"/>
             </div>
             <div class="text-center mt-1">
                 @if (Model.CurrentStatus == "None")
@@ -148,7 +148,7 @@
                 {
                     <a asp-action="PassCourse" asp-controller="Account" asp-route-courseId="@Model.Id">
                         <button class="btn btn-lg btn-primary" @(Model.CanBePassed == true ? "" : "disabled")>
-                            @(Model.CanBePassed ? "Пройти" : "Невозможно завершить")
+                            @(Model.CanBePassed ? "Пройти" : Model.CurrentStatus == "Passed" ? "Пройдено" : "Невозможно завершить")
                         </button>
                     </a>
                 }

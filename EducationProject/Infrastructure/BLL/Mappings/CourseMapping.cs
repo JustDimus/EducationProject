@@ -57,5 +57,15 @@ namespace EducationProject.Infrastructure.BLL.Mappings
                 CourseId = cs.CourseId
             };
         }
+
+        public Expression<Func<AccountCourse, AccountCourseDTO>> AccountCourseConvertExpression
+        {
+            get => ac => new AccountCourseDTO()
+            {
+                CourseId = ac.CourseId,
+                Title = ac.Course.Title,
+                Status = ac.Status
+            };
+        }
     }
 }

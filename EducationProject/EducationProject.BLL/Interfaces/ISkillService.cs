@@ -27,5 +27,7 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<EntityInfoPageDTO<CourseSkillDTO>>> GetCourseSkillPageAsync(
             int courseId,
             PageInfoDTO pageInfo);
+
+        Task<IServiceResult<EntityInfoPageDTO<AccountSkillDTO>>> GetAccountSkillProgressPageAsync(PageInfoDTO pageInfo);
     }
 }

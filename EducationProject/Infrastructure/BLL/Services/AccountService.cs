@@ -13,6 +13,7 @@ using EducationProject.Infrastructure.BLL.Mappings;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Security.Claims;
+using EducationProject.Core.Models.Enums;
 
 namespace EducationProject.Infrastructure.BLL.Services
 {
@@ -30,7 +31,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private ICourseService courseService;
 
-        private IMapping<Account, ShortAccountInfoDTO> accountMapping;
+        private AccountMapping accountMapping;
 
         private ServiceResultMessageCollection serviceResultMessages;
 
@@ -69,6 +70,60 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.passwordHasher = passwordHasher;
 
             this.defaultAccountInfoPageSize = 10;
+        }
+
+        public async Task<IServiceResult<FullAccountInfoDTO>> GetAccountFullInfoAsync(
+            PageInfoDTO coursePageInfo, 
+            PageInfoDTO skillPageInfo)
+        {
+            try
+            {
+                var result = await this.accountRepository.GetAsync<FullAccountInfoDTO>(
+                    a => a.Id == this.authorizationService.GetAccountId(),
+                    this.accountMapping.FullInfoConvertExpression);
+
+                result.PassedCoursesCount = await this.accountCourseRepository.CountAsync(
+                    ac => ac.AccountId == this.authorizationService.GetAccountId() 
+                    && ac.Status == CourseStatus.Passed);
+
+                var accountCoursesServiceResult = await this.courseService.GetAccountCourseProgressPageAsync(coursePageInfo);
+
+                if(!accountCoursesServiceResult.IsSuccessful)
+                {
+                    return new ServiceResult<FullAccountInfoDTO>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = accountCoursesServiceResult.MessageCode
+                    };
+                }
+
+                var accountSkillsServiceResult = await this.skillService.GetAccountSkillProgressPageAsync(skillPageInfo);
+
+                if(!accountSkillsServiceResult.IsSuccessful)
+                {
+                    return new ServiceResult<FullAccountInfoDTO>()
+                    {
+                        IsSuccessful = false,
+                        MessageCode = accountSkillsServiceResult.MessageCode
+                    };
+                }
+
+                result.Skills = accountSkillsServiceResult.Result;
+
+                return new ServiceResult<FullAccountInfoDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = result
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<FullAccountInfoDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
         }
 
         public async Task<IServiceResult<int>> TryLogInAsync(LogInDTO logInModel)

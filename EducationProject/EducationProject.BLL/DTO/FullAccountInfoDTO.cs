@@ -8,12 +8,8 @@ namespace EducationProject.BLL.DTO
     {
         public int PassedCoursesCount { get; set; }
 
-        public IEnumerable<AccountCourseDTO> PassedCourses { get; set; }
+        public EntityInfoPageDTO<AccountCourseDTO> Courses { get; set; }
 
-        public int CoursesInProgressCount { get; set; }
-
-        public IEnumerable<AccountCourseDTO> CoursesInProgress { get; set; }
-
-        public IEnumerable<AccountSkillDTO> AccountSkills { get; set; }
+        public EntityInfoPageDTO<AccountSkillDTO> Skills { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EducationProject.BLL.DTO;
+using EducationProject.Core.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,8 +42,10 @@ namespace EducationProject.BLL.Interfaces
 
         Task<IServiceResult<CourseSkillDTO>> GetCourseSkillAsync(int courseId, int skillId);
 
-        Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCourses(PageInfoDTO pageInfo);
+        Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCoursePageAsync(PageInfoDTO pageInfo);
 
         Task<bool> IsExistAsync(int courseId);
+
+        Task<IServiceResult<EntityInfoPageDTO<AccountCourseDTO>>> GetAccountCourseProgressPageAsync(PageInfoDTO pageInfo);
     }
 }

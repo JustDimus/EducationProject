@@ -39,5 +39,17 @@ namespace EducationProject.Infrastructure.BLL.Mappings
                 SkillTitle = cs.Skill.Title
             };
         }
+
+        public Expression<Func<AccountSkill, AccountSkillDTO>> AccountSkillConvertExpression
+        {
+            get => a => new AccountSkillDTO()
+            {
+                SkillId = a.SkillId,
+                CurrentResult = a.CurrentResult % a.Skill.MaxValue,
+                Level = a.CurrentResult / a.Skill.MaxValue,
+                MaxValue = a.Skill.MaxValue,
+                Title = a.Skill.Title
+            };
+        }
     }
 }

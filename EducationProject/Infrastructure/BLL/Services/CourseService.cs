@@ -65,6 +65,48 @@ namespace EducationProject.Infrastructure.BLL.Services
             this.serviceResultMessages = serviceResultMessageCollection;
         }
 
+        public async Task<IServiceResult<EntityInfoPageDTO<AccountCourseDTO>>> GetAccountCourseProgressPageAsync(PageInfoDTO pageInfo)
+        {
+            try
+            {
+                var pageCount = await this.accountCourseRepository.CountAsync(
+                    ac => ac.AccountId == this.authorizationService.GetAccountId());
+
+                if (pageInfo.PageNumber >= pageCount || pageInfo.PageNumber < 0)
+                {
+                    pageInfo.PageNumber = 0;
+                }
+
+                var accountCourseResult = new EntityInfoPageDTO<AccountCourseDTO>()
+                {
+                    CurrentPage = pageInfo.PageNumber
+                };
+
+                accountCourseResult.CanMoveBack = pageInfo.PageNumber > 0;
+                accountCourseResult.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
+
+                accountCourseResult.Entities = (await this.accountCourseRepository.GetPageAsync<AccountCourseDTO>(
+                    ac => ac.AccountId == this.authorizationService.GetAccountId(),
+                    this.courseMapping.AccountCourseConvertExpression,
+                    pageInfo.PageNumber,
+                    pageInfo.PageSize)).ToList();
+
+                return new ServiceResult<EntityInfoPageDTO<AccountCourseDTO>>()
+                {
+                    IsSuccessful = true,
+                    Result = accountCourseResult
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<EntityInfoPageDTO<AccountCourseDTO>>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
         public Task<bool> IsExistAsync(int courseId)
         {
             return this.courseRepository.AnyAsync(c => c.Id == courseId);
@@ -165,8 +207,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
-
-        public Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCourses(PageInfoDTO pageInfo)
+        public Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCoursePageAsync(PageInfoDTO pageInfo)
         {
             return this.GetCoursePageAsync(
                 pageInfo, 

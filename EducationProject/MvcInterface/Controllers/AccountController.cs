@@ -143,7 +143,7 @@ namespace MvcInterface.Controllers
             }
             else
             {
-                return this.RedirectToAction("Index", "Home");
+                return this.RedirectToAction("Show");
             }
         }
 
@@ -237,6 +237,37 @@ namespace MvcInterface.Controllers
             await this.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return this.RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Show(
+            [FromQuery] int? skillPageNumber,
+            [FromQuery] int? skillPageSize,
+            [FromQuery] int? coursePageNumber,
+            [FromQuery] int? coursePageSize)
+        {
+            var coursePageInfo = new PageInfoDTO()
+            {
+                PageNumber = coursePageNumber ?? 0,
+                PageSize = coursePageSize ?? 10
+            };
+
+            var skillPageInfo = new PageInfoDTO()
+            {
+                PageNumber = skillPageNumber ?? 0,
+                PageSize = skillPageSize ?? 10
+            };
+
+            var accountInfoServiceResult = await this.accountService.GetAccountFullInfoAsync(
+                coursePageInfo,
+                skillPageInfo);
+
+            if (!accountInfoServiceResult.IsSuccessful)
+            {
+                return this.RedirectToAction("Index", "Home");
+            }
+
+            return this.View(accountInfoServiceResult.Result);
         }
 
         private async Task AuthenticateAsync(string email, int accountId)

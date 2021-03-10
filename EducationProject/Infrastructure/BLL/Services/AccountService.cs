@@ -28,6 +28,8 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private ISkillService skillService;
 
+        private ICourseService courseService;
+
         private IMapping<Account, ShortAccountInfoDTO> accountMapping;
 
         private ServiceResultMessageCollection serviceResultMessages;
@@ -44,6 +46,7 @@ namespace EducationProject.Infrastructure.BLL.Services
             IRepository<AccountMaterial> accountMaterialsRepository,
             IMaterialService materialService,
             ISkillService skillService,
+            ICourseService courseService,
             AccountMapping accountMapping,
             ServiceResultMessageCollection serviceResultMessageCollection,
             IAuthorizationService authorizationService,
@@ -57,6 +60,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.skillService = skillService;
             this.materialService = materialService;
+            this.courseService = courseService;
 
             this.accountMapping = accountMapping;
 
@@ -307,34 +311,41 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         public async Task<IServiceResult> AddAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
         {
-            throw new NotImplementedException();
-            /*
-            var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
-
-            if (!isAccountAndCourseExist)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isAccountAndCourseExist = await this.ValidateAccountCourseAsync(accountCourseChange);
+
+                if (!isAccountAndCourseExist)
+                {
+                    return ServiceResult.GetDefault(false);
+                }
+
+                var isAccountCourseAlreadyExist = await this.accountCourseRepository.AnyAsync(ac =>
+                    ac.CourseId == accountCourseChange.CourseId
+                    && ac.AccountId == this.authorizationService.GetAccountId());
+
+                if (isAccountCourseAlreadyExist)
+                {
+                    return ServiceResult.GetDefault(false);
+                }
+
+                await this.accountCourseRepository.CreateAsync(new AccountCourse()
+                {
+                    AccountId = this.authorizationService.GetAccountId(),
+                    CourseId = accountCourseChange.CourseId,
+                    Status = CourseStatus.InProgress
+                });
+
+                await this.accountCourseRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            var isAccountCourseAlreadyExist = await this.accountCourseRepository.AnyAsync(ac =>
-                ac.CourseId == accountCourseChange.CourseId
-                && ac.AccountId == accountCourseChange.AccountId);
-
-            if (isAccountCourseAlreadyExist)
+            catch(Exception ex)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    true,
+                    ex.Message);
             }
-
-            await this.accountCourseRepository.CreateAsync(new AccountCourse()
-            {
-                AccountId = accountCourseChange.AccountId,
-                CourseId = accountCourseChange.CourseId,
-                Status = CourseStatus.InProgress
-            });
-
-            await this.accountCourseRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);*/
         }
 
         public async Task<IServiceResult> RemoveAccountCourseAsync(ChangeAccountCourseDTO accountCourseChange)
@@ -549,25 +560,20 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             return true;
         }
-
+        */
         private async Task<bool> ValidateAccountCourseAsync(ChangeAccountCourseDTO changeAccountCourse)
         {
-            var isCourseExist = await this.courseService.IsExistAsync(new ShortCourseInfoDTO()
-            {
-                Id = changeAccountCourse.CourseId
-            });
+            var isCourseExist = await this.courseService.IsExistAsync(changeAccountCourse.CourseId);
 
             var isAccountExist = await this.accountRepository.AnyAsync(a =>
-                a.Id == changeAccountCourse.AccountId);
+                a.Id == this.authorizationService.GetAccountId());
 
-            if (!isCourseExist.Result || !isAccountExist)
+            if (!isCourseExist || !isAccountExist)
             {
                 return false;
             }
 
             return true;
         }
-        */
-
     }
 }

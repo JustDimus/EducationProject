@@ -19,8 +19,6 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private ISkillService skillService;
 
-        private IAccountService accountService;
-
         private IRepository<CourseSkill> courseSkillRepository;
 
         private IRepository<CourseMaterial> courseMaterialRepository;
@@ -39,7 +37,6 @@ namespace EducationProject.Infrastructure.BLL.Services
             IRepository<Course> courseRepository,
             IMaterialService materialService,
             ISkillService skillService,
-            IAccountService accountService,
             IRepository<CourseSkill> courseSkillRepository,
             IRepository<AccountCourse> accountCourseRepository,
             IAuthorizationService authorizationService,
@@ -63,13 +60,16 @@ namespace EducationProject.Infrastructure.BLL.Services
 
             this.courseMaterialRepository = courseMaterialRepository;
 
-            this.accountService = accountService;
-
             this.courseMapping = courseMapping;
 
             this.serviceResultMessages = serviceResultMessageCollection;
         }
-        
+
+        public Task<bool> IsExistAsync(int courseId)
+        {
+            return this.courseRepository.AnyAsync(c => c.Id == courseId);
+        }
+
         public async Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo)
         {
             try
@@ -125,7 +125,8 @@ namespace EducationProject.Infrastructure.BLL.Services
                     Id = c.Id,
                     Description = c.Description,
                     Title = c.Title,
-                    CreatorId = c.CreatorId
+                    CreatorId = c.CreatorId,
+                    IsVisible = c.IsVisible
                 });
 
                 var skillServiceResult = await this.skillService.GetCourseSkillPageAsync(
@@ -150,7 +151,10 @@ namespace EducationProject.Infrastructure.BLL.Services
                     this.authorizationService.GetAccountId(),
                     materialPageInfo);
 
-                result.CanBePublished = materialServiceResult.Result.Entities.Any();
+                if (result.IsVisible == false)
+                {
+                    result.CanBePublished = materialServiceResult.Result.Entities.Any();
+                }
 
                 if (!materialServiceResult.IsSuccessful)
                 {
@@ -195,6 +199,16 @@ namespace EducationProject.Infrastructure.BLL.Services
                     MessageCode = ex.Message
                 };
             }
+        }
+
+        public Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCourses(PageInfoDTO pageInfo)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IServiceResult<CourseSkillDTO>> GetCourseSkillAsync(int courseId, int skillId)
@@ -405,7 +419,7 @@ namespace EducationProject.Infrastructure.BLL.Services
 
                 var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
                     courseMaterialChange.CourseId,
-                    courseMaterialChange.AccountId);
+                    this.authorizationService.GetAccountId());
 
                 if (!isAccountCanChangeCourse)
                 {
@@ -449,13 +463,25 @@ namespace EducationProject.Infrastructure.BLL.Services
             {
                 var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
                     courseMaterialChange.CourseId,
-                   courseMaterialChange.AccountId);
+                    this.authorizationService.GetAccountId());
 
                 if (!isAccountCanChangeCourse)
                 {
                     return ServiceResult.GetDefault(
                         false,
                         this.serviceResultMessages.PermissionDenied);
+                }
+
+                var courseMaterialCount = await this.courseMaterialRepository.CountAsync(
+                    c => c.CourseId == courseMaterialChange.CourseId);
+
+                if (courseMaterialCount == 1)
+                {
+                    var course = await this.courseRepository.GetAsync(c => c.Id == courseMaterialChange.CourseId);
+
+                    course.IsVisible = false;
+
+                    await this.courseRepository.UpdateAsync(course);
                 }
 
                 await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()

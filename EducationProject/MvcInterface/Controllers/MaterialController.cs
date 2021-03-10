@@ -35,17 +35,23 @@ namespace MvcInterface.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create([FromQuery] string materialType = "Article")
+        public IActionResult Create(
+            [FromQuery] int? addToCourseId,
+            [FromQuery] string materialType = "Article")
         {
             this.materialTypes.TryGetValue(materialType, out int typeId);
 
             this.ViewBag.MaterialType = typeId;
 
+            this.ViewBag.addToCourseId = addToCourseId;
+
             return this.View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateMaterialViewModel materialModel)
+        public async Task<IActionResult> Create(
+            [FromQuery] int? addToCourseId,
+            [FromForm] CreateMaterialViewModel materialModel)
         {
             this.materialTypes.TryGetValue(materialModel.Type, out int typeId);
 
@@ -79,6 +85,18 @@ namespace MvcInterface.Controllers
             }
             else
             {
+                if (addToCourseId.HasValue)
+                {
+                    return this.RedirectToAction(
+                        "AddMaterial",
+                        "Course",
+                        new
+                        {
+                            materialId = createMaterialServiceResult.Result,
+                            courseId = addToCourseId.Value
+                        });
+                }
+
                 return this.RedirectToAction("Index", "Home");
             }
         }
@@ -168,8 +186,9 @@ namespace MvcInterface.Controllers
 
         [HttpGet]
         public async Task<IActionResult> ShowPage(
-            int? pageNumber,
-            int? pageSize)
+            [FromQuery] int? pageNumber,
+            [FromQuery] int? pageSize,
+            [FromQuery] int? addToCourseId)
         {
             var pageInfo = new PageInfoDTO()
             {
@@ -179,7 +198,15 @@ namespace MvcInterface.Controllers
 
             var materialPageServiceResult = await this.materialService.GetMaterialPageAsync(pageInfo);
 
+            this.ViewBag.addToCourseId = addToCourseId;
+
             return this.View(materialPageServiceResult.Result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddToCourse([FromQuery] int courseId)
+        {
+            return this.RedirectToAction("ShowPage", new { addToCourseId = courseId });
         }
 
         private MaterialDTO GenerateMaterial(CreateMaterialViewModel materialModel, int typeId)

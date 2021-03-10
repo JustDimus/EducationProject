@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EducationProject.BLL.DTO
 {
-    public class ChangeCourseMaterialDTO : AccountIdBasedDTO
+    public class ChangeCourseMaterialDTO
     {
         public int CourseId { get; set; }
 

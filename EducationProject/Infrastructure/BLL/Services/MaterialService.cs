@@ -74,11 +74,11 @@ namespace EducationProject.Infrastructure.BLL.Services
                 courseMaterialInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
                 courseMaterialInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
 
-                var courseMaterials = await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(
+                var courseMaterials = (await this.courseMaterialRepository.GetPageAsync<CourseMaterialDTO>(
                     cm => cm.CourseId == courseId,
                     this.materialMapping.CourseMaterialDTOExpression,
                     pageInfo.PageNumber,
-                    pageInfo.PageSize);
+                    pageInfo.PageSize)).ToList();
 
                 foreach(var material in courseMaterials)
                 {

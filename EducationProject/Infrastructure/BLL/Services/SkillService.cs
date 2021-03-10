@@ -70,11 +70,11 @@ namespace EducationProject.Infrastructure.BLL.Services
                 skillInfoPage.CanMoveBack = pageInfo.PageNumber > 0;
                 skillInfoPage.CanMoveForward = pageCount > pageInfo.PageNumber + 1;
 
-                skillInfoPage.Entities = await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(
+                skillInfoPage.Entities = (await this.courseSkillRepository.GetPageAsync<CourseSkillDTO>(
                     cs => cs.CourseId == courseId,
                     this.skillMapping.CourseSkillConvertExpression,
                     pageInfo.PageNumber,
-                    pageInfo.PageSize);
+                    pageInfo.PageSize)).ToList();
 
                 return new ServiceResult<EntityInfoPageDTO<CourseSkillDTO>>()
                 {

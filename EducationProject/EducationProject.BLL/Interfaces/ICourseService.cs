@@ -29,8 +29,6 @@ namespace EducationProject.BLL.Interfaces
 
         Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(IEnumerable<ChangeCourseMaterialDTO> courseMaterials);
 
-        Task<IServiceResult<IEnumerable<ShortCourseInfoDTO>>> GetCoursesByCreatorIdAsync(GetCoursesByCreatorDTO courseCreator);
-
         Task<IServiceResult<int>> CreateCourseAsync(ShortCourseInfoDTO course);
 
         Task<IServiceResult> UpdateCourseAsync(ShortCourseInfoDTO course);
@@ -42,5 +40,11 @@ namespace EducationProject.BLL.Interfaces
         Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetCoursePageAsync(PageInfoDTO pageInfo);
 
         Task<IServiceResult<CourseSkillDTO>> GetCourseSkillAsync(int courseId, int skillId);
+
+        Task<IServiceResult<EntityInfoPageDTO<SkillDTO>>> GetSkillPageAsync(PageInfoDTO pageInfo);
+
+        Task<IServiceResult<EntityInfoPageDTO<ShortCourseInfoDTO>>> GetAccountCourses(PageInfoDTO pageInfo);
+
+        Task<bool> IsExistAsync(int courseId);
     }
 }

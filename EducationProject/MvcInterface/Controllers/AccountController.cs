@@ -32,6 +32,31 @@ namespace MvcInterface.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> PassCourse([FromQuery] int courseId)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PassMaterial([FromQuery] int materialId)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddCourse([FromQuery] int courseId)
+        {
+            var accountCourseDTO = new ChangeAccountCourseDTO()
+            {
+                CourseId = courseId
+            };
+
+            var serviceResult = await this.accountService.AddAccountCourseAsync(accountCourseDTO);
+
+            return this.RedirectToAction("Show", "Course", new { courseId = courseId });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit()
         {
             var accountInfo = await this.accountService.GetAccountInfoAsync();

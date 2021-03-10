@@ -5,17 +5,20 @@
 }
 
 <h1>Создать новый материал</h1>
-<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Article">
+<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Article"
+   asp-route-addToCourseId="@ViewBag.addToCourseId">
     Статья
 </a>
-<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Book">
+<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Book"
+   asp-route-addToCourseId="@ViewBag.addToCourseId">
     Книга
 </a>
-<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Video">
+<a class="btn btn-primary btn-sm active" asp-action="Create" asp-route-materialType="Video"
+   asp-route-addToCourseId="@ViewBag.addToCourseId">
     Видео
 </a>
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<form asp-action="Create">
+<form asp-action="Create" asp-route-addToCourseId="@ViewBag.addToCourseId">
     @switch ((int)ViewBag.MaterialType)
     {
         case 0:

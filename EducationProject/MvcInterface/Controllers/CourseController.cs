@@ -28,6 +28,20 @@ namespace MvcInterface.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Publish([FromQuery] int courseId)
+        {
+            var courseVisibility = new CourseVisibilityDTO()
+            {
+                CourseId = courseId,
+                Visibility = true
+            };
+
+            await this.courseService.ChangeCourseVisibilityAsync(courseVisibility);
+
+            return this.RedirectToAction("Show", new { courseId = courseId });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> ChangeSkill(
             [FromQuery] int courseId,
             [FromQuery] int skillId)
@@ -143,6 +157,38 @@ namespace MvcInterface.Controllers
             {
                 return this.RedirectToAction("Show", new { courseId = addSkillModel.CourseId });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddMaterial(
+            [FromQuery] int courseId,
+            [FromQuery] int materialId)
+        {
+            var courseMaterialChangeDTO = new ChangeCourseMaterialDTO()
+            {
+                CourseId = courseId,
+                MaterialId = materialId
+            };
+
+            await this.courseService.AddCourseMaterialAsync(courseMaterialChangeDTO);
+
+            return this.RedirectToAction("Show", new { courseId = courseId });
+        }
+
+        [HttpGet] 
+        public async Task<IActionResult> RemoveMaterial(
+            [FromQuery] int courseId,
+            [FromQuery] int materialId)
+        {
+            var courseMaterialDTO = new ChangeCourseMaterialDTO()
+            {
+                CourseId = courseId,
+                MaterialId = materialId
+            };
+
+            await this.courseService.RemoveCourseMaterialAsync(courseMaterialDTO);
+
+            return this.RedirectToAction("Show", new { courseId = courseId });
         }
 
         [HttpGet]

@@ -64,7 +64,7 @@
                 </thead>
                 @foreach (var material in Model.Materials.Entities)
                 {
-                    <tr @(material.IsAccountPassed ? "class=\"table-success\"" : "")>
+                    <tr @(material.IsAccountPassed ? "class=bg-success" : "")>
                         <td>
                             @material.MaterialId
                         </td>
@@ -125,6 +125,13 @@
             </nav>
         </div>
         <div class="col-4">
+            @if (!Model.IsVisible)
+            {
+                <div class="text-center">
+                    Не опубликован
+                </div>
+            }
+
             <div class="text-center">
                 <img src="https://st2.depositphotos.com/3489481/5208/i/600/depositphotos_52086275-stock-photo-book-of-life.jpg"
                      width="250" height="250" />
@@ -141,7 +148,7 @@
                 {
                     <a asp-action="PassCourse" asp-route-courseId="@Model.Id">
                         <button class="btn btn-lg btn-primary" @(Model.CanBePassed == true ? "" : "disabled")>
-                            @(Model.CanBePassed ? "Пройти" : "Невозможно")
+                            @(Model.CanBePassed ? "Пройти" : "Невозможно завершить")
                         </button>
                     </a>
                 }
@@ -217,7 +224,7 @@
                     <li class="page-item @(Model.Skills.CanMoveBack ? "" : "disabled")">
                         <a asp-action="Show"
                            asp-route-courseId="@Model.Id"
-                           asp-route-skillPageNumber="@Model.Skills.CurrentPage-1"
+                           asp-route-skillPageNumber="@(Model.Skills.CurrentPage-1)"
                            asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
                            asp-route-materialPageNumber="@(Model.Materials.CurrentPage)"
                            asp-route-materialPageSize="@Model.Materials.CurrentPageSize"
@@ -238,7 +245,7 @@
                     <li class="page-item @(Model.Skills.CanMoveForward ? "" : "disabled")">
                         <a asp-action="Show"
                            asp-route-courseId="@Model.Id"
-                           asp-route-skillPageNumber="@Model.Skills.CurrentPage+1"
+                           asp-route-skillPageNumber="@(Model.Skills.CurrentPage+1)"
                            asp-route-skillPageSize="@Model.Skills.CurrentPageSize"
                            asp-route-materialPageNumber="@(Model.Materials.CurrentPage)"
                            asp-route-materialPageSize="@Model.Materials.CurrentPageSize" class="page-link">

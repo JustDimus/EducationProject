@@ -7,10 +7,22 @@
 <div class="text-center">
     <h1 class="display-4">Материалы</h1>
     <div class="row text-left mb-3">
-        <h3>Создать новый:</h3>
-        <a class="btn btn-primary btn-lg ml-3" asp-action="Create">
-            Создать
-        </a>
+        @if (!((int?)ViewBag.addToCourseId).HasValue)
+        {
+            <h3>Создать новый:</h3>
+            <a class="btn btn-primary btn-lg ml-3" asp-action="Create">
+                Создать
+            </a>
+        }
+        else
+        {
+            <h3>Создать новый и добавить в курс: </h3>
+            <a class="btn btn-primary btn-lg ml-3"
+               asp-action="Create"
+               asp-route-addToCourseId="@ViewBag.addToCourseId">
+                Создать и добавить в курс
+            </a>
+        }
     </div>
     <table class="table table-dark">
         <tr>
@@ -19,6 +31,10 @@
             <th>Описание</th>
             <th>Тип</th>
             <th></th>
+            @if (((int?)ViewBag.addToCourseId).HasValue)
+            {
+                <th></th>
+            }
         </tr>
         @foreach (var material in Model.Entities)
         {
@@ -44,6 +60,17 @@
                         Посмотреть
                     </a>
                 </td>
+                @if (((int?)ViewBag.addToCourseId).HasValue)
+                {
+                    <td>
+                        <a class="btn btn-dark" asp-controller="Course"
+                           asp-action="AddMaterial"
+                           asp-route-courseId="@ViewBag.addToCourseId"
+                           asp-route-materialId="@material.Id">
+                            Добавить
+                        </a>
+                    </td>
+                }
             </tr>
         }
     </table>
@@ -51,19 +78,25 @@
         <ul class="pagination justify-content-center">
             <li class="page-item @(Model.CanMoveBack ? "" : "disabled")">
                 <a asp-action="ShowPage" asp-route-pageNumber="@(Model.CurrentPage-1)"
-                   asp-route-pageSize="10" class="page-link">
+                   asp-route-pageSize="@Model.CurrentPageSize"
+                   asp-route-addToCourseId="@ViewBag.addToCourseId"
+                   class="page-link">
                     Предыдущая
                 </a>
             </li>
             <li class="page-item">
                 <a asp-action="ShowPhoneInfo" asp-route-pageNumber="@(Model.CurrentPage)"
-                   asp-route-pageSize="10" class="page-link">
+                   asp-route-pageSize="@Model.CurrentPageSize"
+                   asp-route-addToCourseId="@ViewBag.addToCourseId"
+                   class="page-link">
                     @(Model.CurrentPage+1)
                 </a>
             </li>
             <li class="page-item @(Model.CanMoveForward ? "" : "disabled")">
                 <a asp-action="ShowPhoneInfo" asp-route-pageNumber="@(Model.CurrentPage+1)"
-                   asp-route-pageSize="10" class="page-link">
+                   asp-route-pageSize="@Model.CurrentPageSize"
+                   asp-route-addToCourseId="@ViewBag.addToCourseId"
+                   class="page-link">
                     Следующая
                 </a>
             </li>

@@ -5,9 +5,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>AddSkill</h1>
+<h1>Добавление скилла в курс</h1>
 
-<h4>AddSkillToCourseViewModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -32,6 +31,6 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Show" asp-controller="Course" asp-route-courseId="@Model.CourseId">Назад</a>
 </div>
 

@@ -5,32 +5,31 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Show</h1>
+<h1>Материал</h1>
 
 <div>
-    <h4>EditMaterialViewModel</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
+            Номер
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Id)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
+            Название
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            Описание
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
+            Тип
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Type)
@@ -38,7 +37,7 @@
         @if (Model.Type != "Book")
         {
             <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.URI)
+                URI
             </dt>
             <dd class = "col-sm-10">
                 @Html.DisplayFor(model => model.URI)
@@ -47,7 +46,7 @@
         @if (Model.Type == "Article")
         {
             <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.PublicationDate)
+                Дата публикации
             </dt>
             <dd class = "col-sm-10">
                 @Html.DisplayFor(model => model.PublicationDate)
@@ -56,13 +55,13 @@
         @if (Model.Type == "Book")
         {
             <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.Author)
+                Автор
             </dt>
             <dd class = "col-sm-10">
                 @Html.DisplayFor(model => model.Author)
             </dd>
             <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.Pages)
+                Кол-во страниц
             </dt>
             <dd class = "col-sm-10">
                 @Html.DisplayFor(model => model.Pages)
@@ -71,13 +70,13 @@
         @if (Model.Type == "Video")
         {
             <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.Duration)
+                Продолжительность (с)
             </dt>
             <dd class = "col-sm-10">
                 @Html.DisplayFor(model => model.Duration)
             </dd>
             <dt class = "col-sm-2">
-                @Html.DisplayNameFor(model => model.Quality)
+                Качество
             </dt>
             <dd class = "col-sm-10">
                 @Html.DisplayFor(model => model.Quality)

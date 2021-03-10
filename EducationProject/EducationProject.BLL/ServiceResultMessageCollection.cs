@@ -25,5 +25,19 @@ namespace EducationProject.BLL
         public string CourseNotExist => "CourseNotExist";
 
         public string MaterialNotExist => "MaterialNotExist";
+
+        public string CourseOrSkillNotExist => "CourseOrSkillNotExist";
+
+        public string CourseOrMaterialNotExist => "CourseOrMaterialNotExist";
+
+        public string CourseSkillExist => "CourseSkillExist";
+
+        public string CourseMaterialExist => "CourseMaterialExist";
+
+        public string CourseSkillNotExist => "CourseSkillNotExist";
+
+        public string CourseMaterialNotExist => "CourseMaterialNotExist";
+
+        public string ZeroCourseMaterials => "ZeroCourseMaterials";
     }
 }

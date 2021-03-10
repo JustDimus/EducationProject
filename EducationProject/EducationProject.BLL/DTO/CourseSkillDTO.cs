@@ -11,5 +11,7 @@ namespace EducationProject.BLL.DTO
         public string SkillTitle { get; set; }
 
         public int SkillChange { get; set; }
+
+        public int CourseId { get; set; }
     }
 }

@@ -19,6 +19,12 @@
                         <a class="btn btn-danger" asp-controller="Course" asp-action="Edit" asp-route-courseId="@Model.Id">
                             Изменить
                         </a>
+                        @if (Model.CanBePublished)
+                        {
+                            <a class="btn btn-dark" asp-action="Publish" asp-route-courseId="@Model.Id">
+                                Опубликовать
+                            </a>
+                        }
                     }
                 </div>
             </div>
@@ -35,7 +41,7 @@
             @if (Model.CanBeChanged)
             {
                 <div class="text-center my-1">
-                    <a class="btn btn-light" asp-controller="Material" asp-action="AddMaterial" asp-route-courseId="@Model.Id">
+                    <a class="btn btn-light" asp-controller="Material" asp-action="AddToCourse" asp-route-courseId="@Model.Id">
                         Добавить новый материал
                     </a>
                 </div>
@@ -143,7 +149,7 @@
             @if (Model.CanBeChanged)
             {
                 <div class="text-center my-1">
-                    <a class="btn btn-light" asp-controller="Skill" asp-action="AddSkill" asp-route-courseId="@Model.Id">
+                    <a class="btn btn-light" asp-controller="Skill" asp-action="AddToCourse" asp-route-courseId="@Model.Id">
                         Добавить новый скилл
                     </a>
                 </div>
@@ -183,7 +189,7 @@
                         </td>
                         <td>
                             <a class="btn btn-info" asp-controller="Skill" asp-action="Show" asp-route-skillId="@skill.SkillId">
-                                Посмотреть
+                                П
                             </a>
                         </td>
                         @if (Model.CanBeChanged)
@@ -192,14 +198,14 @@
                                 <a class="btn btn-success" asp-controller="Course"
                                    asp-action="ChangeSkill" asp-route-courseId="@Model.Id"
                                    asp-route-skillId="@skill.SkillId">
-                                    Изменить
+                                    И
                                 </a>
                             </td>
                             <td>
                                 <a class="btn btn-danger" asp-controller="Course"
                                    asp-action="RemoveSkill" asp-route-courseId="@Model.Id"
                                    asp-route-skillId="@skill.SkillId">
-                                    Удалить
+                                    У
                                 </a>
                             </td>
                         }

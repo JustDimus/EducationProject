@@ -47,5 +47,15 @@ namespace EducationProject.Infrastructure.BLL.Mappings
                     return "Error";
             }
         }
+
+        public Expression<Func<CourseSkill, CourseSkillDTO>> CourseSkillConvertExpression
+        {
+            get => cs => new CourseSkillDTO()
+            {
+                SkillChange = cs.Change,
+                SkillId = cs.SkillId,
+                CourseId = cs.CourseId
+            };
+        }
     }
 }

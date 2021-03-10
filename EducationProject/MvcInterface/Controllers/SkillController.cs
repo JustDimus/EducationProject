@@ -28,13 +28,16 @@ namespace MvcInterface.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create([FromQuery] int? addToCourseId)
         {
+            this.ViewBag.addToCourseId = addToCourseId;
+
             return this.View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateSkillViewModel skillModel)
+        public async Task<IActionResult> Create([FromQuery] int? addToCourseId,
+            [FromForm] CreateSkillViewModel skillModel)
         {
             if(!this.ModelState.IsValid)
             {
@@ -60,7 +63,18 @@ namespace MvcInterface.Controllers
             }
             else
             {
-                return RedirectToAction("Index", "Home");
+                if (addToCourseId.HasValue)
+                {
+                    return RedirectToAction(
+                        "AddSkill", 
+                        "Course", 
+                        new { courseId = addToCourseId.Value, 
+                            skillId = serviceResult.Result });
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
         }
 
@@ -141,17 +155,26 @@ namespace MvcInterface.Controllers
         [HttpGet]
         public async Task<IActionResult> ShowPage(
             [FromQuery] int? pageNumber,
-            [FromQuery] int? pageSize)
+            [FromQuery] int? pageSize,
+            [FromQuery] int? addToCourseId)
         {
             var pageInfo = new PageInfoDTO()
             {
                 PageNumber = pageNumber ?? 0,
-                PageSize = pageNumber ?? 10
+                PageSize = pageSize ?? 10
             };
 
             var skillPageServiceResult = await this.skillService.GetSkillPageAsync(pageInfo);
 
+            this.ViewBag.addToCourseId = addToCourseId;
+
             return this.View(skillPageServiceResult.Result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddToCourse([FromQuery] int courseId)
+        {
+            return this.RedirectToAction("showPage", new { addToCourseId = courseId});
         }
     }
 }

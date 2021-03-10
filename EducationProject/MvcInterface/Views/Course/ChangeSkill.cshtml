@@ -1,0 +1,36 @@
+﻿@model MvcInterface.Models.Models.EditCourseSkillViewModel
+
+@{
+    ViewData["Title"] = "ChangeSkill";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>ChangeSkill</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ChangeSkill">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input type="hidden" asp-for="CourseId" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" asp-for="SkillId" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="ChangeValue" class="control-label"></label>
+                <input asp-for="ChangeValue" class="form-control" />
+                <span asp-validation-for="ChangeValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Show" asp-route-courseId="@Model.CourseId">Назад</a>
+</div>
+

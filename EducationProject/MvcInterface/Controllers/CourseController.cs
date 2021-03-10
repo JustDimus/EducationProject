@@ -28,6 +28,124 @@ namespace MvcInterface.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ChangeSkill(
+            [FromQuery] int courseId,
+            [FromQuery] int skillId)
+        {
+            var skillServiceResult = await this.courseService.GetCourseSkillAsync(courseId, skillId);
+
+            if(!skillServiceResult.IsSuccessful)
+            {
+                this.ModelState.AddModelError(
+                    string.Empty,
+                    this.blMessageParser[skillServiceResult.MessageCode]);
+
+                return View();
+            }
+
+            var addSkillToCourseVM = new EditCourseSkillViewModel()
+            {
+                CourseId = courseId,
+                SkillId = skillId,
+                ChangeValue = skillServiceResult.Result.SkillChange
+            };
+
+            return this.View(addSkillToCourseVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeSkill([FromForm] EditCourseSkillViewModel courseSkillModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(courseSkillModel);
+            }
+
+            var addSkillToCourseDTO = new ChangeCourseSkillDTO()
+            {
+                CourseId = courseSkillModel.CourseId,
+                SkillId = courseSkillModel.SkillId,
+                Change = courseSkillModel.ChangeValue
+            };
+
+            var serviceResult = await this.courseService.ChangeCourseSkillAsync(addSkillToCourseDTO);
+
+            if (!serviceResult.IsSuccessful)
+            {
+                this.ModelState.AddModelError(
+                    string.Empty,
+                    this.blMessageParser[serviceResult.MessageCode]);
+
+                return this.View(courseSkillModel);
+            }
+            else
+            {
+                return this.RedirectToAction("Show", new { courseId = courseSkillModel.CourseId });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RemoveSkill(
+            [FromQuery] int courseId,
+            [FromQuery] int skillId)
+        {
+            var courseSkillDTO = new ChangeCourseSkillDTO()
+            {
+                CourseId = courseId,
+                SkillId = skillId
+            };
+
+            await this.courseService.RemoveCourseSkillAsync(courseSkillDTO);
+
+            return RedirectToAction("Show", new { courseId = courseId });
+        }
+
+        [HttpGet]
+        public IActionResult AddSkill(
+            [FromQuery] int courseId, 
+            [FromQuery] int skillId)
+        {
+            var addSkillToCourseVM = new AddSkillToCourseViewModel()
+            {
+                CourseId = courseId,
+                SkillId = skillId
+            };
+
+            return this.View(addSkillToCourseVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddSkill([FromForm] AddSkillToCourseViewModel addSkillModel)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(addSkillModel);
+            }
+
+            var addSkillToCourseDTO = new ChangeCourseSkillDTO()
+            {
+                CourseId = addSkillModel.CourseId,
+                SkillId = addSkillModel.SkillId,
+                Change = addSkillModel.ChangeValue
+            };
+
+            var serviceResult = await this.courseService.AddCourseSkillAsync(addSkillToCourseDTO);
+            
+            if(!serviceResult.IsSuccessful)
+            {
+                this.ModelState.AddModelError(
+                    string.Empty,
+                    this.blMessageParser[serviceResult.MessageCode]);
+
+                return this.View(addSkillModel);
+            }
+            else
+            {
+                return this.RedirectToAction("Show", new { courseId = addSkillModel.CourseId });
+            }
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             return this.View();

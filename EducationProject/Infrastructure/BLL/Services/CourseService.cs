@@ -197,6 +197,29 @@ namespace EducationProject.Infrastructure.BLL.Services
             }
         }
 
+        public async Task<IServiceResult<CourseSkillDTO>> GetCourseSkillAsync(int courseId, int skillId)
+        {
+            try
+            {
+                return new ServiceResult<CourseSkillDTO>()
+                {
+                    IsSuccessful = true,
+                    Result = await this.courseSkillRepository.GetAsync<CourseSkillDTO>(
+                        cs => cs.CourseId == courseId
+                        && cs.SkillId == skillId,
+                        this.courseMapping.CourseSkillConvertExpression)
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<CourseSkillDTO>()
+                {
+                    IsSuccessful = false,
+                    MessageCode = ex.Message
+                };
+            }
+        }
+
         public async Task<IServiceResult<int>> CreateCourseAsync(ShortCourseInfoDTO course)
         {
             try
@@ -369,191 +392,261 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         public async Task<IServiceResult> AddCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
-            var isCourseAndMaterialExist = await this.CheckCourseMaterialsAsync(courseMaterialChange);
-
-            if (!isCourseAndMaterialExist)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isCourseAndMaterialExist = await this.CheckCourseMaterialsAsync(courseMaterialChange);
+
+                if (!isCourseAndMaterialExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseOrMaterialNotExist);
+                }
+
+                var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                    courseMaterialChange.CourseId,
+                    courseMaterialChange.AccountId);
+
+                if (!isAccountCanChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                var isCourseMaterialAlreadyExist = await this.courseMaterialRepository.AnyAsync(c =>
+                    c.MaterialId == courseMaterialChange.MaterialId
+                    && c.CourseId == courseMaterialChange.CourseId);
+
+                if (isCourseMaterialAlreadyExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseMaterialExist);
+                }
+
+                await this.courseMaterialRepository.CreateAsync(new CourseMaterial()
+                {
+                    CourseId = courseMaterialChange.CourseId,
+                    MaterialId = courseMaterialChange.MaterialId
+                });
+
+                await this.courseMaterialRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
-                courseMaterialChange.CourseId,
-                courseMaterialChange.AccountId);
-
-            if (!isAccountCanChangeCourse)
+            catch (Exception ex)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
             }
-
-            var isCourseMaterialAlreadyExist = await this.courseMaterialRepository.AnyAsync(c =>
-                c.MaterialId == courseMaterialChange.MaterialId
-                && c.CourseId == courseMaterialChange.CourseId);
-
-            if (isCourseMaterialAlreadyExist)
-            {
-                return this.GetDefaultActionResult(false);
-            }
-
-            await this.courseMaterialRepository.CreateAsync(new CourseMaterial()
-            {
-                CourseId = courseMaterialChange.CourseId,
-                MaterialId = courseMaterialChange.MaterialId
-            });
-
-            await this.courseMaterialRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);
         }
         
         public async Task<IServiceResult> RemoveCourseMaterialAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
-                courseMaterialChange.CourseId,
-               courseMaterialChange.AccountId);
-
-            if (!isAccountCanChangeCourse)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                    courseMaterialChange.CourseId,
+                   courseMaterialChange.AccountId);
+
+                if (!isAccountCanChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()
+                {
+                    CourseId = courseMaterialChange.CourseId,
+                    MaterialId = courseMaterialChange.MaterialId
+                });
+
+                await this.courseSkillRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            await this.courseMaterialRepository.DeleteAsync(new CourseMaterial()
+            catch (Exception ex)
             {
-                CourseId = courseMaterialChange.CourseId,
-                MaterialId = courseMaterialChange.MaterialId
-            });
-
-            await this.courseSkillRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
+            }
         }
 
         public async Task<IServiceResult> AddCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
-
-            if (!isCourseAndSkillExist)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
+
+                if (!isCourseAndSkillExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseOrMaterialNotExist);
+                }
+
+                var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                    courseSkillChange.CourseId,
+                    this.authorizationService.GetAccountId());
+
+                if (!isAccountCanChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(c =>
+                    c.SkillId == courseSkillChange.SkillId
+                    && c.CourseId == courseSkillChange.CourseId);
+
+                if (isCourseSkillAlreadyExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseSkillExist);
+                }
+
+                await this.courseSkillRepository.CreateAsync(new CourseSkill()
+                {
+                    CourseId = courseSkillChange.CourseId,
+                    SkillId = courseSkillChange.SkillId,
+                    Change = courseSkillChange.Change
+                });
+
+                await this.courseSkillRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
-                courseSkillChange.CourseId,
-                courseSkillChange.AccountId);
-
-            if (!isAccountCanChangeCourse)
+            catch(Exception ex)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
             }
-
-            var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(c =>
-                c.SkillId == courseSkillChange.SkillId 
-                && c.CourseId == courseSkillChange.CourseId);
-
-            if (isCourseSkillAlreadyExist)
-            {
-                return this.GetDefaultActionResult(false);
-            }
-
-            await this.courseSkillRepository.CreateAsync(new CourseSkill()
-            {
-                CourseId = courseSkillChange.CourseId,
-                SkillId = courseSkillChange.SkillId,
-                Change = courseSkillChange.Change
-            });
-
-            await this.courseSkillRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IServiceResult> RemoveCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
-                courseSkillChange.CourseId,
-                courseSkillChange.AccountId);
-
-            if (!isAccountCanChangeCourse)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                    courseSkillChange.CourseId,
+                    this.authorizationService.GetAccountId());
+
+                if (!isAccountCanChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                await this.courseSkillRepository.DeleteAsync(new CourseSkill()
+                {
+                    CourseId = courseSkillChange.CourseId,
+                    SkillId = courseSkillChange.SkillId
+                });
+
+                await this.courseSkillRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            await this.courseSkillRepository.DeleteAsync(new CourseSkill()
+            catch (Exception ex)
             {
-                CourseId = courseSkillChange.CourseId,
-                SkillId = courseSkillChange.SkillId
-            });
-
-            await this.courseSkillRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
+            }
         }
 
         public async Task<IServiceResult> ChangeCourseSkillAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
-
-            if (!isCourseAndSkillExist)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isCourseAndSkillExist = await this.CheckCourseSkillsAsync(courseSkillChange);
+
+                if (!isCourseAndSkillExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseOrSkillNotExist);
+                }
+
+                var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
+                    courseSkillChange.CourseId,
+                    this.authorizationService.GetAccountId());
+
+                if (!isAccountCanChangeCourse)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.PermissionDenied);
+                }
+
+                await this.courseSkillRepository.UpdateAsync(new CourseSkill()
+                {
+                    CourseId = courseSkillChange.CourseId,
+                    SkillId = courseSkillChange.SkillId,
+                    Change = courseSkillChange.Change
+                });
+
+                await this.courseSkillRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            var isAccountCanChangeCourse = await this.CheckCourseCreatorAsync(
-                courseSkillChange.CourseId,
-                courseSkillChange.AccountId);
-            
-            if (!isAccountCanChangeCourse)
+            catch (Exception ex)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
             }
-
-            var isCourseSkillAlreadyExist = await this.courseSkillRepository.AnyAsync(cs =>
-                cs.CourseId == courseSkillChange.CourseId && cs.SkillId == courseSkillChange.SkillId);
-
-            if (!isCourseSkillAlreadyExist)
-            {
-                return this.GetDefaultActionResult(false);
-            }
-
-            await this.courseSkillRepository.UpdateAsync(new CourseSkill()
-            {
-                CourseId = courseSkillChange.CourseId,
-                SkillId = courseSkillChange.SkillId,
-                Change = courseSkillChange.Change
-            });
-
-            await this.courseSkillRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IServiceResult> ChangeCourseVisibilityAsync(CourseVisibilityDTO visibilityParams)
         {
-            var isCourseExist = await this.CheckCourseCreatorAsync(
-                visibilityParams.CourseId, 
-                visibilityParams.AccountId);
-
-            if (!isCourseExist)
+            try
             {
-                return this.GetDefaultActionResult(false);
+                var isCourseExist = await this.CheckCourseCreatorAsync(
+                    visibilityParams.CourseId,
+                    this.authorizationService.GetAccountId());
+
+                if (!isCourseExist)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.CourseNotExist);
+                }
+
+                var courseMaterialsCount = await this.courseMaterialRepository.CountAsync(cm =>
+                    cm.CourseId == visibilityParams.CourseId);
+
+                if (courseMaterialsCount == 0)
+                {
+                    return ServiceResult.GetDefault(
+                        false,
+                        this.serviceResultMessages.ZeroCourseMaterials);
+                }
+
+                var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == visibilityParams.CourseId);
+
+                courseToUpdate.IsVisible = visibilityParams.Visibility;
+
+                await this.courseRepository.UpdateAsync(courseToUpdate);
+
+                await this.courseRepository.SaveAsync();
+
+                return ServiceResult.GetDefault(true);
             }
-
-            var courseMaterialsCount = await this.courseMaterialRepository.CountAsync(cm =>
-                cm.CourseId == visibilityParams.CourseId);
-
-            if (courseMaterialsCount == 0)
+            catch (Exception ex)
             {
-                return this.GetDefaultActionResult(false);
+                return ServiceResult.GetDefault(
+                    false,
+                    ex.Message);
             }
-
-            var courseToUpdate = await this.courseRepository.GetAsync(c => c.Id == visibilityParams.CourseId);
-
-            courseToUpdate.IsVisible = visibilityParams.Visibility;
-
-            await this.courseRepository.UpdateAsync(courseToUpdate);
-
-            await this.courseRepository.SaveAsync();
-
-            return this.GetDefaultActionResult(true);
         }
 
         public async Task<IServiceResult<bool>> IsCourseContainsMaterialAsync(ChangeCourseMaterialDTO courseMaterial)
@@ -600,6 +693,7 @@ namespace EducationProject.Infrastructure.BLL.Services
                 Result = await this.courseRepository.AnyAsync(c => c.Id == checkEntity.Id)
             };
         }
+
         private async Task<bool> CheckCourseCreatorAsync(int courseId, int accountId)
         {
             return await this.courseRepository.AnyAsync(c => c.Id == courseId && c.CreatorId == accountId);
@@ -607,8 +701,6 @@ namespace EducationProject.Infrastructure.BLL.Services
 
         private async Task<bool> CheckCourseMaterialsAsync(ChangeCourseMaterialDTO courseMaterialChange)
         {
-            throw new NotImplementedException();
-            /*
             var isCourseExist = await this.courseRepository.AnyAsync(c =>
                 c.Id == courseMaterialChange.CourseId);
 
@@ -617,18 +709,16 @@ namespace EducationProject.Infrastructure.BLL.Services
                 Id = courseMaterialChange.MaterialId
             });
 
-            if (!isCourseExist || !isMaterialExist.Result)
+            if (!isCourseExist || !isMaterialExist)
             {
                 return false;
             }
 
-            return true;*/
+            return true;
         }
 
         private async Task<bool> CheckCourseSkillsAsync(ChangeCourseSkillDTO courseSkillChange)
         {
-            throw new NotImplementedException();
-            /*
             var isCourseExist = await this.courseRepository.AnyAsync(c =>
                 c.Id == courseSkillChange.CourseId);
 
@@ -637,12 +727,12 @@ namespace EducationProject.Infrastructure.BLL.Services
                 Id = courseSkillChange.SkillId
             });
 
-            if (!isCourseExist || !isSkillExist.Result)
+            if (!isCourseExist || !isSkillExist)
             {
                 return false;
             }
 
-            return true;*/
+            return true;
         }
 
         private async Task<int> GetPagesCountAsync(int pageSize, Expression<Func<Course, bool>> courseCondition)
